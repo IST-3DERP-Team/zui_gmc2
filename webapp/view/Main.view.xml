@@ -1,0 +1,421 @@
+<mvc:View controllerName="zuigmc2.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc" 
+    displayBlock="true"
+    xmlns="sap.m"
+    height="100%"
+    xmlns:uiL="sap.ui.layout"
+    xmlns:uiT="sap.ui.table"> 
+    <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
+        <content>
+            <uiL:FixFlex id="fixFlexGMC" class="fixFlexFixedSize sidePadding" fixContentSize="50%">
+                <uiL:fixContent>
+                        <uiT:Table id="gmcTab"
+                            rows="{gmc>/results}"
+                            visibleRowCountMode="Auto"
+                            showColumnVisibilityMenu="true"
+                            enableColumnFreeze="true"
+                            enableCellFilter="true"
+                            selectionMode="MultiToggle"
+                            cellClick="onCellClickGMC"
+                            sort="onSorted">
+                            <uiT:rowSettingsTemplate>
+                                <uiT:RowSettings highlight="{= ${gmc>Edited} === true ? 'Warning' : null}" />
+                            </uiT:rowSettingsTemplate>
+                            <uiT:extension>
+                                <Toolbar>
+                                    <ToolbarSpacer/>
+                                    <SearchField
+                                        id="searchFieldGMC"
+                                        placeholder="Filter"
+                                        value=""
+                                        search="filterGlobally"
+                                        width="15rem"/>
+                                    <ToolbarSeparator/>
+                                    <Button id="btnAddGMC" 
+                                        icon="sap-icon://add"
+                                        press="onCreateGMC"
+                                        visible="true"/>
+                                    <Button id="btnEditGMC" 
+                                        icon="sap-icon://edit"
+                                        press="onEditGMC"
+                                        tooltip="Edit"
+                                        visible="true"/>
+                                    <Button id="btnSaveGMC" 
+                                        icon="sap-icon://save"
+                                        press=".onSave('gmc')" 
+                                        visible="false" />
+                                    <Button id="btnCancelGMC" 
+                                        icon="sap-icon://sys-cancel"
+                                        press="onCancelGMC" 
+                                        visible="false" />                                        
+                                    <Button id="btnDeleteGMC" 
+                                        icon="sap-icon://delete"
+                                        press="onDeleteGMC"
+                                        visible="true"/>
+                                    <Button id="btnRefreshGMC" 
+                                        icon="sap-icon://refresh"
+                                        press="onRefreshGMC"
+                                        visible="true"/> 
+                                    <Button id="btnSortGMC" 
+                                        icon="sap-icon://sort"
+                                        press="onColSort"
+                                        visible="true" />
+                                    <Button id="btnFilterGMC" 
+                                        icon="sap-icon://filter"
+                                        press="onColFilter"
+                                        visible="true" />
+                                    <Button id="btnFullScreenHdr" 
+                                        icon="sap-icon://full-screen"
+                                        press="onTableResize('Hdr','Max')"
+                                        visible="true" />
+                                    <Button id="btnExitFullScreenHdr" 
+                                        icon="sap-icon://exit-full-screen"
+                                        press="onTableResize('Hdr','Min')"
+                                        visible="false" />
+                                    <Button id="btnColPropGMC" 
+                                        icon="sap-icon://table-column"
+                                        press="onColumnProp"
+                                        tooltip="Columns"
+                                        visible="true" />
+                                </Toolbar>
+                            </uiT:extension>                
+                            <!-- <uiT:columns>
+                                <uiT:Column id="gmcColGmc"
+                                    width="8rem"
+                                    filterProperty="Gmc"
+                                    sortProperty="Gmc">
+                                    <Label text="GMC" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Gmc}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>
+                                <uiT:Column id="gmcColMattyp"
+                                    name="Mattyp"
+                                    width="8rem"
+                                    filterProperty="Mattyp"
+                                    sortProperty="Mattyp">
+                                    <Label text="Material Type" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Mattyp}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>
+                                <uiT:Column id="gmcColMatgrpcd"
+                                    width="8rem"
+                                    filterProperty="Matgrpcd"
+                                    sortProperty="Matgrpcd">
+                                    <Label text="Material Group" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Matgrpcd}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>
+                                <uiT:Column id="gmcColDescen"
+                                    width="30rem"
+                                    filterProperty="Descen"
+                                    sortProperty="Descen">
+                                    <Label text="Description (EN)" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Descen}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>
+                                <uiT:Column id="gmcColDesczh"
+                                    width="30rem"
+                                    filterProperty="Desczh"
+                                    sortProperty="Desczh">
+                                    <Label text="Description (CN)" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Desczh}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>
+                                <uiT:Column id="gmcColBaseuom"
+                                    width="8rem"
+                                    filterProperty="Baseuom"
+                                    sortProperty="Baseuom">
+                                    <Label text="Base UOM" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Baseuom}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>
+                                <uiT:Column id="gmcColOrderuom"
+                                    width="8rem"
+                                    filterProperty="Orderuom"
+                                    sortProperty="Orderuom">
+                                    <Label text="Order UOM" />
+                                    <uiT:template>
+                                        <Text text="{gmc>Orderuom}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column> 
+                                <uiT:Column id="gmcColDeleted"
+                                    width="8rem"
+                                    filterProperty="Deleted"
+                                    sortProperty="Deleted">
+                                    <Label text="Deleted" />
+                                    <uiT:template>
+                                        <CheckBox selected="{gmc>Deleted}" wrapping="false" />
+                                    </uiT:template>
+                                </uiT:Column>                                
+                            </uiT:columns> -->
+                        </uiT:Table>  
+                </uiL:fixContent> 
+                <uiL:flexContent>
+                    <IconTabBar id="itbDetail"
+                        expanded="{device>/isNoPhone}" 
+                        expandable="false" 
+                        class="tabColor" 
+                        select="onSelectTab"
+                        headerBackgroundDesign="Transparent" 
+                        stretchContentHeight="true" 
+                        applyContentPadding="false">
+                        <items>
+                            <IconTabFilter text="Attributes" key="attributes">
+                                <uiT:Table id="attributesTab"
+                                    rows="{attributes>/results}"
+                                    visibleRowCountMode="Auto"
+                                    showColumnVisibilityMenu="true"
+                                    enableColumnFreeze="true"
+                                    enableCellFilter="true"
+                                    selectionMode="Single"
+                                    sort="onSorted"> 
+                                    <uiT:rowSettingsTemplate>
+                                        <uiT:RowSettings highlight="{= ${attributes>Edited} === true ? 'Warning' : null}" />
+                                    </uiT:rowSettingsTemplate>                                    
+                                    <uiT:extension>
+                                        <Toolbar>
+                                            <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />
+                                            <ToolbarSpacer/>
+                                            <SearchField
+                                                id="searchFieldAttr"
+                                                placeholder="Filter"
+                                                value=""
+                                                search="filterGlobally"
+                                                width="15rem"/>
+                                            <ToolbarSeparator/>
+                                            <Button id="btnEditAttr" 
+                                                icon="sap-icon://edit"
+                                                press=".onEditAttr"
+                                                tooltip="Edit"
+                                                visible="true" />
+                                            <Button id="btnSaveAttr" 
+                                                icon="sap-icon://save"
+                                                press=".onSave('attributes')" 
+                                                visible="false" />
+                                            <Button id="btnCancelAttr" 
+                                                icon="sap-icon://sys-cancel"
+                                                press="onCancelAttr" 
+                                                visible="false" /> 
+                                            <Button id="btnRefreshAttr" 
+                                                icon="sap-icon://refresh"
+                                                press=".onRefreshAttr"
+                                                visible="true" />
+                                            <Button id="btnSortAttr" 
+                                                icon="sap-icon://sort"
+                                                press=".onColSort"
+                                                visible="true" />
+                                            <Button id="btnFilterAttr" 
+                                                icon="sap-icon://filter"
+                                                press=".onColFilter"
+                                                visible="true" />
+                                            <Button id="btnFullScreenAttr" 
+                                                icon="sap-icon://full-screen"
+                                                press="onTableResize('Attr','Max')"
+                                                visible="true" />
+                                            <Button id="btnExitFullScreenAttr" 
+                                                icon="sap-icon://exit-full-screen"
+                                                press="onTableResize('Attr','Min')"
+                                                visible="false" />
+                                            <Button id="btnColPropAttr" 
+                                                icon="sap-icon://table-column"
+                                                press="onColumnProp"
+                                                tooltip="Columns"
+                                                visible="true" />                                                
+                                        </Toolbar>
+                                    </uiT:extension>                
+                                    <!-- <uiT:columns>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Seq"
+                                            sortProperty="Seq">
+                                            <Label text="Seq. No" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Seq}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Classification"
+                                            sortProperty="Classification">
+                                            <Label text="Classification" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Mattypcls}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Attribcd"
+                                            sortProperty="Attribcd">
+                                            <Label text="Attribute" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Attribcd}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="30rem"
+                                            filterProperty="Descen"
+                                            sortProperty="Descen">
+                                            <Label text="Description (EN)" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Descen}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="30rem"
+                                            filterProperty="Desczh"
+                                            sortProperty="Desczh">
+                                            <Label text="Description (CN)" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Desczh}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Createdby"
+                                            sortProperty="Createdby">
+                                            <Label text="Created By" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Createdby}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Createddt"
+                                            sortProperty="Createddt">
+                                            <Label text="Created Date" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Createddt}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column> 
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Updatedby"
+                                            sortProperty="Updatedby">
+                                            <Label text="Updated By" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Updatedby}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Updateddt"
+                                            sortProperty="Updateddt">
+                                            <Label text="Updated Date" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Updateddt}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>                                         
+                                    </uiT:columns> -->
+                                </uiT:Table>
+                            </IconTabFilter>
+                            <IconTabFilter text="Materials" key="materials">
+                                <uiT:Table id="materialsTab"
+                                    rows="{materials>/results}"
+                                    visibleRowCountMode="Auto"
+                                    showColumnVisibilityMenu="true"
+                                    enableColumnFreeze="true"
+                                    enableCellFilter="true"
+                                    selectionMode="Single"
+                                    sort="onSorted">
+                                    <uiT:extension>
+                                        <Toolbar>
+                                            <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />
+                                            <ToolbarSpacer/>
+                                            <SearchField
+                                                id="searchFieldMatl"
+                                                placeholder="Filter"
+                                                value=""
+                                                search="filterGlobally"
+                                                width="15rem"/>
+                                            <ToolbarSeparator/>
+                                            <Button id="refreshMaterialsButton" 
+                                                icon="sap-icon://refresh"
+                                                press=".onRefreshMatl"
+                                                visible="true" />
+                                            <Button id="sortMaterialsButton" 
+                                                icon="sap-icon://sort"
+                                                press=".onColSort"
+                                                visible="true" />
+                                            <Button id="filterMaterialsButton" 
+                                                icon="sap-icon://filter"
+                                                press=".onColFilter"
+                                                visible="true" />
+                                            <Button id="btnFullScreenMatl" 
+                                                icon="sap-icon://full-screen"
+                                                press="onTableResize('Matl','Max')"
+                                                visible="true" />
+                                            <Button id="btnExitFullScreenMatl" 
+                                                icon="sap-icon://exit-full-screen"
+                                                press="onTableResize('Matl','Min')"
+                                                visible="false" />
+                                            <Button id="btnColPropMatl" 
+                                                icon="sap-icon://table-column"
+                                                press="onColumnProp"
+                                                tooltip="Columns"
+                                                visible="true" />                                                
+                                        </Toolbar>
+                                    </uiT:extension>                
+                                    <!-- <uiT:columns>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Matno"
+                                            sortProperty="Matno">
+                                            <Label text="Material No." />
+                                            <uiT:template>
+                                                <Text text="{materials>Matno}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="30rem"
+                                            filterProperty="Descen"
+                                            sortProperty="Descen">
+                                            <Label text="Description (EN)" />
+                                            <uiT:template>
+                                                <Text text="{materials>Descen}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="30rem"
+                                            filterProperty="Desczh"
+                                            sortProperty="Desczh">
+                                            <Label text="Description (CN)" />
+                                            <uiT:template>
+                                                <Text text="{materials>Desczh}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>                                        
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Createdby"
+                                            sortProperty="Createdby">
+                                            <Label text="Created By" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Createdby}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Createddt"
+                                            sortProperty="Createddt">
+                                            <Label text="Created Date" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Createddt}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column> 
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Updatedby"
+                                            sortProperty="Updatedby">
+                                            <Label text="Updated By" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Updatedby}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                        <uiT:Column width="8rem"
+                                            filterProperty="Updateddt"
+                                            sortProperty="Updateddt">
+                                            <Label text="Updated Date" />
+                                            <uiT:template>
+                                                <Text text="{attributes>Updateddt}" wrapping="false" />
+                                            </uiT:template>
+                                        </uiT:Column>
+                                    </uiT:columns> -->
+                                </uiT:Table>
+                            </IconTabFilter>
+                        </items>
+                    </IconTabBar>
+                </uiL:flexContent>
+            </uiL:FixFlex>         
+        </content>
+    </Page>
+</mvc:View>

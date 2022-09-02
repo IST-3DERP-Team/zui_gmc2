@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZGW_3DERP_GMC_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="GMC" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Gmc"/>
+                </Key>
+                <Property Name="Matgrpcd" Type="Edm.String" Nullable="false" MaxLength="9" sap:unicode="false" sap:label="Material Group"/>
+                <Property Name="Gmc" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="GMC No." sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Mattyp" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Material Type"/>
+                <Property Name="Descen" Type="Edm.String" Nullable="false" MaxLength="1000" sap:unicode="false" sap:label="Description (EN)" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Desczh" Type="Edm.String" Nullable="false" MaxLength="1000" sap:unicode="false" sap:label="Description (CN)" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Baseuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Base UOM" sap:semantics="unit-of-measure"/>
+                <Property Name="Orderuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Order UOM" sap:semantics="unit-of-measure"/>
+                <Property Name="Issuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Issue UOM" sap:semantics="unit-of-measure"/>
+                <Property Name="Grswt" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="Orderuom" sap:label="Gross Weight"/>
+                <Property Name="Netwt" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="Orderuom" sap:label="Net Weight"/>
+                <Property Name="Wtuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Weight UOM" sap:semantics="unit-of-measure"/>
+                <Property Name="Volume" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:unit="Orderuom" sap:label="Volume"/>
+                <Property Name="Voluom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Volume UOM" sap:semantics="unit-of-measure"/>
+                <Property Name="Cusmatcd" Type="Edm.String" Nullable="false" MaxLength="100" sap:unicode="false" sap:label="Cust. Material Code"/>
+                <Property Name="Processcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Process Code"/>
+                <Property Name="Deleted" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Createdby" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Createddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Created Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Updatedby" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Updated By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Updateddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Updated Date" sap:creatable="false" sap:updatable="false"/>
+                <NavigationProperty Name="NAVATRB" Relationship="ZGW_3DERP_GMC_SRV.GMC_Attributes" FromRole="FromRole_GMC_Attributes" ToRole="ToRole_GMC_Attributes"/>
+                <NavigationProperty Name="NAVMAT" Relationship="ZGW_3DERP_GMC_SRV.GMC_Material" FromRole="FromRole_GMC_Material" ToRole="ToRole_GMC_Material"/>
+            </EntityType>
+            <EntityType Name="MatTypeRsc" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Mattyp"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattyp" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Material type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gmcnrkeycd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="GMC Number Key Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattypgrp" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Material Type Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="MatGrpRsc" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Spras"/>
+                    <PropertyRef Name="Matkl"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Spras" Type="Edm.String" Nullable="false" MaxLength="2" sap:unicode="false" sap:label="Language" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Matkl" Type="Edm.String" Nullable="false" MaxLength="9" sap:unicode="false" sap:label="Material Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Wgbez" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Matl Grp Desc." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Wgbez60" Type="Edm.String" Nullable="false" MaxLength="60" sap:unicode="false" sap:label="Mat.Grp Desc. 2" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="UOMRsc" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Msehi"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Msehi" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Internal UoM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Kzex3" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="3-char.ext.unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Kzex6" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="6-char.ext.unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Andec" Type="Edm.Int16" Nullable="false" sap:unicode="false" sap:label="Rounding" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Kzkeh" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Commercial unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Kzwob" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Value bsd cmmt" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Kz1eh" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="(1) unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Kz2eh" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="(2) unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Dimid" Type="Edm.String" Nullable="false" MaxLength="6" sap:unicode="false" sap:label="Dimension" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Zaehl" Type="Edm.Int32" Nullable="false" sap:unicode="false" sap:label="Numerator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Nennr" Type="Edm.Int32" Nullable="false" sap:unicode="false" sap:label="Denominator" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Exp10" Type="Edm.Int16" Nullable="false" sap:unicode="false" sap:label="Exponent" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Addko" Type="Edm.Decimal" Nullable="false" Precision="9" Scale="6" sap:unicode="false" sap:label="Additive const." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Expon" Type="Edm.Int16" Nullable="false" sap:unicode="false" sap:label="fl. pt. exp." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Decan" Type="Edm.Int16" Nullable="false" sap:unicode="false" sap:label="Decimal places" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Isocode" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="ISO code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Primary" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="Primary code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="TempValue" Type="Edm.Double" Nullable="false" sap:unicode="false" sap:label="Temperature" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="TempUnit" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Temperature un." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Famunit" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Un.of meas.fam." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PressVal" Type="Edm.Double" Nullable="false" sap:unicode="false" sap:label="Pressure Value" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PressUnit" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Pressure Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+            </EntityType>
+            <EntityType Name="ProcessRsc" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Processcd"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Processcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Process Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Desc1" Type="Edm.String" Nullable="false" MaxLength="256" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Desc2" Type="Edm.String" Nullable="false" MaxLength="256" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Hasoutput" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Reqind" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Workctr" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Work Center" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Proctyp" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Process Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Vasproc" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="VAS Process" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Createdby" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Created By" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Createddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Created Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Updatedby" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Updated By" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Updateddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Updated Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="GMCAttrib" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Gmc"/>
+                    <PropertyRef Name="Mattypcls"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gmc" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="GMC No." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattypcls" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Classification" sap:creatable="false"/>
+                <Property Name="Seq" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Seq No." sap:creatable="false"/>
+                <Property Name="Attribcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Attribute" sap:creatable="false"/>
+                <Property Name="Descen" Type="Edm.String" Nullable="false" MaxLength="500" sap:unicode="false" sap:label="Description (EN)" sap:creatable="false"/>
+                <Property Name="Desczh" Type="Edm.String" Nullable="false" MaxLength="500" sap:unicode="false" sap:label="Description (CN)" sap:creatable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Createdby" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Createddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Created Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Createdtm" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Created Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Updatedby" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Updated By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Updateddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Updated Date" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="GMCMaterial" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Matno"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Matno" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Material No." sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Gmc" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="GMC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Descen" Type="Edm.String" Nullable="false" MaxLength="238" sap:unicode="false" sap:label="Description (EN)" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Desczh" Type="Edm.String" Nullable="false" MaxLength="238" sap:unicode="false" sap:label="Description (CN)" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Custmatno" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Customer Material Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Hasgmc" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Processcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Process Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Remarks" Type="Edm.String" Nullable="false" MaxLength="100" sap:unicode="false" sap:label="Remarks" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Excmattyp" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Excluded Material Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Withmold" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Withlogo" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Createdby" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Created By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Createddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Created Date" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Createdtm" Type="Edm.Time" Precision="0" sap:unicode="false" sap:label="Created Time" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Updatedby" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Updated By" sap:creatable="false" sap:updatable="false"/>
+                <Property Name="Updateddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Updated Date" sap:creatable="false" sap:updatable="false"/>
+            </EntityType>
+            <EntityType Name="MatTypeClass" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Mattyp"/>
+                    <PropertyRef Name="Mattypcls"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattyp" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Material type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattypcls" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Mat Type Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Shorttext" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Shorttext2" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Additional Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Seq" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Seq Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gmccls" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Attrib" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Inclindesc" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="True/False" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Usgcls" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Usage Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="MatTypeAttrib" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Mandt"/>
+                    <PropertyRef Name="Mattyp"/>
+                    <PropertyRef Name="Mattypcls"/>
+                    <PropertyRef Name="Attribcd"/>
+                </Key>
+                <Property Name="Mandt" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Client" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattyp" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Material type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattypcls" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Material Type Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Attribcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Attrib Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Shorttext" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Shorttext2" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Additional Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="GMCParam" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Seq"/>
+                </Key>
+                <Property Name="Seq" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Seq Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gmc" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="GMC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattyp" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:label="Material type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Sbu" Type="Edm.String" Nullable="false" MaxLength="5" sap:unicode="false" sap:label="SBU" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Descen" Type="Edm.String" Nullable="false" MaxLength="238" sap:unicode="false" sap:label="GMC Description (EN)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Desczh" Type="Edm.String" Nullable="false" MaxLength="238" sap:unicode="false" sap:label="GMC Description (ZH)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Matgrpcd" Type="Edm.String" Nullable="false" MaxLength="9" sap:unicode="false" sap:label="Material Group" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Baseuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Base Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Orderuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Order Unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Issuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Unit of issue" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Grswt" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:label="Gross weight" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Netwt" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:label="Net weight" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Wtuom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Weight unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Volume" Type="Edm.Decimal" Nullable="false" Precision="13" Scale="3" sap:unicode="false" sap:label="Volume" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Voluom" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Volume unit" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="unit-of-measure"/>
+                <Property Name="Cusmatcd" Type="Edm.String" Nullable="false" MaxLength="100" sap:unicode="false" sap:label="CUSMATCD" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Processcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="PROCESSCD" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <NavigationProperty Name="GMCAttribParamSet" Relationship="ZGW_3DERP_GMC_SRV.GMC_Attrib_Param" FromRole="FromRole_GMC_Attrib_Param" ToRole="ToRole_GMC_Attrib_Param"/>
+                <NavigationProperty Name="RetMsgSet" Relationship="ZGW_3DERP_GMC_SRV.GMC_RetMsg_Param" FromRole="FromRole_GMC_RetMsg_Param" ToRole="ToRole_GMC_RetMsg_Param"/>
+            </EntityType>
+            <EntityType Name="GMCAttribParam" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Seq"/>
+                    <PropertyRef Name="Seqno"/>
+                </Key>
+                <Property Name="Seq" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Seq Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Seqno" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Seq Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gmc" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="GMC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Mattypcls" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Mat Type Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Attribcd" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Attrib Code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Descen" Type="Edm.String" Nullable="false" MaxLength="500" sap:unicode="false" sap:label="DESCEN" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Desczh" Type="Edm.String" Nullable="false" MaxLength="500" sap:unicode="false" sap:label="DESCZH" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Deleted" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Deleted" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="RetMsg" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Seq"/>
+                    <PropertyRef Name="Type"/>
+                    <PropertyRef Name="Id"/>
+                    <PropertyRef Name="Number"/>
+                    <PropertyRef Name="Code"/>
+                    <PropertyRef Name="Message"/>
+                </Key>
+                <Property Name="Seq" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Seq Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Type" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Message type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Id" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Message Class" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Number" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Message Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Code" Type="Edm.String" Nullable="false" MaxLength="5" sap:unicode="false" sap:label="Message code" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Message" Type="Edm.String" Nullable="false" MaxLength="220" sap:unicode="false" sap:label="Message Text" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LogNo" Type="Edm.String" Nullable="false" MaxLength="20" sap:unicode="false" sap:label="Log number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LogMsgNo" Type="Edm.String" Nullable="false" MaxLength="6" sap:unicode="false" sap:label="Message no." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MessageV1" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Message Variable" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MessageV2" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Message Variable" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MessageV3" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Message Variable" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="MessageV4" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Message Variable" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Parameter" Type="Edm.String" Nullable="false" MaxLength="32" sap:unicode="false" sap:label="Parameter Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Row" Type="Edm.Int32" Nullable="false" sap:unicode="false" sap:label="Parameter line" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Field" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Field name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="System" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Logical system" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <Association Name="GMC_Material" sap:content-version="1">
+                <End Type="ZGW_3DERP_GMC_SRV.GMC" Multiplicity="1" Role="FromRole_GMC_Material"/>
+                <End Type="ZGW_3DERP_GMC_SRV.GMCMaterial" Multiplicity="*" Role="ToRole_GMC_Material"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_GMC_Material">
+                        <PropertyRef Name="Gmc"/>
+                    </Principal>
+                    <Dependent Role="ToRole_GMC_Material">
+                        <PropertyRef Name="Gmc"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="GMC_Attributes" sap:content-version="1">
+                <End Type="ZGW_3DERP_GMC_SRV.GMC" Multiplicity="1" Role="FromRole_GMC_Attributes"/>
+                <End Type="ZGW_3DERP_GMC_SRV.GMCAttrib" Multiplicity="*" Role="ToRole_GMC_Attributes"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_GMC_Attributes">
+                        <PropertyRef Name="Gmc"/>
+                    </Principal>
+                    <Dependent Role="ToRole_GMC_Attributes">
+                        <PropertyRef Name="Gmc"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="GMC_Attrib_Param" sap:content-version="1">
+                <End Type="ZGW_3DERP_GMC_SRV.GMCParam" Multiplicity="1" Role="FromRole_GMC_Attrib_Param"/>
+                <End Type="ZGW_3DERP_GMC_SRV.GMCAttribParam" Multiplicity="*" Role="ToRole_GMC_Attrib_Param"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_GMC_Attrib_Param">
+                        <PropertyRef Name="Seq"/>
+                    </Principal>
+                    <Dependent Role="ToRole_GMC_Attrib_Param">
+                        <PropertyRef Name="Seq"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <Association Name="GMC_RetMsg_Param" sap:content-version="1">
+                <End Type="ZGW_3DERP_GMC_SRV.GMCParam" Multiplicity="1" Role="FromRole_GMC_RetMsg_Param"/>
+                <End Type="ZGW_3DERP_GMC_SRV.RetMsg" Multiplicity="*" Role="ToRole_GMC_RetMsg_Param"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_GMC_RetMsg_Param">
+                        <PropertyRef Name="Seq"/>
+                    </Principal>
+                    <Dependent Role="ToRole_GMC_RetMsg_Param">
+                        <PropertyRef Name="Seq"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <EntityContainer Name="ZGW_3DERP_GMC_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="GMCSet" EntityType="ZGW_3DERP_GMC_SRV.GMC" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="MatTypeRscSet" EntityType="ZGW_3DERP_GMC_SRV.MatTypeRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="MatGrpRscSet" EntityType="ZGW_3DERP_GMC_SRV.MatGrpRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="UOMRscSet" EntityType="ZGW_3DERP_GMC_SRV.UOMRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="ProcessRscSet" EntityType="ZGW_3DERP_GMC_SRV.ProcessRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GMCAttribSet" EntityType="ZGW_3DERP_GMC_SRV.GMCAttrib" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GMCMaterialSet" EntityType="ZGW_3DERP_GMC_SRV.GMCMaterial" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="MatTypeClassSet" EntityType="ZGW_3DERP_GMC_SRV.MatTypeClass" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="MatTypeAttribSet" EntityType="ZGW_3DERP_GMC_SRV.MatTypeAttrib" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GMCParamSet" EntityType="ZGW_3DERP_GMC_SRV.GMCParam" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="GMCAttribParamSet" EntityType="ZGW_3DERP_GMC_SRV.GMCAttribParam" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="RetMsgSet" EntityType="ZGW_3DERP_GMC_SRV.RetMsg" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <AssociationSet Name="GMC_AttributesSet" Association="ZGW_3DERP_GMC_SRV.GMC_Attributes" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GMCSet" Role="FromRole_GMC_Attributes"/>
+                    <End EntitySet="GMCAttribSet" Role="ToRole_GMC_Attributes"/>
+                </AssociationSet>
+                <AssociationSet Name="GMC_Attrib_ParamSet" Association="ZGW_3DERP_GMC_SRV.GMC_Attrib_Param" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GMCParamSet" Role="FromRole_GMC_Attrib_Param"/>
+                    <End EntitySet="GMCAttribParamSet" Role="ToRole_GMC_Attrib_Param"/>
+                </AssociationSet>
+                <AssociationSet Name="GMC_RetMsg_ParamSet" Association="ZGW_3DERP_GMC_SRV.GMC_RetMsg_Param" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GMCParamSet" Role="FromRole_GMC_RetMsg_Param"/>
+                    <End EntitySet="RetMsgSet" Role="ToRole_GMC_RetMsg_Param"/>
+                </AssociationSet>
+                <AssociationSet Name="GMC_MaterialSet" Association="ZGW_3DERP_GMC_SRV.GMC_Material" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="GMCSet" Role="FromRole_GMC_Material"/>
+                    <End EntitySet="GMCMaterialSet" Role="ToRole_GMC_Material"/>
+                </AssociationSet>
+            </EntityContainer>
+            <atom:link rel="self" href="http://159.138.39.203:8000/sap/opu/odata/sap/ZGW_3DERP_GMC_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://159.138.39.203:8000/sap/opu/odata/sap/ZGW_3DERP_GMC_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

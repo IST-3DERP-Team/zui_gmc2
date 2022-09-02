@@ -1,0 +1,54 @@
+/* Enter your custom styles here */
+
+.headerContent {
+    height: 50%;
+    position: relative;
+}
+
+.detailContent {
+    height: 50%;
+    position: relative;
+}
+
+.tabColor {
+    background-color: aliceblue !important;
+}
+
+/* .tablePadding {
+    height: 200px;
+} */
+
+.sapMBtn.activeFiltering .sapMBtnInner {
+    background: linear-gradient(45deg, blue, transparent) !important;
+}
+
+.sapMBtn.activeFiltering .sapMBtnIcon {
+    color: #ffffff !important;
+}
+
+.tabColumnRowsBgColor .sapUiTableTr.sapUiTableRowSel, 
+.tabColumnRowsBgColor .sapUiTableRowSelectionCell.sapUiTableRowSel, 
+.tabColumnRowsBgColor .sapUiTableRowActionCell.sapUiTableRowSel {
+    background-color: #ffffff !important;
+}
+
+.requiredField {
+    color: red !important;
+}
+
+.sapMBtn .sapMBtnInner {
+    background: lightgrey;
+    border: none;
+}
+
+.selHdrKeyFontStyle {
+    font-style: italic;
+}
+
+.sapMITBHead {
+    margin: 0 !important;
+}
+
+.sidePadding {
+    padding: 0px 0.5rem !important;
+}
