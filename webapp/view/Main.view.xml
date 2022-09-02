@@ -4,7 +4,7 @@
     xmlns="sap.m"
     height="100%"
     xmlns:uiL="sap.ui.layout"
-    xmlns:uiT="sap.ui.table"> 
+    xmlns:uiT="sap.ui.table">  
     <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
         <content>
             <uiL:FixFlex id="fixFlexGMC" class="fixFlexFixedSize sidePadding" fixContentSize="50%">
