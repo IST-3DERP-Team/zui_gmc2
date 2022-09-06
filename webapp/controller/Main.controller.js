@@ -115,6 +115,10 @@ sap.ui.define([
 
                         oJSONModel.setData(data);
                         _this.getView().setModel(oJSONModel, "materials");
+
+                        if (_this.byId("searchFieldMatl").getProperty("value") !== "" ) {
+                            _this.exeGlobalSearch(_this.byId("searchFieldMatl").getProperty("value"), "materials")
+                        }
                     },
                     error: function (err) { }
                 })
@@ -142,6 +146,10 @@ sap.ui.define([
                         // console.log(response)
                         oJSONModel.setData(data);
                         _this.getView().setModel(oJSONModel, "attributes");
+
+                        if (_this.byId("searchFieldAttr").getProperty("value") !== "" ) {
+                            _this.exeGlobalSearch(_this.byId("searchFieldAttr").getProperty("value"), "attributes")
+                        }
                     },
                     error: function (err) { }
                 })
@@ -460,40 +468,79 @@ sap.ui.define([
             },
 
             onEditGMC() {
-                this.byId("btnAddGMC").setVisible(false);
-                this.byId("btnEditGMC").setVisible(false);
-                this.byId("btnSaveGMC").setVisible(true);
-                this.byId("btnCancelGMC").setVisible(true);
-                this.byId("btnDeleteGMC").setVisible(false);
-                this.byId("btnRefreshGMC").setVisible(false);
-                this.byId("btnSortGMC").setVisible(false);
-                this.byId("btnFilterGMC").setVisible(false);
-                this.byId("btnExitFullScreenHdr").setVisible(false);
-                this.byId("btnColPropGMC").setVisible(false);
-                this.byId("searchFieldGMC").setVisible(false);
-                this.onTableResize("Hdr","Max");
-                this.byId("btnExitFullScreenHdr").setVisible(false);
-
-                this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("gmc").getData());
+                var oModel = this.getOwnerComponent().getModel();
+                var oEntitySet = "/GMCMaterialSet";
+                var me = this;
 
                 var oTable = this.byId("gmcTab");
                 var aSelIndices = oTable.getSelectedIndices();
                 var aData = this.getView().getModel("gmc").getData().results;
                 var aDataToEdit = [];
+                var bDeleted = false, bWithMaterial = false;
+                var iCounter = 0;
+                // console.log(this.getView().getModel("materials").getData().results.length)
 
                 if (aSelIndices.length > 0) {
-                    aSelIndices.forEach(item => {
-                        aDataToEdit.push(aData.at(item));
+                    aSelIndices.forEach((item, index) => {
+                        if (aData.at(item).Deleted === true) {
+                            iCounter++;
+                            bDeleted = true;
+
+                            if (aSelIndices.length === iCounter) {
+                                MessageBox.information("Selected record(s) either has assigned material already or deleted, no record to edit.");
+                            }
+                        }
+                        else {
+                            oModel.read(oEntitySet, {
+                                urlParameters: {
+                                    "$filter": "Gmc eq '" + aData.at(item).Gmc + "'"
+                                },
+                                success: function (data, response) {
+                                    iCounter++;
+                                    // console.log(data.results)
+                                    if (data.results.length > 0) bWithMaterial = true;
+                                    else aDataToEdit.push(aData.at(item));
+
+                                    if (aSelIndices.length === iCounter) {
+                                        if (aDataToEdit.length === 0) {
+                                            MessageBox.information("Selected record(s) either has assigned material already or deleted, no record to edit.");
+                                        }
+                                        else {
+                                            me.byId("btnAddGMC").setVisible(false);
+                                            me.byId("btnEditGMC").setVisible(false);
+                                            me.byId("btnSaveGMC").setVisible(true);
+                                            me.byId("btnCancelGMC").setVisible(true);
+                                            me.byId("btnDeleteGMC").setVisible(false);
+                                            me.byId("btnRefreshGMC").setVisible(false);
+                                            me.byId("btnSortGMC").setVisible(false);
+                                            me.byId("btnFilterGMC").setVisible(false);
+                                            me.byId("btnExitFullScreenHdr").setVisible(false);
+                                            me.byId("btnColPropGMC").setVisible(false);
+                                            me.byId("searchFieldGMC").setVisible(false);
+                                            me.onTableResize("Hdr","Max");
+                                            me.byId("btnExitFullScreenHdr").setVisible(false);
+                            
+                                            me._oDataBeforeChange = jQuery.extend(true, {}, me.getView().getModel("gmc").getData());
+                        
+                                            me.getView().getModel("gmc").setProperty("/results", aDataToEdit);
+                                            me.setRowEditMode("gmc");
+                            
+                                            me.getView().getModel("ui").setProperty("/dataMode", 'EDIT');                    
+                                        }
+                                    }                                    
+                                },
+                                error: function (err) {
+                                    iCounter++;
+                                }
+                            })
+                        }
                     })
                 }
-                else aDataToEdit = aData;
-
-                aDataToEdit = aDataToEdit.filter(item => item.Deleted === false);
-                
-                this.getView().getModel("gmc").setProperty("/results", aDataToEdit);
-                this.setRowEditMode("gmc");
-
-                this.getView().getModel("ui").setProperty("/dataMode", 'EDIT');
+                else {
+                    // aDataToEdit = aData;
+                    MessageBox.information("No selected record(s) to edit.");
+                }
+                // aDataToEdit = aDataToEdit.filter(item => item.Deleted === false);
             },
 
             onEditAttr: function(oEvent) {
@@ -1076,6 +1123,10 @@ sap.ui.define([
                         _this.getView().setModel(oJSONModel, "gmc");
                         _this.getMaterials();
                         _this.getAttributes();
+
+                        if (_this.byId("searchFieldGMC").getProperty("value") !== "" ) {
+                            _this.exeGlobalSearch(_this.byId("searchFieldGMC").getProperty("value"), "gmc")
+                        }
                     },
                     error: function (err) {
                     }
@@ -1267,32 +1318,47 @@ sap.ui.define([
 
                 this.getMaterials();
                 this.getAttributes();
+
+                this.byId("searchFieldAttr").setProperty("value", "");
+                this.byId("searchFieldMatl").setProperty("value", "");
             },
 
             filterGlobally: function(oEvent) {
                 var oTable = oEvent.getSource().oParent.oParent;
                 var sTable = oTable.getBindingInfo("rows").model;
                 var sQuery = oEvent.getParameter("query");
+
+                if (sTable === "gmc") {
+                    this.byId("searchFieldAttr").setProperty("value", "");
+                    this.byId("searchFieldMatl").setProperty("value", "");
+                }
+
+                this.exeGlobalSearch(sQuery, sTable);
+            },
+
+            exeGlobalSearch(arg1, arg2) {
                 var oFilter = null;
                 var aFilter = [];
+                
+                if (arg1) {
+                    this._aFilterableColumns[arg2].forEach(item => {
+                        var sDataType = this._aColumns[arg2].filter(col => col.name === item.name)[0].type;
 
-                if (sQuery) {
-                    this._aFilterableColumns[sTable].forEach(item => {
-                        var sDataType = this._aColumns[sTable].filter(col => col.name === item.name)[0].type;
-
-                        if (sDataType === "Edm.Boolean") aFilter.push(new Filter(item.name, FilterOperator.EQ, sQuery));
-                        else aFilter.push(new Filter(item.name, FilterOperator.Contains, sQuery));
+                        if (sDataType === "Edm.Boolean") aFilter.push(new Filter(item.name, FilterOperator.EQ, arg1));
+                        else aFilter.push(new Filter(item.name, FilterOperator.Contains, arg1));
                     })
 
                     oFilter = new Filter(aFilter, false);
-
-                    // oFilter = new Filter([
-                    //     new Filter("Gmc", FilterOperator.Contains, sQuery),
-                    //     new Filter("Mattyp", FilterOperator.Contains, sQuery)
-                    // ], false);
                 }
     
-                this.byId(sTable + "Tab").getBinding("rows").filter(oFilter, "Application");
+                this.byId(arg2 + "Tab").getBinding("rows").filter(oFilter, "Application");
+
+                if (arg1 && arg2 === "gmc") {
+                    var vGmc = this.getView().getModel(arg2).getData().results.filter((item,index) => index === this.byId(arg2 + "Tab").getBinding("rows").aIndices[0])[0].Gmc;
+                    this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
+                    this.getAttributes();
+                    this.getMaterials();
+                }
             },
 
             createViewSettingsDialog: function (arg1, arg2) {
