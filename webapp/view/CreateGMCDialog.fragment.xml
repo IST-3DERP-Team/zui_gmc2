@@ -5,7 +5,7 @@
         xmlns:uit="sap.ui.table"
         id="fragment-1" 
         fragmentName="fragment1">
-    <Dialog contentWidth="805px"
+    <Dialog contentWidth="900px"
         contentHeight="500px"
         title="Material Classifications"
         resizable="true"
@@ -23,13 +23,13 @@
             visibleRowCount="{/rowCount}"
             paste="onPaste">
             <uit:columns>
-                <uit:Column width="10rem">
+                <uit:Column width="7rem">
                     <Label text="Classification" />
                     <uit:template>
                         <Text text="{class>Mattypcls}" wrapping="false" />
                     </uit:template>
                 </uit:Column>
-                <uit:Column width="10rem">
+                <uit:Column width="9rem">
                     <Label text="Attribute" />
                     <uit:template>
                         <Input id="iptAttribcd"
@@ -40,20 +40,21 @@
                             showValueHelp="true"
                             valueHelpRequest="handleValueHelp"
                             showSuggestion="true" 
+                            maxSuggestionWidth="500px"
                             suggestionItems="{path:'/MatTypeAttribSet', templateShareable:false}">
                             <suggestionItems>
-                                <core:Item text="{Attribcd}" key="{Attribcd}" />
+                                <core:ListItem text="{Attribcd}" key="{Attribcd}" additionalText="{Shorttext}" />
                             </suggestionItems>
                         </Input>
                     </uit:template>
                 </uit:Column>
-                <uit:Column width="15rem">
+                <uit:Column width="20rem">
                     <Label text="Description (EN)" />
                     <uit:template>
                         <Input value="{class>Descen}" enabled="true" />
                     </uit:template>
                 </uit:Column>
-                <uit:Column width="15rem">
+                <uit:Column width="20rem">
                     <Label text="Description (CN)" />
                     <uit:template>
                         <Input value="{class>Desczh}" enabled="true" />
