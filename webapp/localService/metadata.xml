@@ -10,6 +10,19 @@
                 <Property Name="Desc" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="Mattyp" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Material Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
+            <EntityType Name="WtUOMRsc" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="Msehi"/>
+                </Key>
+                <Property Name="Msehi" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Internal UoM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Msehl" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Unit of Measurement Text" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="SBURsc" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SBU"/>
+                </Key>
+                <Property Name="SBU" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="SBU" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
             <EntityType Name="GMC" sap:content-version="1">
                 <Key>
                     <PropertyRef Name="Gmc"/>
@@ -34,8 +47,8 @@
                 <Property Name="Createddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Created Date" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="Updatedby" Type="Edm.String" MaxLength="50" sap:unicode="false" sap:label="Updated By" sap:creatable="false" sap:updatable="false"/>
                 <Property Name="Updateddt" Type="Edm.DateTime" Precision="7" sap:unicode="false" sap:label="Updated Date" sap:creatable="false" sap:updatable="false"/>
-                <NavigationProperty Name="NAVATRB" Relationship="ZGW_3DERP_GMC_SRV.GMC_Attributes" FromRole="FromRole_GMC_Attributes" ToRole="ToRole_GMC_Attributes"/>
                 <NavigationProperty Name="NAVMAT" Relationship="ZGW_3DERP_GMC_SRV.GMC_Material" FromRole="FromRole_GMC_Material" ToRole="ToRole_GMC_Material"/>
+                <NavigationProperty Name="NAVATRB" Relationship="ZGW_3DERP_GMC_SRV.GMC_Attributes" FromRole="FromRole_GMC_Attributes" ToRole="ToRole_GMC_Attributes"/>
             </EntityType>
             <EntityType Name="MatTypeRsc" sap:content-version="1">
                 <Key>
@@ -227,13 +240,6 @@
                 <Property Name="Field" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Field name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
                 <Property Name="System" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Logical system" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
             </EntityType>
-            <EntityType Name="WtUOMRsc" sap:content-version="1">
-                <Key>
-                    <PropertyRef Name="Msehi"/>
-                </Key>
-                <Property Name="Msehi" Type="Edm.String" Nullable="false" MaxLength="3" sap:unicode="false" sap:label="Internal UoM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-                <Property Name="Msehl" Type="Edm.String" Nullable="false" MaxLength="30" sap:unicode="false" sap:label="Unit of Measurement Text" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
-            </EntityType>
             <Association Name="GMC_Material" sap:content-version="1">
                 <End Type="ZGW_3DERP_GMC_SRV.GMC" Multiplicity="1" Role="FromRole_GMC_Material"/>
                 <End Type="ZGW_3DERP_GMC_SRV.GMCMaterial" Multiplicity="*" Role="ToRole_GMC_Material"/>
@@ -284,6 +290,8 @@
             </Association>
             <EntityContainer Name="ZGW_3DERP_GMC_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
                 <EntitySet Name="MatTypeSHSet" EntityType="ZGW_3DERP_GMC_SRV.MatTypeSH" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="WtUOMRscSet" EntityType="ZGW_3DERP_GMC_SRV.WtUOMRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="SBUSet" EntityType="ZGW_3DERP_GMC_SRV.SBURsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
                 <EntitySet Name="GMCSet" EntityType="ZGW_3DERP_GMC_SRV.GMC" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="MatTypeRscSet" EntityType="ZGW_3DERP_GMC_SRV.MatTypeRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="MatGrpRscSet" EntityType="ZGW_3DERP_GMC_SRV.MatGrpRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
@@ -296,7 +304,6 @@
                 <EntitySet Name="GMCParamSet" EntityType="ZGW_3DERP_GMC_SRV.GMCParam" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="GMCAttribParamSet" EntityType="ZGW_3DERP_GMC_SRV.GMCAttribParam" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <EntitySet Name="RetMsgSet" EntityType="ZGW_3DERP_GMC_SRV.RetMsg" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
-                <EntitySet Name="WtUOMRscSet" EntityType="ZGW_3DERP_GMC_SRV.WtUOMRsc" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
                 <AssociationSet Name="GMC_AttributesSet" Association="ZGW_3DERP_GMC_SRV.GMC_Attributes" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
                     <End EntitySet="GMCSet" Role="FromRole_GMC_Attributes"/>
                     <End EntitySet="GMCAttribSet" Role="ToRole_GMC_Attributes"/>

@@ -52,3 +52,11 @@
 .sidePadding {
     padding: 0px 0.5rem !important;
 }
+
+.marginTopNone {
+    margin-top: 0 !important;
+}
+
+.defBGColor {
+    background-color: aliceblue !important;
+}

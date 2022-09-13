@@ -1,0 +1,10 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<ResponsivePopover
+		title=""
+        contentHeight="0"
+		class="sapUiPopupWithPadding defBGColor"
+		placement="Bottom" >
+	</ResponsivePopover>
+</core:FragmentDefinition>

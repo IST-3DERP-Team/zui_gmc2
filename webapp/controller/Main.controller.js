@@ -7,12 +7,12 @@ sap.ui.define([
     'sap/ui/model/Sorter',
     "sap/ui/Device",
     "sap/ui/table/library",
-    "sap/m/TablePersoController"
+    'sap/ui/core/Fragment',
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, JSONModel, MessageBox, Filter, FilterOperator, Sorter, Device, library, TablePersoController) {
+    function (Controller, JSONModel, MessageBox, Filter, FilterOperator, Sorter, Device, library, Fragment) {
         "use strict";
 
         // shortcut for sap.ui.table.SortOrder
@@ -25,41 +25,38 @@ sap.ui.define([
                 var oModel = this.getOwnerComponent().getModel();               
                 var _this = this; 
                 this.validationErrors = [];
-                this.showLoadingDialog('Loading...')
+                this.showLoadingDialog('Loading...');
 
-                oModel.read('/GMCSet', { 
+                _this.getView().setModel(new JSONModel({
+                    activeGmc: '',
+                    activeMattyp: '',
+                    sbu: ''
+                }), "ui");
+
+                oModel.read('/SBURscSet', { 
                     success: function (data, response) {
-                        data.results.forEach((item, index) => {
-                            item.Deleted = item.Deleted === "X" ? true : false;
+                        if (data.results.length === 1) {
+                            _this.getView().getModel("ui").setProperty("/sbu", data.results[0].SBU);
+                            _this.getGMC();
+                        }
+                        else {
+                            _this.closeLoadingDialog();
 
-                            if (item.Createddt !== null)
-                                item.Createddt = dateFormat.format(item.Createddt);
-
-                            if (item.Updateddt !== null)
-                                item.Updateddt = dateFormat.format(item.Updateddt);
-
-                            if (index === 0) {
-                                item.Active = true;
-                            }
-                            else {
-                                item.Active = false;
-                            }
-                        });
-
-                        data.results.sort((a,b) => (a.Gmc > b.Gmc ? 1 : -1));
-                        
-                        var oJSONModel = new sap.ui.model.json.JSONModel();
-                        oJSONModel.setData(data);
-
-                        _this.getView().setModel(new JSONModel({
-                            activeGmc: data.results[0].Gmc,
-                            activeMattyp: data.results[0].Mattyp
-                        }), "ui");
-
-                        _this.getView().setModel(oJSONModel, "gmc");
-                        _this.getMaterials();
-                        _this.getAttributes();
-                        _this.closeLoadingDialog();
+                            var oCBoxSBU = _this.byId('cboxSBU');
+                            if (!_this._oPopover) {
+                                Fragment.load({
+                                    name: "zuigmc2.view.Popover",
+                                    controller: this
+                                }).then(function(oPopover){
+                                    _this._oPopover = oPopover;
+                                    _this.getView().addDependent(_this._oPopover);                                    
+                                    _this._oPopover.openBy(oCBoxSBU);
+                                    _this._oPopover.setTitle("Select SBU");
+                                }.bind(_this));
+                            } else {
+                                this._oPopover.openBy(oCBoxSBU);
+                            }                            
+                        }
                     },
                     error: function (err) { }
                 })
@@ -111,7 +108,107 @@ sap.ui.define([
                 this._cancelAttr = false;
             },
 
-            getMaterials() {
+            onSBUChange: function(oEvent) {
+                // console.log(this.byId('cboxSBU').getSelectedKey());
+                var vSBU = this.byId('cboxSBU').getSelectedKey();
+                this.getView().getModel("ui").setProperty("/sbu", vSBU);
+                this.showLoadingDialog('Loading...');
+                this.getGMC();
+            },
+            
+            getGMC() {
+                var oModel = this.getOwnerComponent().getModel();
+                var _this = this;
+
+                var oTable = this.byId('attributesTab');
+                var oColumns = oTable.getColumns();
+
+                for (var i = 0, l = oColumns.length; i < l; i++) {
+                    if (oColumns[i].getFiltered()) {
+                        oColumns[i].filter("");
+                    }
+
+                    if (oColumns[i].getSorted()) {
+                        oColumns[i].setSorted(false);
+                    }
+                }
+
+                oTable = this.byId('materialsTab');
+                oColumns = oTable.getColumns();
+
+                for (var i = 0, l = oColumns.length; i < l; i++) {
+                    if (oColumns[i].getFiltered()) {
+                        oColumns[i].filter("");
+                    }
+
+                    if (oColumns[i].getSorted()) {
+                        oColumns[i].setSorted(false);
+                    }
+                }
+
+                var vSBU = this.getView().getModel("ui").getData().sbu;
+
+                oModel.read('/GMCSet', { 
+                    urlParameters: {
+                        "$filter": "Sbu eq '" + vSBU + "'"
+                    },                    
+                    success: function (data, response) {
+                        data.results.forEach((item, index) => {
+                            item.Deleted = item.Deleted === "X" ? true : false;
+
+                            if (item.Createddt !== null)
+                                item.Createddt = dateFormat.format(item.Createddt);
+
+                            if (item.Updateddt !== null)
+                                item.Updateddt = dateFormat.format(item.Updateddt);
+
+                            if (index === 0) {
+                                item.Active = true;
+                            }
+                            else {
+                                item.Active = false;
+                            }
+                        });
+
+                        data.results.sort((a,b) => (a.Gmc > b.Gmc ? 1 : -1));
+                        
+                        var oJSONModel = new sap.ui.model.json.JSONModel();
+                        oJSONModel.setData(data);
+
+                        if (data.results.length > 0) {
+                            _this.getView().getModel("ui").setProperty("/activeGmc", data.results[0].Gmc);
+                            _this.getView().getModel("ui").setProperty("/activeMattyp", data.results[0].Mattyp);    
+                            _this.getMaterials(false);
+                            _this.getAttributes(false);
+                        }
+                        else {
+                            _this.getView().getModel("ui").setProperty("/activeGmc", '');
+                            _this.getView().getModel("ui").setProperty("/activeMattyp", '');
+
+                            _this.getView().setModel(new JSONModel({
+                                results: []
+                            }), "materials");
+
+                            _this.getView().setModel(new JSONModel({
+                                results: []
+                            }), "attributes");
+                        }
+
+                        // _this.getView().setModel(new JSONModel({
+                        //     activeGmc: data.results[0].Gmc,
+                        //     activeMattyp: data.results[0].Mattyp,
+                        //     sbu: ''
+                        // }), "ui");
+
+                        _this.getView().setModel(oJSONModel, "gmc");
+                        // console.log(_this.byId('gmcTab').getModel())
+                        _this.closeLoadingDialog();
+                    },
+                    error: function (err) { }
+                })
+            },
+
+            getMaterials(arg) {
                 var oModel = this.getOwnerComponent().getModel();
                 var oJSONModel = new JSONModel();
                 var oEntitySet = "/GMCMaterialSet";
@@ -131,18 +228,28 @@ sap.ui.define([
                                 item.Updateddt = dateFormat.format(item.Updateddt);
                         })
 
+                        var aFilters = [];
+
+                        if (arg && _this.getView().byId("materialsTab").getBinding("rows")) {
+                            aFilters = _this.getView().byId("materialsTab").getBinding("rows").aFilters;
+                        }
+
                         oJSONModel.setData(data);
                         _this.getView().setModel(oJSONModel, "materials");
 
                         if (_this.byId("searchFieldMatl").getProperty("value") !== "" ) {
                             _this.exeGlobalSearch(_this.byId("searchFieldMatl").getProperty("value"), "materials")
                         }
+
+                        if (arg && aFilters) {
+                            _this.onRefreshFilter("materials", aFilters);
+                        }
                     },
                     error: function (err) { }
                 })
             },
 
-            getAttributes() {
+            getAttributes(arg) {
                 var oModel = this.getOwnerComponent().getModel();
                 var oJSONModel = new JSONModel();
                 var oEntitySet = "/GMCAttribSet";
@@ -162,11 +269,21 @@ sap.ui.define([
                                 item.Updateddt = dateFormat.format(item.Updateddt);
                         })
                         // console.log(response)
+                        var aFilters = [];
+
+                        if (arg && _this.getView().byId("attributesTab").getBinding("rows")) {
+                            aFilters = _this.getView().byId("attributesTab").getBinding("rows").aFilters;
+                        }
+
                         oJSONModel.setData(data);
                         _this.getView().setModel(oJSONModel, "attributes");
 
                         if (_this.byId("searchFieldAttr").getProperty("value") !== "" ) {
                             _this.exeGlobalSearch(_this.byId("searchFieldAttr").getProperty("value"), "attributes")
+                        }
+
+                        if (arg && aFilters) {
+                            _this.onRefreshFilter("attributes", aFilters);
                         }
                     },
                     error: function (err) { }
@@ -365,26 +482,30 @@ sap.ui.define([
             onTableResize(arg1, arg2) {
                 if (arg1 === "Hdr") {
                     if (arg2 === "Max") {
-                        this.byId("fixFlexGMC").setProperty("fixContentSize", "99%");
+                        // this.byId("fixFlexGMC").setProperty("fixContentSize", "99%");
+                        this.byId("itbDetail").setVisible(false);
                         this.byId("btnFullScreenHdr").setVisible(false);
                         this.byId("btnExitFullScreenHdr").setVisible(true);
                     }
                     else {
-                        this.byId("fixFlexGMC").setProperty("fixContentSize", "50%");
+                        // this.byId("fixFlexGMC").setProperty("fixContentSize", "50%");
+                        this.byId("itbDetail").setVisible(true);
                         this.byId("btnFullScreenHdr").setVisible(true);
                         this.byId("btnExitFullScreenHdr").setVisible(false);
                     }
                 }
                 else {
                     if (arg2 === "Max") {
-                        this.byId("fixFlexGMC").setProperty("fixContentSize", "0%");
+                        // this.byId("fixFlexGMC").setProperty("fixContentSize", "0%");
+                        this.byId("gmcTab").setVisible(false);
                         this.byId("btnFullScreenAttr").setVisible(false);
                         this.byId("btnExitFullScreenAttr").setVisible(true);
                         this.byId("btnFullScreenMatl").setVisible(false);
                         this.byId("btnExitFullScreenMatl").setVisible(true);
                     }
                     else {
-                        this.byId("fixFlexGMC").setProperty("fixContentSize", "50%");
+                        // this.byId("fixFlexGMC").setProperty("fixContentSize", "50%");
+                        this.byId("gmcTab").setVisible(true);
                         this.byId("btnFullScreenAttr").setVisible(true);
                         this.byId("btnExitFullScreenAttr").setVisible(false);
                         this.byId("btnFullScreenMatl").setVisible(true);
@@ -478,34 +599,32 @@ sap.ui.define([
                         })
                 })
 
-                // var oModel = this.getView().getModel("gmc");
-                // oModel.oData.results.push(oNewRow);
-                // oModel.refresh();
-                // console.log(oNewRow)
                 oNewRow["New"] = true;
                 aNewRow.push(oNewRow);
                 this.getView().getModel("gmc").setProperty("/results", aNewRow);
                 this.getView().getModel("ui").setProperty("/dataMode", 'NEW');
-
+                // console.log(aNewRow)
+                // console.log(this.getView().getModel("gmc"))
                 // console.log(oTable.getBinding())
 
                 if (oTable.getBinding()) {
                     this._aFiltersBeforeChange = jQuery.extend(true, [], oTable.getBinding().aFilters);
-                    // console.log(oTable.getBinding().aFilters)
-                    
-                    // console.log(this._aFiltersBeforeChange)
-                }
 
+                    // oTable.getBinding().aSorters = null;
+                    oTable.getBinding().aFilters = null;
+                }
+                // console.log(this._aFiltersBeforeChange)
                 var oColumns = oTable.getColumns();
 
                 for (var i = 0, l = oColumns.length; i < l; i++) {
-                  var isFiltered = oColumns[i].getFiltered();
-                  
-                  if (isFiltered) {
-                    // clear column filter if the filter is set
-                    oColumns[i].filter("");
-                  }
+                    var isFiltered = oColumns[i].getFiltered();
+                    // console.log(oColumns[i].getFiltered())
+                    if (isFiltered) {
+                        oColumns[i].filter("");
+                    }
                 }
+
+                oTable.getModel().refresh(true);
             },
 
             onEditGMC() {
@@ -535,7 +654,7 @@ sap.ui.define([
                             bDeleted = true;
 
                             if (aSelIndices.length === iCounter) {
-                                MessageBox.information("Selected record(s) either has assigned material already or deleted, no record to edit.");
+                                MessageBox.information("Selected record(s) either has assigned material or deleted already, no record to edit.");
                             }
                         }
                         else {
@@ -1214,7 +1333,7 @@ sap.ui.define([
                                         oModel.update(oEntitySet, oParam, {
                                             method: "PUT",
                                             success: function(data, oResponse) {
-                                                oModelGMC.setProperty(sPath + '/Deleted', true);                                               
+                                                oModelGMC.setProperty(sPath + '/Deleted', true);
                                                 iDeleted++;
 
                                                 if (iDeleted === aSelRows.length) {
@@ -1228,11 +1347,11 @@ sap.ui.define([
                                             }
                                         });
                                     }, 500)
-                                });                            
+                                });
                             }
                         }
                     });
-                }               
+                }
             },
 
             onRefreshGMC() {
@@ -1242,8 +1361,12 @@ sap.ui.define([
                 var oJSONModel = new JSONModel();
                 var dateFormat = sap.ui.core.format.DateFormat.getDateInstance({pattern : "MM/dd/yyyy" });
                 var _this = this;
+                var vSBU = this.getView().getModel("ui").getData().sbu;
 
                 oModel.read('/GMCSet', {
+                    urlParameters: {
+                        "$filter": "Sbu eq '" + vSBU + "'"
+                    },                     
                     success: function (data, response) {
                         data.results.forEach((item, index) => {
                             item.Deleted = item.Deleted === "X" ? true : false;
@@ -1262,13 +1385,23 @@ sap.ui.define([
 
                         data.results.sort((a,b) => (a.Gmc > b.Gmc ? 1 : -1));
 
-                        oJSONModel.setData(data);
-                        _this.getView().setModel(oJSONModel, "gmc");
-                        _this.getMaterials();
-                        _this.getAttributes();
+                        var aFilters = [];
 
+                        if (_this.getView().byId("gmcTab").getBinding("rows")) {
+                            aFilters = _this.getView().byId("gmcTab").getBinding("rows").aFilters;
+                        }
+
+                        oJSONModel.setData(data);
+                        _this.getView().setModel(oJSONModel, "gmc");                     
+                        _this.getAttributes(true);
+                        _this.getMaterials(true);
+                        
                         if (_this.byId("searchFieldGMC").getProperty("value") !== "" ) {
                             _this.exeGlobalSearch(_this.byId("searchFieldGMC").getProperty("value"), "gmc")
+                        }
+
+                        if (aFilters) {
+                            _this.onRefreshFilter("gmc", aFilters);
                         }
 
                         _this.closeLoadingDialog();
@@ -1278,12 +1411,30 @@ sap.ui.define([
                 })
             },
 
+            onRefreshFilter(pModel, pFilters) {
+                // if (pFilters.length > 0) {
+                //     pFilters.forEach(item => {
+                //         var iColIdx = this._aColumns[pModel].findIndex(x => x.name == item.sPath);
+                //         this.getView().byId(pModel + "Tab").filter(this.getView().byId(pModel + "Tab").getColumns()[iColIdx], 
+                //             item.oValue1);
+                //     });
+                // }
+
+                var oTable = this.byId(pModel + "Tab");
+                var oColumns = oTable.getColumns();
+
+                pFilters.forEach(item => {
+                    oColumns.filter(fItem => fItem.getFilterProperty() === item.sPath)
+                        .forEach(col => col.filter(item.oValue1))
+                }) 
+            },
+
             onRefreshAttr() {
-                this.getAttributes();
+                this.getAttributes(true);
             },
 
             onRefreshMatl() {
-                this.getMaterials();
+                this.getMaterials(true);
             },
 
             onColumnProp: function(oEvent) {
@@ -1461,11 +1612,37 @@ sap.ui.define([
                 var vGmc = oEvent.getParameters().rowBindingContext.getObject().Gmc;
                 this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
 
-                this.getMaterials();
-                this.getAttributes();
+                this.getMaterials(false);
+                this.getAttributes(false);
 
                 this.byId("searchFieldAttr").setProperty("value", "");
                 this.byId("searchFieldMatl").setProperty("value", "");
+
+                var oTable = this.byId('attributesTab');
+                var oColumns = oTable.getColumns();
+
+                for (var i = 0, l = oColumns.length; i < l; i++) {
+                    if (oColumns[i].getFiltered()) {
+                        oColumns[i].filter("");
+                    }
+
+                    if (oColumns[i].getSorted()) {
+                        oColumns[i].setSorted(false);
+                    }
+                }
+
+                oTable = this.byId('materialsTab');
+                oColumns = oTable.getColumns();
+
+                for (var i = 0, l = oColumns.length; i < l; i++) {
+                    if (oColumns[i].getFiltered()) {
+                        oColumns[i].filter("");
+                    }
+
+                    if (oColumns[i].getSorted()) {
+                        oColumns[i].setSorted(false);
+                    }
+                }
             },
 
             filterGlobally: function(oEvent) {
@@ -1501,8 +1678,8 @@ sap.ui.define([
                 if (arg1 && arg2 === "gmc") {
                     var vGmc = this.getView().getModel(arg2).getData().results.filter((item,index) => index === this.byId(arg2 + "Tab").getBinding("rows").aIndices[0])[0].Gmc;
                     this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
-                    this.getAttributes();
-                    this.getMaterials();
+                    this.getAttributes(false);
+                    this.getMaterials(false);
                 }
             },
 
@@ -1963,13 +2140,7 @@ sap.ui.define([
             },
 
             onAfterRendering() {
-                this.getView().byId("gmcTab").attachBrowserEvent("keydown", function(oEvent) {
-                    // console.log("table is click");
-                    // console.log(oEvent);
 
-                    // console.log(oEvent.target.querySelectorAll('.sapUiTableTr'));
-                    
-                });
             },
 
             createDialog: null,
@@ -2104,9 +2275,7 @@ sap.ui.define([
                                 _this._oViewSettingsDialog["zuigmc2.view.CreateGMCDialog"].close();
                                 _this.setButton("gmc", "save");
                                 _this.onRefreshGMC();
-                                
-                                if (_this.getView().getModel("ui").getData().dataMode === 'NEW') _this.setFilterAfterCreate();
-                                
+                                _this.setFilterAfterCreate();
                                 _this.getView().getModel("ui").setProperty("/dataMode", 'READ');
                             }
 
@@ -2214,8 +2383,8 @@ sap.ui.define([
                     var sRowPath = this.byId(oEvent.srcControl.sId).oBindingContexts["gmc"].sPath;
                     var oRow = this.getView().getModel("gmc").getProperty(sRowPath);
                     this.getView().getModel("ui").setProperty("/activeGmc", oRow.Gmc);
-                    this.getMaterials();
-                    this.getAttributes();
+                    this.getMaterials(false);
+                    this.getAttributes(false);
                 }
             },
 
@@ -2298,11 +2467,18 @@ sap.ui.define([
                         aFilter.push(new Filter(item.sPath, this.getConnector(item.sOperator), item.oValue1));
                         oColumns.filter(fItem => fItem.getFilterProperty() === item.sPath)
                             .forEach(col => col.filter(item.oValue1))
-                    })
+                    }) 
                     
-                    oFilter = new Filter(aFilter, true);
-                    oTable.getBinding("rows").filter(oFilter, "Application");
+                    // oFilter = new Filter(aFilter, true);
+                    // oTable.getBinding("rows").filter(oFilter, "Application");
+                    // oTable.getModel().refresh(true);
+
+                    // console.log(this.getView().getModel("gmc"))
                 }
+            },
+
+            onFiltered: function(oEvent) {
+                console.log(oEvent.getSource())
             },
 
         });
