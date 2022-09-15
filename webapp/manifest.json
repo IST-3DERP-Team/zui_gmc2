@@ -22,7 +22,16 @@
                 "settings": {
                     "odataVersion": "2.0",
                     "annotations": [],
-                    "localUri": "localService/metadata.xml"
+                    "localUri": "localService/mainService/metadata.xml"
+                }
+            },
+            "ZGW_3DERP_COMMON_SRV": {
+                "uri": "/sap/opu/odata/sap/ZGW_3DERP_COMMON_SRV/",
+                "type": "OData",
+                "settings": {
+                    "odataVersion": "2.0",
+                    "annotations": [],
+                    "localUri": "localService/ZGW_3DERP_COMMON_SRV/metadata.xml"
                 }
             }
         }
@@ -73,6 +82,15 @@
                 "dataSource": "mainService",
                 "preload": true,
                 "settings": {}
+            },
+            "ZGW_3DERP_COMMON_SRV": {
+                "dataSource": "ZGW_3DERP_COMMON_SRV",
+                "preload": true,
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Inline",
+                    "refreshAfterChange": false
+                }
             }
         },
         "resources": {

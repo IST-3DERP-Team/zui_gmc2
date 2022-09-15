@@ -302,6 +302,11 @@
                                 press="onColumnProp"
                                 tooltip="Columns"
                                 visible="true" />
+                            <Button id="btnTabLayoutGMC" 
+                                icon="sap-icon://grid" 
+                                press="onSaveTableLayout"
+                                tooltip="Save Table Layout" 
+                                visible="true" />                                 
                         </Toolbar>
                     </uiT:extension>
                     <uiT:layoutData>
@@ -377,7 +382,12 @@
                                             icon="sap-icon://table-column"
                                             press="onColumnProp"
                                             tooltip="Columns"
-                                            visible="true" />                                                
+                                            visible="true" />
+                                        <Button id="btnTabLayoutAttr" 
+                                            icon="sap-icon://grid" 
+                                            press="onSaveTableLayout"
+                                            tooltip="Save Table Layout" 
+                                            visible="true" />                                             
                                     </Toolbar>
                                 </uiT:extension>
                             </uiT:Table>
@@ -426,7 +436,12 @@
                                             icon="sap-icon://table-column"
                                             press="onColumnProp"
                                             tooltip="Columns"
-                                            visible="true" />                                                
+                                            visible="true" />
+                                        <Button id="btnTabLayoutMatl" 
+                                            icon="sap-icon://grid" 
+                                            press="onSaveTableLayout"
+                                            tooltip="Save Table Layout" 
+                                            visible="true" />                                             
                                     </Toolbar>
                                 </uiT:extension>
                             </uiT:Table>
