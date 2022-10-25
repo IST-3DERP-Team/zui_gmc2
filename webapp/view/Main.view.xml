@@ -229,9 +229,15 @@
                     enableColumnFreeze="true"
                     enableCellFilter="true"
                     selectionMode="MultiToggle"
+                    firstVisibleRowChanged="onFirstVisibleRowChanged"
                     cellClick="onCellClickGMC"
-                    filter="onFiltered"
-                    sort="onSorted">
+                    sort="onSort"
+                    filter="onFilter"
+                    columnFreeze="onColumnUpdated"
+                    columnMove="onColumnUpdated"
+                    columnResize="onColumnUpdated"
+                    columnSelect="onColumnUpdated"
+                    columnVisibility="onColumnUpdated">
                     <uiT:rowSettingsTemplate>
                         <uiT:RowSettings highlight="{= ${gmc>Edited} === true ? 'Warning' : null}" />
                     </uiT:rowSettingsTemplate>
@@ -315,10 +321,8 @@
                 </uiT:Table>
                 <IconTabBar id="itbDetail"
                     expanded="{device>/isNoPhone}" 
-                    expandable="false" 
-                    class="tabColor" 
+                    expandable="false"
                     select="onSelectTab"
-                    headerBackgroundDesign="Transparent" 
                     stretchContentHeight="true" 
                     applyContentPadding="false">
                     <items>
@@ -330,7 +334,16 @@
                                 enableColumnFreeze="true"
                                 enableCellFilter="true"
                                 selectionMode="Single"
-                                sort="onSorted"> 
+                                selectionBehavior="RowSelector"
+                                firstVisibleRowChanged="onFirstVisibleRowChanged"
+                                cellClick="onCellClick"
+                                sort="onSort"
+                                filter="onFilter"
+                                columnFreeze="onColumnUpdated"
+                                columnMove="onColumnUpdated"
+                                columnResize="onColumnUpdated"
+                                columnSelect="onColumnUpdated"
+                                columnVisibility="onColumnUpdated"> 
                                 <uiT:rowSettingsTemplate>
                                     <uiT:RowSettings highlight="{= ${attributes>Edited} === true ? 'Warning' : null}" />
                                 </uiT:rowSettingsTemplate>                                    
@@ -400,7 +413,16 @@
                                 enableColumnFreeze="true"
                                 enableCellFilter="true"
                                 selectionMode="Single"
-                                sort="onSorted">
+                                selectionBehavior="RowSelector"
+                                firstVisibleRowChanged="onFirstVisibleRowChanged"
+                                cellClick="onCellClick"
+                                sort="onSort"
+                                filter="onFilter"
+                                columnFreeze="onColumnUpdated"
+                                columnMove="onColumnUpdated"
+                                columnResize="onColumnUpdated"
+                                columnSelect="onColumnUpdated"
+                                columnVisibility="onColumnUpdated">
                                 <uiT:extension>
                                     <Toolbar>
                                         <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />

@@ -119,13 +119,19 @@ sap.ui.define([
                     dataMode: 'READ'
                 }), "ui");
 
-                var oDelegateKeyUp = {
+                var oTableEventDelegate = {
                     onkeyup: function(oEvent){
                         _this.onKeyUp(oEvent);
+                    },
+
+                    onAfterRendering: function(oEvent) {
+                        _this.onAfterTableRendering(oEvent);
                     }
                 };
 
-                this.byId("gmcTab").addEventDelegate(oDelegateKeyUp);
+                this.byId("gmcTab").addEventDelegate(oTableEventDelegate);
+                this.byId("attributesTab").addEventDelegate(oTableEventDelegate);
+                this.byId("materialsTab").addEventDelegate(oTableEventDelegate);
 
                 this._isGMCEdited = false;
                 this._isAttrEdited = false;
@@ -133,6 +139,7 @@ sap.ui.define([
                 this._cancelGMCCreate = false;
                 this._cancelGMC = false;
                 this._cancelAttr = false;
+                this._tableRendered = "";
             },
 
             onSBUChange: function(oEvent) {
@@ -208,6 +215,8 @@ sap.ui.define([
                     },                    
                     success: function (data, response) {
                         if (data.results.length > 0) {
+                            data.results.sort((a,b) => (a.GMC > b.GMC ? 1 : -1));
+
                             data.results.forEach((item, index) => {
                                 item.DELETED = item.DELETED === "X" ? true : false;
     
@@ -217,18 +226,13 @@ sap.ui.define([
                                 if (item.UPDATEDDT !== null)
                                     item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
     
-                                if (index === 0) {
-                                    item.Active = true;
-                                }
-                                else {
-                                    item.Active = false;
-                                }
+                                if (index === 0) item.ACTIVE = "X";
+                                else item.ACTIVE = "";
                             });
-    
-                            data.results.sort((a,b) => (a.GMC > b.GMC ? 1 : -1));
-                            
+                                
                             var oJSONModel = new sap.ui.model.json.JSONModel();
                             oJSONModel.setData(data);
+                            _this._tableRendered = "gmcTab";
 
                             _this.getView().getModel("ui").setProperty("/activeGmc", data.results[0].GMC);
                             _this.getView().getModel("ui").setProperty("/activeMattyp", data.results[0].MATTYP);    
@@ -274,12 +278,17 @@ sap.ui.define([
                         "$filter": "GMC eq '" + sGmc + "'"
                     },
                     success: function (data, response) {
+                        data.results.sort((a,b) => (a.MATNO > b.MATNO ? 1 : -1));
+
                         data.results.forEach((item, index) => {
                             if (item.CREATEDDT !== null)
                                 item.CREATEDDT = dateFormat.format(item.CREATEDDT);
 
                             if (item.UPDATEDDT !== null)
                                 item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
+
+                            if (index === 0) item.ACTIVE = "X";
+                            else item.ACTIVE = "";
                         })
 
                         var aFilters = [];
@@ -290,6 +299,7 @@ sap.ui.define([
 
                         oJSONModel.setData(data);
                         _this.getView().setModel(oJSONModel, "materials");
+                        _this._tableRendered = "materialsTab";
 
                         if (_this.byId("searchFieldMatl").getProperty("value") !== "" ) {
                             _this.exeGlobalSearch(_this.byId("searchFieldMatl").getProperty("value"), "materials")
@@ -298,6 +308,8 @@ sap.ui.define([
                         if (arg && aFilters) {
                             _this.onRefreshFilter("materials", aFilters);
                         }
+
+                        _this.setActiveRowHighlight("materials");
                     },
                     error: function (err) { }
                 })
@@ -315,12 +327,17 @@ sap.ui.define([
                         "$filter": "GMC eq '" + sGmc + "'"
                     },
                     success: function (data, response) {
+                        data.results.sort((a,b) => (a.SEQ > b.SEQ ? 1 : -1));
+
                         data.results.forEach((item, index) => {
                             if (item.CREATEDDT !== null)
                                 item.CREATEDDT = dateFormat.format(item.CREATEDDT);
 
                             if (item.UPDATEDDT !== null)
                                 item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
+
+                            if (index === 0) item.ACTIVE = "X";
+                            else item.ACTIVE = "";
                         })
                         // console.log(response)
                         var aFilters = [];
@@ -331,6 +348,7 @@ sap.ui.define([
 
                         oJSONModel.setData(data);
                         _this.getView().setModel(oJSONModel, "attributes");
+                        _this._tableRendered = "attributesTab";
 
                         if (_this.byId("searchFieldAttr").getProperty("value") !== "" ) {
                             _this.exeGlobalSearch(_this.byId("searchFieldAttr").getProperty("value"), "attributes")
@@ -339,6 +357,8 @@ sap.ui.define([
                         if (arg && aFilters) {
                             _this.onRefreshFilter("attributes", aFilters);
                         }
+
+                        _this.setActiveRowHighlight("attributes");
                     },
                     error: function (err) { }
                 })
@@ -473,7 +493,13 @@ sap.ui.define([
                 var aSortableColumns = [];
                 var aFilterableColumns = [];
                 var aColumns = [];
-
+                
+                oMetadata.sort((a,b) => (+a.Order > +b.Order ? 1 : -1));
+                
+                oMetadata.forEach((item, index) => {
+                    item.Order = index;
+                });
+                
                 oMetadata.forEach((prop, idx) => {
                     var vCreatable = prop.Editable;
                     var vUpdatable = prop.Editable;
@@ -671,7 +697,7 @@ sap.ui.define([
             addColumns(table, columns, model) {
                 var aColumns = columns.filter(item => item.showable === true)
                 aColumns.sort((a,b) => (a.position > b.position ? 1 : -1));
-                console.log(aColumns)
+                // console.log(aColumns)
 
                 aColumns.forEach(col => {
                     // console.log(col)
@@ -683,7 +709,11 @@ sap.ui.define([
                             sortProperty: col.name,
                             filterProperty: col.name,
                             label: new sap.m.Text({text: col.label}),
-                            template: new sap.m.Text({text: "{" + model + ">" + col.name + "}"}),
+                            template: new sap.m.Text({
+                                text: "{" + model + ">" + col.name + "}",
+                                wrapping: false, 
+                                tooltip: "{" + model + ">" + col.name + "}"
+                            }),
                             visible: col.visible
                         }));
                     }
@@ -695,7 +725,11 @@ sap.ui.define([
                             sortProperty: col.name,
                             filterProperty: col.name,
                             label: new sap.m.Text({text: col.label}),
-                            template: new sap.m.Text({text: "{" + model + ">" + col.name + "}"}),
+                            template: new sap.m.Text({
+                                text: "{" + model + ">" + col.name + "}",
+                                wrapping: false, 
+                                tooltip: "{" + model + ">" + col.name + "}"
+                            }),
                             visible: col.visible
                         }));
                     }
@@ -712,11 +746,25 @@ sap.ui.define([
                         }));
                     }
                 })
+
+                table.addColumn(new sap.ui.table.Column({
+                    id: model + "ColACTIVE",
+                    width: "100px",
+                    sortProperty: "ACTIVE",
+                    filterProperty: "ACTIVE",
+                    label: new sap.m.Text({text: "Active"}),
+                    template: new sap.m.Text({
+                        text: "{" + model + ">ACTIVE}",
+                        wrapping: false, 
+                        tooltip: "{" + model + ">ACTIVE}"
+                    }),
+                    visible: false
+                }));
             },
 
             onAddColumns(table, columns, model) {
                 var aColumns = columns.filter(item => item.showable === true)
-                console.log(aColumns)
+                // console.log(aColumns)
                 aColumns.forEach(col => {
                     if (col.type === "Edm.String") {
                         table.addColumn(new sap.ui.table.Column({
@@ -767,6 +815,8 @@ sap.ui.define([
                         this.byId("btnFullScreenHdr").setVisible(true);
                         this.byId("btnExitFullScreenHdr").setVisible(false);
                     }
+
+                    this._tableRendered = "gmcTab";
                 }
                 else {
                     if (arg2 === "Max") {
@@ -784,7 +834,9 @@ sap.ui.define([
                         this.byId("btnExitFullScreenAttr").setVisible(false);
                         this.byId("btnFullScreenMatl").setVisible(true);
                         this.byId("btnExitFullScreenMatl").setVisible(false);
-                    }                    
+                    }   
+                    
+                    this._tableRendered = "";
                 }
             },
 
@@ -829,7 +881,7 @@ sap.ui.define([
                                         maxSuggestionWidth: ci.valueHelp["suggestionItems"].additionalText !== undefined ? ci.valueHelp["suggestionItems"].maxSuggestionWidth : "1px",
                                         suggestionItems: {
                                             path: ci.valueHelp["suggestionItems"].path,
-                                            length: 1000,
+                                            length: 10000,
                                             template: new sap.ui.core.ListItem({
                                                 key: ci.valueHelp["suggestionItems"].text,
                                                 text: ci.valueHelp["suggestionItems"].text,
@@ -881,7 +933,6 @@ sap.ui.define([
                 this.getView().getModel("ui").setProperty("/dataMode", 'NEW');
                 // console.log(aNewRow)
                 // console.log(this.getView().getModel("gmc"))
-                // console.log(oTable.getBinding())
 
                 if (oTable.getBinding()) {
                     this._aFiltersBeforeChange = jQuery.extend(true, [], oTable.getBinding().aFilters);
@@ -900,7 +951,7 @@ sap.ui.define([
                     }
                 }
 
-                oTable.getModel().refresh(true);
+                // oTable.getModel().refresh(true);
             },
 
             onEditGMC() {
@@ -1020,7 +1071,7 @@ sap.ui.define([
                             // console.log(_data)
                             oTable.getRows()[index].getCells()[iIndex].bindAggregation("suggestionItems", {
                                 path: "attribute>/" + item.MATTYPCLS,
-                                length: 1000,
+                                length: 10000,
                                 template: new sap.ui.core.ListItem({
                                     text: "{attribute>Attribcd}",
                                     key: "{attribute>Attribcd}",
@@ -1066,7 +1117,7 @@ sap.ui.define([
                 this.getView().getModel(arg).getData().results.forEach(item => item.Edited = false);
 
                 var oTable = this.byId(arg + "Tab");
-
+                
                 oTable.getColumns().forEach((col, idx) => {
                     this._aColumns[arg].filter(item => item.label === col.getLabel().getText())
                         .forEach(ci => {
@@ -1089,7 +1140,7 @@ sap.ui.define([
                                         maxSuggestionWidth: ci.valueHelp["suggestionItems"].additionalText !== undefined ? ci.valueHelp["suggestionItems"].maxSuggestionWidth : "1px",
                                         suggestionItems: {
                                             path: ci.valueHelp["items"].path, //ci.valueHelp.model + ">/items", //ci.valueHelp["suggestionItems"].path,
-                                            length: 1000,
+                                            length: 10000,
                                             template: new sap.ui.core.ListItem({
                                                 key: "{" + ci.valueHelp["items"].value + "}", //"{" + ci.valueHelp.model + ">" + ci.valueHelp["items"].value + "}",
                                                 text: "{" + ci.valueHelp["items"].value + "}", //"{" + ci.valueHelp.model + ">" + ci.valueHelp["items"].value + "}", //ci.valueHelp["suggestionItems"].text
@@ -1215,6 +1266,7 @@ sap.ui.define([
                     if (this.getView().getModel("ui").getData().dataMode === 'NEW') this.setFilterAfterCreate();
 
                     this.getView().getModel("ui").setProperty("/dataMode", 'READ');
+                    this.setActiveRowHighlight("gmc");                   
                 }
             },
 
@@ -1318,8 +1370,7 @@ sap.ui.define([
                             if (iKeyCount > 1) entitySet = entitySet.substr(0, entitySet.length - 1);
     
                             entitySet += ")";
-                            console.log(entitySet)
-                            console.log(param)
+
                             setTimeout(() => {
                                 oModel.update(entitySet, param, {
                                     method: "PUT",
@@ -1338,6 +1389,19 @@ sap.ui.define([
                                             })
                                             
                                             _this.getView().getModel("ui").setProperty("/dataMode", 'READ');
+
+                                            var oTable = _this.byId(arg + "Tab");
+
+                                            setTimeout(() => {
+                                                var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
+                            
+                                                oTable.getRows().forEach(row => {
+                                                    if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
+                                                        row.addStyleClass("activeRow");
+                                                    }
+                                                    else row.removeStyleClass("activeRow");
+                                                })                    
+                                            }, 1);                                            
                                         }
                                     },
                                     error: function() {
@@ -1770,6 +1834,8 @@ sap.ui.define([
                         "$filter": "SBU eq '" + vSBU + "'"
                     },                     
                     success: function (data, response) {
+                        data.results.sort((a,b) => (a.GMC > b.GMC ? 1 : -1));
+
                         data.results.forEach((item, index) => {
                             item.DELETED = item.DELETED === "X" ? true : false;
                             item.CREATEDDT = dateFormat.format(item.CREATEDDT);
@@ -1777,16 +1843,10 @@ sap.ui.define([
                             if (item.UPDATEDDT !== null)
                                 item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
                                 
-                            if (index === 0) {
-                                item.Active = true;
-                            }
-                            else {
-                                item.Active = false;
-                            }
+                            if (index === 0) item.ACTIVE = "X";
+                            else item.ACTIVE = "";
                         })
-
-                        data.results.sort((a,b) => (a.GMC > b.GMC ? 1 : -1));
-
+                        
                         var aFilters = [];
 
                         if (_this.getView().byId("gmcTab").getBinding("rows")) {
@@ -1794,7 +1854,9 @@ sap.ui.define([
                         }
 
                         oJSONModel.setData(data);
-                        _this.getView().setModel(oJSONModel, "gmc");                     
+                        _this.getView().setModel(oJSONModel, "gmc"); 
+                        _this._tableRendered = "gmcTab";
+
                         _this.getAttributes(true);
                         _this.getMaterials(true);
                         
@@ -1807,6 +1869,7 @@ sap.ui.define([
                         }
 
                         _this.closeLoadingDialog();
+                        _this.setActiveRowHighlight("gmc");
                     },
                     error: function (err) {
                     }
@@ -1890,6 +1953,8 @@ sap.ui.define([
                         }
                         else col.setVisible(true);
                     })
+
+                    this.setActiveRowHighlight(sTable)
                 }
             },
 
@@ -1897,7 +1962,7 @@ sap.ui.define([
                 this._oViewSettingsDialog["zuigmc2.view.ColumnDialog"].close();
             },
 
-            onSorted: function(oEvent) {
+            onSort: function(oEvent) {
                 var sColumnName = oEvent.getParameters().column.getProperty("sortProperty");
                 var sSortOrder = oEvent.getParameters().sortOrder;
                 var bMultiSort = oEvent.getParameters().columnAdded;
@@ -1914,6 +1979,21 @@ sap.ui.define([
                         } 
                     })
                 }
+
+                var oTable = oEvent.getSource();
+                var sModel;
+
+                if (oTable.getId().indexOf("gmcTab") >= 0) {
+                    sModel = "gmc";
+                }
+                else if (oTable.getId().indexOf("attributesTab") >= 0) {
+                    sModel = "attributes";
+                }
+                else if (oTable.getId().indexOf("materialsTab") >= 0) {
+                    sModel = "materials";
+                }
+
+                this.setActiveRowHighlight(sModel);               
             },
 
             onColSort: function(oEvent) {
@@ -1929,6 +2009,7 @@ sap.ui.define([
             
             beforeOpenColSort: function(oEvent) {
                 oEvent.getSource().getContent()[0].removeSelectionInterval(0, oEvent.getSource().getModel().getData().items.length - 1);
+                
                 oEvent.getSource().getModel().getData().items.forEach(item => {
                     if (item.sorted) {                       
                         oEvent.getSource().getContent()[0].addSelectionInterval(item.position, item.position);
@@ -2004,6 +2085,7 @@ sap.ui.define([
 
                 this.byId(sTable + "Tab").getBinding("rows").filter(oFilter, "Application");
                 this._aFilterableColumns[sTable] = oDialogData;
+                this.setActiveRowHighlight(sTable);
             },
 
             onColFilterCancel: function(oEvent) {
@@ -2043,6 +2125,21 @@ sap.ui.define([
                     if (oColumns[i].getSorted()) {
                         oColumns[i].setSorted(false);
                     }
+                }
+
+                if (oEvent.getParameters().rowBindingContext) {
+                    var oTable = oEvent.getSource(); //this.byId("ioMatListTab");
+                    var sRowPath = oEvent.getParameters().rowBindingContext.sPath;
+
+                    oTable.getModel("gmc").getData().results.forEach(row => row.ACTIVE = "");
+                    oTable.getModel("gmc").setProperty(sRowPath + "/ACTIVE", "X"); 
+                    
+                    oTable.getRows().forEach(row => {
+                        if (row.getBindingContext("gmc") && row.getBindingContext("gmc").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                            row.addStyleClass("activeRow");
+                        }
+                        else row.removeStyleClass("activeRow")
+                    })
                 }
             },
 
@@ -2415,7 +2512,11 @@ sap.ui.define([
                     this._aColumns[arg].filter(item => item.label === col.getLabel().getText())
                         .forEach(ci => {
                             if (ci.type === "STRING" || ci.type === "NUMBER") {
-                                col.setTemplate(new sap.m.Text({text: "{" + arg + ">" + ci.name + "}"}));
+                                col.setTemplate(new sap.m.Text({
+                                    text: "{" + arg + ">" + ci.name + "}",
+                                    wrapping: false,
+                                    tooltip: "{" + arg + ">" + ci.name + "}"
+                                }));
                             }
                             else if (ci.type === "BOOLEAN") {
                                 col.setTemplate(new sap.m.CheckBox({selected: "{" + arg + ">" + ci.name + "}", editable: false}));
@@ -2534,14 +2635,20 @@ sap.ui.define([
             },
 
             onSelectTab: function(oEvent) {
-                var oSource = oEvent.getSource();
-                // console.log(oEvent.getSource())
+                // var oSource = oEvent.getSource();
+                // console.log(oSource)
                 // console.log(oEvent.getSource().getItems())
                 // console.log(oEvent.getSource().getSelectedKey())
+                this._tableRendered = oEvent.getSource().getSelectedKey() + "Tab";
+                this.setActiveRowHighlight(oEvent.getSource().getSelectedKey());
             },
 
-            onAfterRendering() {
-
+            onAfterTableRendering: function(oEvent) {
+                console.log(this._tableRendered)
+                if (this._tableRendered !== "") {
+                    this.setActiveRowHighlight(this._tableRendered.replace("Tab", ""));
+                    this._tableRendered = "";
+                } 
             },
 
             createDialog: null,
@@ -2616,7 +2723,7 @@ sap.ui.define([
                         if (item.DESCZH !== '') _aDesczh.push(item.DESCZH);
                     }
                 })
-                console.log(this.getView().getModel("class").getData().results)
+                
                 if (_aDescen.join('') === '') {
                     MessageBox.information("At least one description should be specified.");
                 }
@@ -2682,6 +2789,8 @@ sap.ui.define([
                             }
 
                             MessageBox.information(res.RetMsgSet.results[0].Message);
+
+                            _this.setActiveRowHighlight("gmc");
                         },
                         error: function() {
                             // alert("Error");
@@ -2715,13 +2824,13 @@ sap.ui.define([
                         success: function (data, response) {
                             data.results.sort((a,b) => (a.Attribcd > b.Attribcd ? 1 : -1));
                             _data[_mattypcls] = data.results;                            
-                            
+                            console.log(data)
                             // oSource.getContent()[0].getRows()[index].getCells()[1].getBindingInfo("suggestionItems").path = "attribute>/" + _mattypcls;
                             // console.log(oSource.getContent()[0].getRows()[index].getCells()[1])
                             // console.log(data)
                             oSource.getContent()[0].getRows()[index].getCells()[1].bindAggregation("suggestionItems", {
                                 path: "attribute>/" + _mattypcls,
-                                length: 1000,
+                                length: 10000,
                                 template: new sap.ui.core.ListItem({
                                     text: "{attribute>Attribcd}",
                                     key: "{attribute>Attribcd}",
@@ -2781,12 +2890,63 @@ sap.ui.define([
                 var _dataMode = this.getView().getModel("ui").getData().dataMode;
                 _dataMode = _dataMode === undefined ? "READ": _dataMode;
 
-                if ((oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") && oEvent.srcControl.sParentAggregationName === "rows" && _dataMode === "READ") {
-                    var sRowPath = this.byId(oEvent.srcControl.sId).oBindingContexts["gmc"].sPath;
-                    var oRow = this.getView().getModel("gmc").getProperty(sRowPath);
-                    this.getView().getModel("ui").setProperty("/activeGmc", oRow.GMC);
-                    this.getMaterials(false);
-                    this.getAttributes(false);
+                if ((oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") && oEvent.srcControl.sParentAggregationName === "rows") {
+                    var oTable = this.byId(oEvent.srcControl.sId).oParent;
+
+                    if (oTable.getId().indexOf("gmcTab") >= 0) {
+                        if (_dataMode === "READ") {
+                            var sRowPath = this.byId(oEvent.srcControl.sId).oBindingContexts["gmc"].sPath;
+                            var oRow = this.getView().getModel("gmc").getProperty(sRowPath);
+
+                            this.getView().getModel("ui").setProperty("/activeGmc", oRow.GMC);
+                            this.getMaterials(false);
+                            this.getAttributes(false);
+                        }
+
+                        if (this.byId(oEvent.srcControl.sId).getBindingContext("gmc")) {
+                            var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("gmc").sPath;
+                            
+                            oTable.getModel("gmc").getData().results.forEach(row => row.ACTIVE = "");
+                            oTable.getModel("gmc").setProperty(sRowPath + "/ACTIVE", "X"); 
+                            
+                            oTable.getRows().forEach(row => {
+                                if (row.getBindingContext("gmc") && row.getBindingContext("gmc").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                                    row.addStyleClass("activeRow");
+                                }
+                                else row.removeStyleClass("activeRow")
+                            })
+                        }                        
+                    }
+                    else if (oTable.getId().indexOf("attributesTab") >= 0) {
+                        if (this.byId(oEvent.srcControl.sId).getBindingContext("attributes")) {
+                            var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("attributes").sPath;
+
+                            oTable.getModel("attributes").getData().results.forEach(row => row.ACTIVE = "");
+                            oTable.getModel("attributes").setProperty(sRowPath + "/ACTIVE", "X"); 
+                            
+                            oTable.getRows().forEach(row => {
+                                if (row.getBindingContext("attributes") && row.getBindingContext("attributes").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                                    row.addStyleClass("activeRow");
+                                }
+                                else row.removeStyleClass("activeRow")
+                            })
+                        }
+                    }
+                    else if (oTable.getId().indexOf("materialsTab") >= 0) {
+                        if (this.byId(oEvent.srcControl.sId).getBindingContext("materials")) {
+                            var sRowPath = this.byId(oEvent.srcControl.sId).getBindingContext("materials").sPath;
+
+                            oTable.getModel("materials").getData().results.forEach(row => row.ACTIVE = "");
+                            oTable.getModel("materials").setProperty(sRowPath + "/ACTIVE", "X"); 
+                            
+                            oTable.getRows().forEach(row => {
+                                if (row.getBindingContext("materials") && row.getBindingContext("materials").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                                    row.addStyleClass("activeRow");
+                                }
+                                else row.removeStyleClass("activeRow")
+                            })
+                        }
+                    }                   
                 }
             },
 
@@ -2825,6 +2985,7 @@ sap.ui.define([
                     this.getView().getModel("gmc").setProperty("/", this._oDataBeforeChange);
                     this.getView().getModel("ui").setProperty("/dataMode", 'READ');
                     this._isGMCEdited = false;
+                    this.setActiveRowHighlight("gmc");
                 }
                 else if (this._cancelAttr) {
                     this.byId("btnEditAttr").setVisible(true);
@@ -2882,8 +3043,21 @@ sap.ui.define([
                 }
             },
 
-            onFiltered: function(oEvent) {
-                console.log(oEvent.getSource())
+            onFilter: function(oEvent) {
+                var oTable = oEvent.getSource();
+                var sModel;
+
+                if (oTable.getId().indexOf("gmcTab") >= 0) {
+                    sModel = "gmc";
+                }
+                else if (oTable.getId().indexOf("attributesTab") >= 0) {
+                    sModel = "attributes";
+                }
+                else if (oTable.getId().indexOf("materialsTab") >= 0) {
+                    sModel = "materials";
+                }
+
+                this.setActiveRowHighlight(sModel);
             },
 
             onSaveTableLayout: function (oEvent) {
@@ -2946,6 +3120,102 @@ sap.ui.define([
                         sap.m.MessageBox.error(err);
                     }
                 });                
+            },
+
+            onFirstVisibleRowChanged: function (oEvent) {
+                var oTable = oEvent.getSource();
+                var sModel;
+
+                if (oTable.getId().indexOf("gmcTab") >= 0) {
+                    sModel = "gmc";
+                }
+                else if (oTable.getId().indexOf("attributesTab") >= 0) {
+                    sModel = "attributes";
+                }
+                else if (oTable.getId().indexOf("materialsTab") >= 0) {
+                    sModel = "materials";
+                }
+
+                setTimeout(() => {
+                    var oData = oTable.getModel(sModel).getData().results;
+                    var iStartIndex = oTable.getBinding("rows").iLastStartIndex;
+                    var iLength = oTable.getBinding("rows").iLastLength + iStartIndex;
+
+                    if (oTable.getBinding("rows").aIndices.length > 0) {
+                        for (var i = iStartIndex; i < iLength; i++) {
+                            var iDataIndex = oTable.getBinding("rows").aIndices.filter((fItem, fIndex) => fIndex === i);
+    
+                            if (oData[iDataIndex].ACTIVE === "X") oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].addStyleClass("activeRow");
+                            else oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].removeStyleClass("activeRow");
+                        }
+                    }
+                    else {
+                        for (var i = iStartIndex; i < iLength; i++) {
+                            if (oData[i].ACTIVE === "X") oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].addStyleClass("activeRow");
+                            else oTable.getRows()[iStartIndex === 0 ? i : i - iStartIndex].removeStyleClass("activeRow");
+                        }
+                    }
+                }, 1);
+            },
+
+            onColumnUpdated: function (oEvent) {
+                var oTable = oEvent.getSource();
+                var sModel;
+
+                if (oTable.getId().indexOf("gmcTab") >= 0) {
+                    sModel = "gmc";
+                }
+                else if (oTable.getId().indexOf("attributesTab") >= 0) {
+                    sModel = "attributes";
+                }
+                else if (oTable.getId().indexOf("materialsTab") >= 0) {
+                    sModel = "materials";
+                }
+
+                this.setActiveRowHighlight(sModel);
+            },
+
+            setActiveRowHighlight(arg) {
+                var oTable = this.byId(arg + "Tab");
+                
+                setTimeout(() => {
+                    var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
+
+                    oTable.getRows().forEach(row => {
+                        if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
+                            row.addStyleClass("activeRow");
+                        }
+                        else row.removeStyleClass("activeRow");
+                    })
+                }, 1);
+            },
+
+            onCellClick: function(oEvent) {
+                if (oEvent.getParameters().rowBindingContext) {
+                    var oTable = oEvent.getSource(); //this.byId("ioMatListTab");
+                    var sRowPath = oEvent.getParameters().rowBindingContext.sPath;
+                    var sModel;
+
+                    if (oTable.getId().indexOf("gmcTab") >= 0) {
+                        sModel = "gmc";
+                    }
+                    else if (oTable.getId().indexOf("attributesTab") >= 0) {
+                        sModel = "attributes";
+                    }
+                    else if (oTable.getId().indexOf("materialsTab") >= 0) {
+                        sModel = "materials";
+                    }
+    
+                    oTable.getModel(sModel).getData().results.forEach(row => row.ACTIVE = "");
+                    oTable.getModel(sModel).setProperty(sRowPath + "/ACTIVE", "X"); 
+                    
+                    oTable.getRows().forEach(row => {
+                        if (row.getBindingContext(sModel) && row.getBindingContext(sModel).sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                            row.addStyleClass("activeRow");
+                        }
+                        else row.removeStyleClass("activeRow");
+                    })
+                }
             },
 
         });

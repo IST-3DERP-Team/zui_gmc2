@@ -60,3 +60,7 @@
 .defBGColor {
     background-color: aliceblue !important;
 }
+
+.activeRow {
+    background-color: #e1ebf3 !important;
+}
