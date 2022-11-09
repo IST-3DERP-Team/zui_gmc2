@@ -7,6 +7,14 @@
     xmlns:uiL="sap.ui.layout"
     xmlns:uiT="sap.ui.table">  
     <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
+        <dependents>
+            <core:CommandExecution id="CE_NEW" command="New" enabled="true" execute=".onNew" />
+            <core:CommandExecution id="CE_EDIT" command="Edit" enabled="true" execute=".onEdit" />
+            <core:CommandExecution id="CE_DELETE" command="Delete" enabled="true" execute=".onDelete" />
+            <core:CommandExecution id="CE_SAVE" command="Save" enabled="true" execute=".onSave" />
+            <core:CommandExecution id="CE_CANCEL" command="Cancel" enabled="true" execute=".onCancel" />
+            <core:CommandExecution id="CE_REFRESH" command="Refresh" enabled="true" execute=".onRefresh" />
+        </dependents>
         <content>
             <!-- <uiL:FixFlex id="fixFlexGMC" class="fixFlexFixedSize sidePadding" fixContentSize="50%">
                 <uiL:fixContent>
@@ -231,6 +239,7 @@
                     selectionMode="MultiToggle"
                     firstVisibleRowChanged="onFirstVisibleRowChanged"
                     cellClick="onCellClickGMC"
+                    rowSelectionChange="onRowSelectionChange"
                     sort="onSort"
                     filter="onFilter"
                     columnFreeze="onColumnUpdated"
@@ -254,6 +263,7 @@
                                 class="marginTopNone">
                                 <core:Item key="{SBU}" text="{SBU}" />
                             </ComboBox>
+                            <Text text="{counts>/gmc} GMC" class="selHdrKeyFontStyle" />
                             <ToolbarSpacer/>
                             <SearchField
                                 id="searchFieldGMC"
@@ -273,7 +283,7 @@
                                 visible="true"/>
                             <Button id="btnSaveGMC" 
                                 icon="sap-icon://save"
-                                press=".onSave('gmc')" 
+                                press=".onSaveChanges('gmc')" 
                                 visible="false" />
                             <Button id="btnCancelGMC" 
                                 icon="sap-icon://sys-cancel"
@@ -349,7 +359,7 @@
                                 </uiT:rowSettingsTemplate>                                    
                                 <uiT:extension>
                                     <Toolbar>
-                                        <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />
+                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} Attributes )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
                                         <SearchField
                                             id="searchFieldAttr"
@@ -365,7 +375,7 @@
                                             visible="true" />
                                         <Button id="btnSaveAttr" 
                                             icon="sap-icon://save"
-                                            press=".onSave('attributes')" 
+                                            press=".onSaveChanges('attributes')" 
                                             visible="false" />
                                         <Button id="btnCancelAttr" 
                                             icon="sap-icon://sys-cancel"
@@ -425,7 +435,7 @@
                                 columnVisibility="onColumnUpdated">
                                 <uiT:extension>
                                     <Toolbar>
-                                        <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />
+                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} Materials )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
                                         <SearchField
                                             id="searchFieldMatl"
