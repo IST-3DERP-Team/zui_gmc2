@@ -157,40 +157,60 @@ sap.ui.define([
 
                 this.getView().setModel(new JSONModel(this._counts), "counts");
 
-                // if (sap.ui.getCore().byId("backBtn") !== undefined) {
-                //     this._fBackButton = sap.ui.getCore().byId("backBtn").mEventRegistry.press[0].fFunction;
-
-                //     sap.ui.getCore().byId("backBtn").mEventRegistry.press[0].fFunction = function(oEvent) {
-                //         _this.onNavBack();
-                //         sap.ui.getCore().byId("backBtn").mEventRegistry.press[0].fFunction = _this._fBackButton;
-                //     }                    
-                // }
-
-                // window.addEventListener('beforeunload', function (e) {
-                //     _this.onExit();
-                // });
-
                 // this.setKeyboardShortcuts();
 
                 // this.byId("gmcTab").attachBrowserEvent('click', function (e) {
                 //     e.preventDefault();
                 //     console.log("table click");
                 // });
+                var oDDTextParam = [];
+                var oDDTextResult = {};
+                var oModelCaps = this.getOwnerComponent().getModel("ZGW_3DERP_COMMON_SRV");
 
+                oDDTextParam.push({CODE: "ADD"});
+                oDDTextParam.push({CODE: "EDIT"});  
+                oDDTextParam.push({CODE: "SAVE"});
+                oDDTextParam.push({CODE: "CANCEL"});
+                oDDTextParam.push({CODE: "DELETE"});
+                oDDTextParam.push({CODE: "REFRESH"});
+                oDDTextParam.push({CODE: "SORT"});
+                oDDTextParam.push({CODE: "FILTER"});
+                oDDTextParam.push({CODE: "FULLSCREEN"});
+                oDDTextParam.push({CODE: "EXITFULLSCREEN"});
+                oDDTextParam.push({CODE: "COLUMNS"});
+                oDDTextParam.push({CODE: "SAVELAYOUT"});
+                oDDTextParam.push({CODE: "INFO_GMC_NO_EDIT"});
+                oDDTextParam.push({CODE: "INFO_GMC_WITH_MATL"});
+                oDDTextParam.push({CODE: "INFO_SEL_RECORD_DELETED"});
+                oDDTextParam.push({CODE: "INFO_SEL_RECORD_ALREADY_DELETED"});
+                oDDTextParam.push({CODE: "INFO_GMC_DESC_REQD"}); 
+                oDDTextParam.push({CODE: "INFO_NO_SEL_RECORD_TO_PROC"}); 
+                oDDTextParam.push({CODE: "INFO_INPUT_REQD_FIELDS"}); 
+                oDDTextParam.push({CODE: "INFO_NO_DATA_MODIFIED"}); 
+                oDDTextParam.push({CODE: "INFO_CHECK_INVALID_ENTRIES"}); 
+                oDDTextParam.push({CODE: "INFO_SEL_ONE_COL"}); 
+                oDDTextParam.push({CODE: "INFO_LAYOUT_SAVE"}); 
+
+                oModelCaps.create("/CaptionMsgSet", { CaptionMsgItems: oDDTextParam  }, {
+                    method: "POST",
+                    success: function(oData, oResponse) {        
+                        oData.CaptionMsgItems.results.forEach(item => {
+                            oDDTextResult[item.CODE] = item.TEXT;
+                        })
+
+                        _this.getView().setModel(new JSONModel(oDDTextResult), "ddtext");
+                        // console.log(_this.getView().getModel("ddtext").getData())
+                    },
+                    error: function(err) {
+                        sap.m.MessageBox.error(err);
+                    }
+                });
             },
 
-            onExit: function() {
-                console.log('app exit');
-
-                // var oModel = new sap.ui.model.odata.ODataModel("/sap/opu/odata/sap/ZGW_3DERP_GMC_SRV/");
-
-                // oModel.read('/SBURscSet', { 
-                //     success: function (data, response) {
-                //         console.log(data)
-                //     },
-                //     error: function (err) { }
-                // })                
-            },
+            // onExit: function() {
+            //     console.log('app exit');
+            //     console.log(sap.ushell.Container.getDirtyFlag());
+            // },
 
             onSBUChange: function(oEvent) {
                 // console.log(this.byId('cboxSBU').getSelectedKey());
@@ -791,6 +811,12 @@ sap.ui.define([
                                 tooltip: "{" + model + ">" + col.name + "}"
                             }),
                             visible: col.visible
+                            // multiLabels: [
+                            //     new sap.m.Text({text: col.label}),
+                            //     new sap.m.Text({ 
+                            //         text : "1000"
+                            //     })
+                            // ]
                         }));
                     }
                     else if (col.type === "BOOLEAN" ) {
@@ -1054,7 +1080,7 @@ sap.ui.define([
                                         }));
                                     }
                                 }
-                            } 
+                            }
 
                             if (ci.required) {
                                 col.getLabel().addStyleClass("requiredField");
@@ -1107,7 +1133,7 @@ sap.ui.define([
                             bDeleted = true;
 
                             if (aSelIndices.length === iCounter) {
-                                MessageBox.information("Selected record(s) either has assigned material or deleted already, no record to edit.");
+                                MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_GMC_NO_EDIT"]);
                             }
                         }
                         else {
@@ -1123,7 +1149,7 @@ sap.ui.define([
 
                                     if (aSelIndices.length === iCounter) {
                                         if (aDataToEdit.length === 0) {
-                                            MessageBox.information("Selected record(s) either has assigned material already or deleted, no record to edit.");
+                                            MessageBox.information(me.getView().getModel("ddtext").getData()["INFO_GMC_NO_EDIT"]);
                                         }
                                         else {
                                             me.byId("btnAddGMC").setVisible(false);
@@ -1163,7 +1189,7 @@ sap.ui.define([
                 }
                 else {
                     // aDataToEdit = aData;
-                    MessageBox.information("No selected record(s) to edit.");
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_NO_SEL_RECORD_TO_PROC"]);
                 }
                 // aDataToEdit = aDataToEdit.filter(item => item.Deleted === false);
             },
@@ -1171,7 +1197,7 @@ sap.ui.define([
             onEditAttr: async function(oEvent) {
                 var bExist = await this.checkMaterials(this);
                 if (bExist) {
-                    sap.m.MessageBox.information("GMC has assigned material already, editing not allowed.");    
+                    sap.m.MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_GMC_WITH_MATL"]);    
                     return;
                 }
                 
@@ -1453,7 +1479,7 @@ sap.ui.define([
                 {
                     if (aNewRows.length > 0) {
                         if (aNewRows[0].MATTYP === '' || aNewRows[0].MATGRPCD === '' || aNewRows[0].BASEUOM === '') {
-                            MessageBox.information("Please input required fields.");
+                            MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_INPUT_REQD_FIELDS"]);
                         }
                         else {
                             this.onCreateDialog(aNewRows[0]);
@@ -1478,21 +1504,18 @@ sap.ui.define([
                         var oModel = this.getOwnerComponent().getModel();
                         var iEdited = 0;
                         var _this = this;
-                        
-                        aEditedRows.forEach(item => {
-                            // var entitySet = "/GMCSet('" + item.Gmc + "')";
-                            // var param = {
-                            //     "Baseuom": item.Baseuom,
-                            //     "Orderuom": item.Orderuom,
-                                // "Grswt": item.Grswt,
-                                // "Netwt": item.Netwt,
-                                // "Wtuom": item.Wtuom,
-                                // "Volume": item.Volume,
-                                // "Voluom": item.Voluom,
-                                // "Cusmatcd": item.Cusmatcd,
-                                // "Processcd": item.Processcd
-                            // };
-                            
+                        // var paramBatch = [];
+                        // console.log(oModel);
+                        // console.log(this.byId(arg + "Tab").getRows()[0])
+
+                        oModel.setUseBatch(true);
+                        oModel.setDeferredGroups(["update"]);
+                        var mParameters = {  
+                            "groupId": "update"
+                            // "changeSetId": "foo"  
+                        };
+                        oTable.getRows()
+                        aEditedRows.forEach(item => {                           
                             var entitySet = "/" + this._aEntitySet[arg] + "(";
                             var param = {};
     
@@ -1509,56 +1532,130 @@ sap.ui.define([
                                 }
                             })
                             
-                            if (iKeyCount > 1) entitySet = entitySet.substr(0, entitySet.length - 1);
+                            if (iKeyCount > 1) entitySet = entitySet.substring(0, entitySet.length - 1);
     
                             entitySet += ")";
+                            // console.log(param);
+                            // paramBatch.push(oModel.createBatchOperation(entitySet, "PUT", param));
+                            // console.log(param);
 
-                            setTimeout(() => {
-                                oModel.update(entitySet, param, {
-                                    method: "PUT",
-                                    success: function(data, oResponse) {
-                                        iEdited++;
+                            oModel.update(entitySet, param, mParameters);
+
+                            // setTimeout(() => {
+                            //     oModel.update(entitySet, param, {
+                            //         method: "PUT",
+                            //         success: function(data, oResponse) {
+                            //             iEdited++;
     
-                                        if (iEdited === aEditedRows.length) {
-                                            _this.closeLoadingDialog();
-                                            _this.setButton(arg, "save");
-                                            sap.ushell.Container.setDirtyFlag(false);
+                            //             if (iEdited === aEditedRows.length) {
+                            //                 _this.closeLoadingDialog();
+                            //                 _this.setButton(arg, "save");
+                            //                 sap.ushell.Container.setDirtyFlag(false);
     
-                                            var oIconTabBar = _this.byId("itbDetail");
-                                            oIconTabBar.getItems().forEach(item => item.setProperty("enabled", true));
+                            //                 var oIconTabBar = _this.byId("itbDetail");
+                            //                 oIconTabBar.getItems().forEach(item => item.setProperty("enabled", true));
     
-                                            _this.getView().getModel(arg).getData().results.forEach((row,index) => {
-                                                _this.getView().getModel(arg).setProperty('/results/' + index + '/Edited', false);
-                                            })
+                            //                 _this.getView().getModel(arg).getData().results.forEach((row,index) => {
+                            //                     _this.getView().getModel(arg).setProperty('/results/' + index + '/Edited', false);
+                            //                 })
                                             
-                                            _this.getView().getModel("ui").setProperty("/dataMode", 'READ');
+                            //                 _this.getView().getModel("ui").setProperty("/dataMode", 'READ');
 
-                                            var oTable = _this.byId(arg + "Tab");
+                            //                 var oTable = _this.byId(arg + "Tab");
 
-                                            setTimeout(() => {
-                                                var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
+                            //                 setTimeout(() => {
+                            //                     var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
                             
-                                                oTable.getRows().forEach(row => {
-                                                    if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
-                                                        row.addStyleClass("activeRow");
-                                                    }
-                                                    else row.removeStyleClass("activeRow");
-                                                })                    
-                                            }, 1);                                            
+                            //                     oTable.getRows().forEach(row => {
+                            //                         if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
+                            //                             row.addStyleClass("activeRow");
+                            //                         }
+                            //                         else row.removeStyleClass("activeRow");
+                            //                     })                    
+                            //                 }, 1);                                            
+                            //             }
+                            //         },
+                            //         error: function() {
+                            //             iEdited++;
+                            //             // alert("Error");
+                            //         }
+                            //     });
+                            // }, 500)
+                        });
+                        // console.log(paramBatch);
+                        // oModel.addBatchChangeOperations(paramBatch);
+                        // oModel.submitBatch(
+                        //     function(data){
+                        //         console.log('success');
+                        //         _this.closeLoadingDialog();
+                        //         _this.setButton(arg, "save");
+                        //         sap.ushell.Container.setDirtyFlag(false);
+
+                        //         var oIconTabBar = _this.byId("itbDetail");
+                        //         oIconTabBar.getItems().forEach(item => item.setProperty("enabled", true));
+
+                        //         _this.getView().getModel(arg).getData().results.forEach((row,index) => {
+                        //             _this.getView().getModel(arg).setProperty('/results/' + index + '/Edited', false);
+                        //         })
+                                
+                        //         _this.getView().getModel("ui").setProperty("/dataMode", 'READ');
+
+                        //         var oTable = _this.byId(arg + "Tab");
+
+                        //         setTimeout(() => {
+                        //             var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
+                
+                        //             oTable.getRows().forEach(row => {
+                        //                 if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
+                        //                     row.addStyleClass("activeRow");
+                        //                 }
+                        //                 else row.removeStyleClass("activeRow");
+                        //             })                    
+                        //         }, 1);                                
+                        //     },
+                        //     function(err){
+                        //         console.log('failed');
+                        //     }
+                        // );
+                        
+                        oModel.submitChanges({
+                            groupId: "update",
+                            success: function(odata, resp){ 
+                                // console.log(odata, resp); 
+                                _this.closeLoadingDialog();
+                                _this.setButton(arg, "save");
+
+                                sap.ushell.Container.setDirtyFlag(false);
+
+                                var oIconTabBar = _this.byId("itbDetail");
+                                oIconTabBar.getItems().forEach(item => item.setProperty("enabled", true));
+
+                                _this.getView().getModel(arg).getData().results.forEach((row,index) => {
+                                    _this.getView().getModel(arg).setProperty('/results/' + index + '/Edited', false);
+                                })
+                                
+                                _this.getView().getModel("ui").setProperty("/dataMode", 'READ');
+
+                                var oTable = _this.byId(arg + "Tab");
+
+                                setTimeout(() => {
+                                    var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
+                
+                                    oTable.getRows().forEach(row => {
+                                        if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
+                                            row.addStyleClass("activeRow");
                                         }
-                                    },
-                                    error: function() {
-                                        iEdited++;
-                                        // alert("Error");
-                                    }
-                                });
-                            }, 500)
+                                        else row.removeStyleClass("activeRow");
+                                    })                    
+                                }, 1);                                 
+                            },
+                            error: function(odata, resp) { console.log(resp); }
                         });
                     }
                     else {
                         var bCompact = true;
     
-                        MessageBox.information("No data have been modified.",
+                        MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_NO_DATA_MODIFIED"],
                             {
                                 styleClass: bCompact ? "sapUiSizeCompact" : ""
                             }
@@ -1566,7 +1663,7 @@ sap.ui.define([
                     }
                 }
                 else {
-                    MessageBox.information("Please check invalid entry on input fields.");
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_CHECK_INVALID_ENTRIES"]);
                 }
             },
 
@@ -1578,7 +1675,7 @@ sap.ui.define([
                 {
                     if (aNewRows.length > 0) {
                         if (aNewRows[0].MATTYP === '' || aNewRows[0].MATGRPCD === '' || aNewRows[0].BASEUOM === '') {
-                            MessageBox.information("Please input required fields.");
+                            MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_INPUT_REQD_FIELDS"]);
                         }
                         else {
                             this.onCreateDialog(aNewRows[0]);
@@ -1670,7 +1767,7 @@ sap.ui.define([
                     else {
                         var bCompact = true;
     
-                        MessageBox.information("No data have been modified.",
+                        MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_NO_DATA_MODIFIED"],
                             {
                                 styleClass: bCompact ? "sapUiSizeCompact" : ""
                             }
@@ -1678,7 +1775,7 @@ sap.ui.define([
                     }
                 }
                 else {
-                    MessageBox.information("Please check invalid entry on input fields.");
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_CHECK_INVALID_ENTRIES"]);
                 }
             },
 
@@ -1902,7 +1999,7 @@ sap.ui.define([
                 else {
                     var bCompact = true;
 
-                    MessageBox.information("No data have been modified.",
+                    MessageBox.information(me.getView().getModel("ddtext").getData()["INFO_NO_DATA_MODIFIED"],
                         {
                             styleClass: bCompact ? "sapUiSizeCompact" : ""
                         }
@@ -1973,7 +2070,7 @@ sap.ui.define([
             
                                                             if (iDeleted === aDataToDelete.length) {
                                                                 me.closeLoadingDialog();
-                                                                MessageBox.information("Selected record(s) successfully deleted.");
+                                                                MessageBox.information(me.getView().getModel("ddtext").getData()["INFO_SEL_RECORD_DELETED"]);
                                                             }
                                                         },
                                                         error: function() {
@@ -1988,14 +2085,14 @@ sap.ui.define([
                                 });
                             }
                             else {
-                                if (bDeleted && wMaterial) MessageBox.information("Selected record(s) either has assigned material or deleted already.");
-                                else if (bDeleted) MessageBox.information("Selected record(s) already deleted.");
-                                else if (wMaterial) MessageBox.information("Selected record(s) has assigned material already.");
+                                if (bDeleted && wMaterial) MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_GMC_NO_EDIT"]);
+                                else if (bDeleted) MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_SEL_RECORD_ALREADY_DELETED"]);
+                                else if (wMaterial) MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_GMC_WITH_MATL"]);
                             }
                         }
                     })
                 }
-                else MessageBox.information("No record(s) have been selected for deletion.");
+                else MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_NO_SEL_RECORD_TO_PROC"]);
             },
 
             onRefreshGMC() {
@@ -2118,7 +2215,7 @@ sap.ui.define([
                 var aSelRows = oDialogTable.getSelectedIndices();
 
                 if (aSelRows.length === 0) {
-                    MessageBox.information("Please select at least one visible column.");
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_SEL_ONE_COL"]);
                 }
                 else {
                     oDialog.close();
@@ -2939,7 +3036,7 @@ sap.ui.define([
                 })
                 
                 if (_aDescen.join('') === '') {
-                    MessageBox.information("At least one description should be specified.");
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_GMC_DESC_REQD"]);
                 }
                 else {
                     this.showLoadingDialog('Processing...');
@@ -2984,7 +3081,8 @@ sap.ui.define([
                         "RetMsgSet": [{ "Seq": "1" }]
                     }
 
-                    // console.log(_param)
+                    console.log(_param);
+                    return;
 
                     var oModel = this.getOwnerComponent().getModel();
 
@@ -3379,7 +3477,7 @@ sap.ui.define([
                 oModel.create("/TableLayoutSet", oParam, {
                     method: "POST",
                     success: function(data, oResponse) {
-                        sap.m.MessageBox.information("Layout saved.");
+                        sap.m.MessageBox.information(me.getView().getModel("ddtext").getData()["INFO_LAYOUT_SAVE"]);
                         //Common.showMessage(me._i18n.getText('t6'));
                     },
                     error: function(err) {
