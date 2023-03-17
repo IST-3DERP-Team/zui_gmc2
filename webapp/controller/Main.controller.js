@@ -64,7 +64,7 @@ sap.ui.define([
                                 this._oPopover.openBy(oCBoxSBU);
                             }
 
-                            _this.byId("btnColPropAttr").setEnabled(false);
+                            _this.byId("btnColPropAttr").setEnabled(false); 
                             _this.byId("btnAddGMC").setEnabled(false);
                             _this.byId("btnEditGMC").setEnabled(false);
                             _this.byId("btnDeleteGMC").setEnabled(false);
@@ -3437,7 +3437,7 @@ sap.ui.define([
                 var sModel;
 
                 if (oTable.getId().indexOf("gmcTab") >= 0) {
-                    sModel = "gmc";
+                    sModel = "gmc";                   
                 }
                 else if (oTable.getId().indexOf("attributesTab") >= 0) {
                     sModel = "attributes";
@@ -3447,6 +3447,10 @@ sap.ui.define([
                 }
 
                 this.setActiveRowHighlight(sModel);
+
+                setTimeout(() => {
+                    this.getView().getModel("counts").setProperty("/" + sModel, oTable.getBinding("rows").aIndices.length);
+                }, 100);
             },
 
             onSaveTableLayout: function (oEvent) {
