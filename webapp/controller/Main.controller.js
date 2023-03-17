@@ -8,11 +8,12 @@ sap.ui.define([
     "sap/ui/Device",
     "sap/ui/table/library",
     'sap/ui/core/Fragment',
+    "sap/ui/core/routing/HashChanger",
 ],
     /**
      * @param {typeof sap.ui.core.mvc.Controller} Controller
      */
-    function (Controller, JSONModel, MessageBox, Filter, FilterOperator, Sorter, Device, library, Fragment) {
+    function (Controller, JSONModel, MessageBox, Filter, FilterOperator, Sorter, Device, library, Fragment, HashChanger) {
         "use strict";
 
         // shortcut for sap.ui.table.SortOrder
@@ -22,6 +23,8 @@ sap.ui.define([
         return Controller.extend("zuigmc2.controller.Main", {
 
             onInit: function () {
+                this.getAppAction();
+
                 var oModel = this.getOwnerComponent().getModel();               
                 var _this = this; 
                 this.validationErrors = [];
@@ -205,6 +208,28 @@ sap.ui.define([
                         sap.m.MessageBox.error(err);
                     }
                 });
+            },
+
+            getAppAction: async function() {
+                if (sap.ushell.Container !== undefined) {
+                    const fullHash = new HashChanger().getHash(); 
+                    const urlParsing = await sap.ushell.Container.getServiceAsync("URLParsing");
+                    const shellHash = urlParsing.parseShellHash(fullHash); 
+                    const sAction = shellHash.action;
+
+                    if (sAction === "display") {
+                        this.byId("btnAddGMC").setVisible(false);
+                        this.byId("btnEditGMC").setVisible(false);
+                        this.byId("btnDeleteGMC").setVisible(false);
+                        this.byId("btnEditAttr").setVisible(false);
+                    }
+                    else {
+                        this.byId("btnAddGMC").setVisible(true);
+                        this.byId("btnEditGMC").setVisible(true);
+                        this.byId("btnDeleteGMC").setVisible(true);
+                        this.byId("btnEditAttr").setVisible(true);
+                    }
+                }
             },
 
             // onExit: function() {

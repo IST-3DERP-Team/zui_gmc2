@@ -270,6 +270,7 @@
                                 placeholder="Filter"
                                 value=""
                                 search="filterGlobally"
+                                visible="false"
                                 width="15rem"/>
                             <ToolbarSeparator/>
                             <Button id="btnAddGMC" 
@@ -375,6 +376,7 @@
                                             placeholder="Filter"
                                             value=""
                                             search="filterGlobally"
+                                            visible="false"
                                             width="15rem"/>
                                         <ToolbarSeparator/>
                                         <Button id="btnEditAttr" 
@@ -458,6 +460,7 @@
                                             placeholder="Filter"
                                             value=""
                                             search="filterGlobally"
+                                            visible="false"
                                             width="15rem"/>
                                         <ToolbarSeparator/>
                                         <Button id="refreshMaterialsButton" 
