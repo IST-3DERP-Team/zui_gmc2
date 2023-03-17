@@ -265,14 +265,14 @@
                             </ComboBox>
                             <Text text="{counts>/gmc} GMC" class="selHdrKeyFontStyle" />
                             <ToolbarSpacer/>
-                            <SearchField
+                            <!-- <SearchField
                                 id="searchFieldGMC"
                                 placeholder="Filter"
                                 value=""
                                 search="filterGlobally"
                                 visible="false"
                                 width="15rem"/>
-                            <ToolbarSeparator/>
+                            <ToolbarSeparator/> -->
                             <Button id="btnAddGMC" 
                                 icon="sap-icon://add"
                                 press="onCreateGMC" 
@@ -371,14 +371,14 @@
                                     <Toolbar>
                                         <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} Attributes )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
-                                        <SearchField
+                                        <!-- <SearchField
                                             id="searchFieldAttr"
                                             placeholder="Filter"
                                             value=""
                                             search="filterGlobally"
                                             visible="false"
                                             width="15rem"/>
-                                        <ToolbarSeparator/>
+                                        <ToolbarSeparator/> -->
                                         <Button id="btnEditAttr" 
                                             icon="sap-icon://edit"
                                             press=".onEditAttr"
@@ -455,14 +455,14 @@
                                     <Toolbar>
                                         <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} Materials )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
-                                        <SearchField
+                                        <!-- <SearchField
                                             id="searchFieldMatl"
                                             placeholder="Filter"
                                             value=""
                                             search="filterGlobally"
                                             visible="false"
                                             width="15rem"/>
-                                        <ToolbarSeparator/>
+                                        <ToolbarSeparator/> -->
                                         <Button id="refreshMaterialsButton" 
                                             icon="sap-icon://refresh"
                                             press=".onRefreshMatl"
