@@ -1449,7 +1449,7 @@ sap.ui.define([
                     this.byId("btnFilterGMC").setVisible(true);
                     this.byId("btnFullScreenHdr").setVisible(true);
                     this.byId("btnColPropGMC").setVisible(true);
-                    this.byId("searchFieldGMC").setVisible(true);
+                    // this.byId("searchFieldGMC").setVisible(true);
                     this.onTableResize("Hdr","Min");
                     this.setRowReadMode("gmc");
                     this.getView().getModel("gmc").setProperty("/", this._oDataBeforeChange);
@@ -1483,7 +1483,7 @@ sap.ui.define([
                     this.byId("btnFilterAttr").setVisible(true);
                     this.byId("btnFullScreenHdr").setVisible(true);
                     this.byId("btnColPropAttr").setVisible(true);
-                    this.byId("searchFieldAttr").setVisible(true);
+                    // this.byId("searchFieldAttr").setVisible(true);
                     this.onTableResize("Attr","Min");
                     this.byId("btnTabLayoutAttr").setVisible(true);
     
@@ -1817,7 +1817,7 @@ sap.ui.define([
                         this.byId("btnFilterGMC").setVisible(true);
                         this.byId("btnFullScreenHdr").setVisible(true);
                         this.byId("btnColPropGMC").setVisible(true);
-                        this.byId("searchFieldGMC").setVisible(true);
+                        // this.byId("searchFieldGMC").setVisible(true);
                         this.onTableResize("Hdr","Min");
                         this.byId("btnTabLayoutGMC").setVisible(true);
                         this.byId("cboxSBU").setEnabled(true);
@@ -1831,7 +1831,7 @@ sap.ui.define([
                         this.byId("btnFilterAttr").setVisible(true);
                         this.byId("btnFullScreenAttr").setVisible(true);
                         this.byId("btnColPropAttr").setVisible(true);
-                        this.byId("searchFieldAttr").setVisible(true);
+                        // this.byId("searchFieldAttr").setVisible(true);
                         this.onTableResize("Attr","Min");
                         this.byId("btnTabLayoutAttr").setVisible(true);
                     }
@@ -1992,7 +1992,7 @@ sap.ui.define([
                                         _this.byId("btnFilterAttr").setVisible(true);
                                         _this.byId("btnFullScreenAttr").setVisible(true);
                                         _this.byId("btnColPropAttr").setVisible(true);
-                                        _this.byId("searchFieldAttr").setVisible(true);
+                                        // _this.byId("searchFieldAttr").setVisible(true);
                                         _this.onTableResize("Attr","Min");
                                         _this.byId("btnTabLayoutAttr").setVisible(true);
 
@@ -3350,7 +3350,7 @@ sap.ui.define([
                     this.byId("btnFilterGMC").setVisible(true);
                     this.byId("btnFullScreenHdr").setVisible(true);
                     this.byId("btnColPropGMC").setVisible(true);
-                    this.byId("searchFieldGMC").setVisible(true);
+                    // this.byId("searchFieldGMC").setVisible(true);
                     this.byId("btnTabLayoutGMC").setVisible(true);
                     this.byId("cboxSBU").setEnabled(true);
                     this.onTableResize("Hdr","Min");
@@ -3371,7 +3371,7 @@ sap.ui.define([
                     this.byId("btnFilterAttr").setVisible(true);
                     this.byId("btnFullScreenHdr").setVisible(true);
                     this.byId("btnColPropAttr").setVisible(true);
-                    this.byId("searchFieldAttr").setVisible(true);
+                    // this.byId("searchFieldAttr").setVisible(true);
                     this.onTableResize("Attr","Min");
                     this.byId("btnTabLayoutAttr").setVisible(true);
 
