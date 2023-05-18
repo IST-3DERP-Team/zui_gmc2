@@ -312,7 +312,11 @@
                                 icon="sap-icon://filter"
                                 press="onColFilter"
                                 tooltip="{ddtext>/FILTER}"
-                                visible="true" />
+                                visible="true">
+                                <customData>
+                                    <core:CustomData key="TableId" value="gmcTab" />
+                                </customData>
+                            </Button>
                             <Button id="btnFullScreenHdr" 
                                 icon="sap-icon://full-screen"
                                 press="onTableResize('Hdr','Max')"

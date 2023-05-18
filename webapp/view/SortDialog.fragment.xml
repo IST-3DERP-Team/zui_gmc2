@@ -8,7 +8,7 @@
     <Dialog contentWidth="380px" 
         contentHeight="350px"
         verticalScrolling="true"
-        title="Sort by"
+        title="Sort Criteria"
         resizable="true"
         draggable="true"
         beforeOpen="beforeOpenColSort">

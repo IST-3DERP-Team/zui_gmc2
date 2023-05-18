@@ -217,6 +217,8 @@ sap.ui.define([
                     const shellHash = urlParsing.parseShellHash(fullHash); 
                     const sAction = shellHash.action;
 
+                    this._appAction = sAction;
+
                     if (sAction === "display") {
                         this.byId("btnAddGMC").setVisible(false);
                         this.byId("btnEditGMC").setVisible(false);
@@ -587,7 +589,7 @@ sap.ui.define([
                         }
                     },
                     error: function (err) {
-                        me.closeLoadingDialog(that);
+                        me.closeLoadingDialog(me);
                     }
                 });
             },
@@ -953,20 +955,20 @@ sap.ui.define([
             },
 
             onNew() {
-                if (this.getView().getModel("ui").getData().dataMode === "READ") {
+                if (this.getView().getModel("ui").getData().dataMode === "READ" && this._appAction !== "display") {
                     if (this._sActiveTable === "gmcTab") this.onCreateGMC();
                 }
             },
 
             onEdit() {
-                if (this.getView().getModel("ui").getData().dataMode === "READ") {
+                if (this.getView().getModel("ui").getData().dataMode === "READ" && this._appAction !== "display") {
                     if (this._sActiveTable === "gmcTab") this.onEditGMC();
                     else if (this._sActiveTable === "attributesTab") this.onEditAttr();
                 }
             },
             
             onDelete() {
-                if (this.getView().getModel("ui").getData().dataMode === "READ") {
+                if (this.getView().getModel("ui").getData().dataMode === "READ" && this._appAction !== "display") {
                     if (this._sActiveTable === "gmcTab") this.onDeleteGMC();
                 }
             },
@@ -2347,69 +2349,797 @@ sap.ui.define([
                 this._oViewSettingsDialog["zuigmc2.view.SortDialog"].close();
             },
 
+            // onColFilterConfirm: function(oEvent) {
+            //     var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+            //     oDialog.close();
+
+            //     var bFilter = false;
+            //     var aFilter = [];
+            //     var oFilter = null;
+            //     var sTable = oDialog.getModel().getData().table;
+            //     var oDialogData = oDialog.getModel().getData().items;
+
+            //     oDialogData.forEach(item => {
+            //         if (item.value !== "") {
+            //             bFilter = true;
+            //             aFilter.push(new Filter(item.name, this.getConnector(item.connector), item.value))
+            //         }
+            //     })
+                
+            //     if (bFilter) {
+            //         oFilter = new Filter(aFilter, true);
+
+            //         if (sTable == "gmc"){
+            //             this.getView().byId("btnFilterGMC").addStyleClass("activeFiltering");
+            //         }
+            //         else if (sTable == "attributes"){
+            //             this.getView().byId("btnFilterAttr").addStyleClass("activeFiltering");
+            //         }
+            //         else if (sTable == "materials"){
+            //             this.getView().byId("filterMaterialsButton").addStyleClass("activeFiltering");
+            //         }
+            //     }
+            //     else {
+            //         oFilter = "";
+
+            //         if (sTable == "gmc"){
+            //             this.getView().byId("btnFilterGMC").removeStyleClass("activeFiltering");
+            //         }
+            //         else if (sTable == "attributes"){
+            //             this.getView().byId("btnFilterAttr").removeStyleClass("activeFiltering");
+            //         }
+            //         else if (sTable == "materials"){
+            //             this.getView().byId("filterMaterialsButton").removeStyleClass("activeFiltering");
+            //         }
+            //     }
+
+            //     this.byId(sTable + "Tab").getBinding("rows").filter(oFilter, "Application");
+
+            //     this._aFilterableColumns[sTable] = oDialogData;
+            //     this.setActiveRowHighlight(sTable);
+            // },
+
             onColFilter: function(oEvent) {
-                var oTable = oEvent.getSource().oParent.oParent               
-                var aFilterableColumns = this._aFilterableColumns[oTable.getBindingInfo("rows").model];
+                var sDialogFragmentName = "zuigmc2.view.GenericFilterDialog";
+                var oViewSettingsDialog = this._oViewSettingsDialog[sDialogFragmentName];
 
-                var oDialog = this._oViewSettingsDialog["zuigmc2.view.FilterDialog"];
-                oDialog.getModel().setProperty("/table", oTable.getBindingInfo("rows").model);
+                if (!oViewSettingsDialog) {
+                    oViewSettingsDialog = sap.ui.xmlfragment(sDialogFragmentName, this);
+                    
+                    if (Device.system.desktop) {
+                        oViewSettingsDialog.addStyleClass("sapUiSizeCompact");
+                    }
+
+                    oViewSettingsDialog.setModel(new JSONModel());
+
+                    this._oViewSettingsDialog[sDialogFragmentName] = oViewSettingsDialog;
+                    this.getView().addDependent(oViewSettingsDialog);
+                }
+
+                var oTable = oEvent.getSource().oParent.oParent;
+                // var aFilterableColumns = jQuery.extend(true, [], this._aFilterableColumns[oTable.getBindingInfo("rows").model]);
+                var aFilterableColumns = jQuery.extend(true, [], this._aColumns[oTable.getBindingInfo("rows").model]);
+                console.log(aFilterableColumns)
+                var oDialog = this._oViewSettingsDialog[sDialogFragmentName];
+                var aColumnItems = oDialog.getModel().getProperty("/items");
+                var oFilterValues = oDialog.getModel().getProperty("/values");
+                var oFilterCustom = oDialog.getModel().getProperty("/custom");
+                var vSelectedItem = oDialog.getModel().getProperty("/selectedItem");
+                var vSelectedColumn = oDialog.getModel().getProperty("/selectedColumn");
+                var oSearchValues = {}; //oDialog.getModel().getProperty("/search");
+                var aData = jQuery.extend(true, [], oTable.getModel("gmc").getData().results);
+                var oColumnValues = {};
+                var bFiltered = false;
+                var vFilterType = "VLF";
+                // if (oSearchValues === undefined) { 
+                //     oSearchValues = {};
+                //     initSearchValues = true;
+                // }
+
+                if (oFilterCustom === undefined) { 
+                    oFilterCustom = {};
+                }        
+
+                if (aColumnItems !== undefined) {
+                    if (aColumnItems.filter(fItem => fItem.isFiltered === true).length > 0) { bFiltered = true; }
+                }
+
+                aFilterableColumns = aFilterableColumns.filter(col => col.name !== "SBU");
+                aFilterableColumns.forEach((col, idx) => {
+                    oColumnValues[col.name] = [];
+
+                    aData.forEach(val => {
+                        if (val[col.name] === "" || val[col.name] === null) { val[col.name] = "(blank)" }
+                        else if (val[col.name] === true) { val[col.name] = "Yes" }
+                        else if (val[col.name] === false) { val[col.name] = "No" }
+
+                        if (oColumnValues[col.name].findIndex(item => item.Value === val[col.name]) < 0) {
+                            if (bFiltered && oFilterValues && oFilterValues[col.name].findIndex(item => item.Value === val[col.name]) >= 0) {
+                                oFilterValues[col.name].forEach(item => {
+                                    if (item.Value === val[col.name]) {
+                                        oColumnValues[col.name].push({
+                                            Value: item.Value,
+                                            Selected: item.Selected
+                                        })
+                                    }
+                                })
+                            }
+                            else {
+                                oColumnValues[col.name].push({
+                                    Value: val[col.name],
+                                    Selected: true
+                                })
+                            }
+                        }
+                    }); 
+
+                    oColumnValues[col.name].sort((a,b) => (a.Value > b.Value ? 1 : -1));
+
+                    col.selected = false;                    
+
+                    if (!bFiltered) { 
+                        if (idx === 0) {
+                            vSelectedColumn = col.name;
+                            vSelectedItem = col.label;
+                            col.selected = true;
+                        }
+
+                        oFilterCustom[col.name] = {
+                            Operator: col.type === "STRING" ? "Contains" : "EQ",
+                            ValFr: "",
+                            ValTo: ""
+                        };
+
+                        col.filterType = "VLF";
+                        col.isFiltered = false;
+                    }
+                    else if (bFiltered) {
+                        aColumnItems.filter(fItem => fItem.name === col.name).forEach(item => {
+                            col.filterType = item.filterType;
+                            col.isFiltered = item.isFiltered;
+                        })
+
+                        if (vSelectedItem === col.label) { 
+                            // vSelectedColumn = col.name; 
+                            vFilterType = col.filterType;
+                        }
+                    }
+
+                    // if (initSearchValues) { 
+                        oSearchValues[col.name] = ""
+                    // }                  
+                })
+
+                oDialog.getModel().setProperty("/sourceTabId", oEvent.getSource().data("TableId"));
                 oDialog.getModel().setProperty("/items", aFilterableColumns);
-                oDialog.getModel().setProperty("/rowCount", aFilterableColumns.length);
+                oDialog.getModel().setProperty("/values", oColumnValues);
+                oDialog.getModel().setProperty("/currValues", jQuery.extend(true, [], oColumnValues[vSelectedColumn]));
+                oDialog.getModel().setProperty("/rowCount", oColumnValues[vSelectedColumn].length);
+                oDialog.getModel().setProperty("/selectedItem", vSelectedItem);
+                oDialog.getModel().setProperty("/selectedColumn", vSelectedColumn);
+                oDialog.getModel().setProperty("/search", oSearchValues);
+                oDialog.getModel().setProperty("/reset", false);
+                oDialog.getModel().setProperty("/custom", oFilterCustom);
+                oDialog.getModel().setProperty("/customColFilterOperator", oFilterCustom[vSelectedColumn].Operator);
+                oDialog.getModel().setProperty("/customColFilterFrVal", oFilterCustom[vSelectedColumn].ValFr);
+                oDialog.getModel().setProperty("/customColFilterToVal", oFilterCustom[vSelectedColumn].ValTo);
                 oDialog.open();
-            },
+                oDialog.setInitialFocus(sap.ui.getCore().byId("searchFilterValue"));
 
-            onColFilterConfirm: function(oEvent) {
-                var oDialog = this._oViewSettingsDialog["zuigmc2.view.FilterDialog"];
-                oDialog.close();
+                // if (!initSearchValues) {
+                    // var vSearchText = oSearchValues[vSelectedColumn];
+                    // sap.ui.getCore().byId("searchFilterValue").setValue(vSearchText);
+                    // this.onSearchFilterValue(vSearchText);
+                // }
 
-                var bFilter = false;
-                var aFilter = [];
-                var oFilter = null;
-                var sTable = oDialog.getModel().getData().table;
-                var oDialogData = oDialog.getModel().getData().items;
+                sap.ui.getCore().byId("searchFilterValue").setValue("");
+                // this.onSearchFilterValue(""); 
 
-                oDialogData.forEach(item => {
-                    if (item.value !== "") {
-                        bFilter = true;
-                        aFilter.push(new Filter(item.name, this.getConnector(item.connector), item.value))
+                var bAddSelection = false;
+                var iStartSelection = -1, iEndSelection = -1;
+                var oTableValues = sap.ui.getCore().byId("filterValuesTab"); // oDialog.getContent()[0].getDetailPage("detail").getContent()[0].getItems()[0].getContent()[0];
+
+                oTableValues.clearSelection();
+                oColumnValues[vSelectedColumn].forEach((row, idx) => {
+                    if (row.Selected) { 
+                        if (iStartSelection === -1) iStartSelection = idx;
+                        iEndSelection = idx;
+                    }
+                    
+                    if (!row.Selected || idx === (oColumnValues[vSelectedColumn].length - 1)) {
+                        if (iStartSelection !== -1) { 
+                            if (!bAddSelection) { oTableValues.setSelectionInterval(iStartSelection, iEndSelection); }
+                            else { oTableValues.addSelectionInterval(iStartSelection, iEndSelection); }
+                            
+                            bAddSelection = true;
+                            oDialog.getModel().setProperty("/reset", false);
+                        } 
+
+                        iStartSelection = -1;
+                        iEndSelection = -1;
                     }
                 })
-                
-                if (bFilter) {
-                    oFilter = new Filter(aFilter, true);
 
-                    if (sTable == "gmc"){
-                        this.getView().byId("btnFilterGMC").addStyleClass("activeFiltering");
-                    }
-                    else if (sTable == "attributes"){
-                        this.getView().byId("btnFilterAttr").addStyleClass("activeFiltering");
-                    }
-                    else if (sTable == "materials"){
-                        this.getView().byId("filterMaterialsButton").addStyleClass("activeFiltering");
+                oDialog.getModel().setProperty("/reset", true);
+
+                if (bFiltered) { sap.ui.getCore().byId("btnColFilterClear").setEnabled(true); }
+                else { 
+                    sap.ui.getCore().byId("btnColFilterClear").setEnabled(false); 
+                    sap.ui.getCore().byId("colFilterList").getItems().forEach(item => item.setIcon("sap-icon://text-align-justified"));
+                }
+
+                // var cIconTabBar = sap.ui.getCore().byId("itbColFilter");
+                // cIconTabBar.setSelectedKey("values");
+
+                if (vFilterType === "UDF") {
+                    sap.ui.getCore().byId("rbtnUDF").setSelected(true);
+                    sap.ui.getCore().byId("panelUDF").setVisible(true);
+                    sap.ui.getCore().byId("panelVLF").setVisible(false);
+                }
+                else {
+                    sap.ui.getCore().byId("rbtnVLF").setSelected(true);
+                    sap.ui.getCore().byId("panelUDF").setVisible(false);
+                    sap.ui.getCore().byId("panelVLF").setVisible(true);
+                }
+
+                var vDataType = aFilterableColumns.filter(fItem => fItem.name === vSelectedColumn)[0].type;
+                
+                if (vDataType === "BOOLEAN") {
+                    sap.ui.getCore().byId("rbtnUDF").setVisible(false);
+                    sap.ui.getCore().byId("lblUDF").setVisible(false);
+                }
+                else {
+                    sap.ui.getCore().byId("rbtnUDF").setVisible(true);
+                    sap.ui.getCore().byId("lblUDF").setVisible(true);
+                }
+
+                if (vDataType === "NUMBER") {
+                    sap.ui.getCore().byId("customColFilterFrVal").setType("Number");
+                    sap.ui.getCore().byId("customColFilterToVal").setType("Number");
+                }
+                else {
+                    sap.ui.getCore().byId("customColFilterFrVal").setType("Text");
+                    sap.ui.getCore().byId("customColFilterToVal").setType("Text");
+                }
+
+                if (vDataType === "DATETIME") {
+                    sap.ui.getCore().byId("customColFilterFrVal").setVisible(false);
+                    sap.ui.getCore().byId("customColFilterToVal").setVisible(false);
+                    sap.ui.getCore().byId("customColFilterFrDate").setVisible(true);
+                    sap.ui.getCore().byId("customColFilterToDate").setVisible(true);
+                }
+                else{
+                    sap.ui.getCore().byId("customColFilterFrVal").setVisible(true);
+                    sap.ui.getCore().byId("customColFilterToVal").setVisible(true);
+                    sap.ui.getCore().byId("customColFilterFrDate").setVisible(false);
+                    sap.ui.getCore().byId("customColFilterToDate").setVisible(false);
+                }
+
+                if (vDataType !== "STRING") {
+                    if (sap.ui.getCore().byId("customColFilterOperator").getItems().filter(item => item.getKey() === "Contains").length > 0) {
+                        sap.ui.getCore().byId("customColFilterOperator").removeItem(3);
+                        sap.ui.getCore().byId("customColFilterOperator").removeItem(2);
                     }
                 }
                 else {
-                    oFilter = "";
-
-                    if (sTable == "gmc"){
-                        this.getView().byId("btnFilterGMC").removeStyleClass("activeFiltering");
-                    }
-                    else if (sTable == "attributes"){
-                        this.getView().byId("btnFilterAttr").removeStyleClass("activeFiltering");
-                    }
-                    else if (sTable == "materials"){
-                        this.getView().byId("filterMaterialsButton").removeStyleClass("activeFiltering");
+                    if (sap.ui.getCore().byId("customColFilterOperator").getItems().filter(item => item.getKey() === "Contains").length === 0) {
+                        sap.ui.getCore().byId("customColFilterOperator").insertItem(
+                            new sap.ui.core.Item({
+                                key: "Contains", 
+                                text: "Contains"
+                            }), 2
+                        );
+    
+                        sap.ui.getCore().byId("customColFilterOperator").insertItem(
+                            new sap.ui.core.Item({
+                                key: "NotContains", 
+                                text: "Not Contains"
+                            }), 3
+                        );
                     }
                 }
 
-                this.byId(sTable + "Tab").getBinding("rows").filter(oFilter, "Application");
+                var oDelegateClick = {
+                    onclick: function (oEvent) {
+                        if (oEvent.srcControl.sId === "lblUDF") {
+                            sap.ui.getCore().byId("panelUDF").setVisible(true);
+                            sap.ui.getCore().byId("panelVLF").setVisible(false);
+                        }
+                        else {
+                            sap.ui.getCore().byId("panelUDF").setVisible(false);
+                            sap.ui.getCore().byId("panelVLF").setVisible(true);
+                        }
+                    }
+                };
 
-                this._aFilterableColumns[sTable] = oDialogData;
-                this.setActiveRowHighlight(sTable);
+                sap.ui.getCore().byId("lblVLF").addEventDelegate(oDelegateClick);
+                sap.ui.getCore().byId("lblUDF").addEventDelegate(oDelegateClick);
+            },
+
+            onColFilterClear: function(oEvent) {
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+                var oColumnItems = oDialog.getModel().getProperty("/items");
+                var oColumnValues = oDialog.getModel().getProperty("/values");
+                var sSourceTabId = oDialog.getModel().getData().sourceTabId;
+                oDialog.close();
+
+                var oFilter = "";
+
+                oColumnItems.forEach(item => {
+                    oColumnValues[item.name].forEach(val => val.Selected = true )
+
+                    // oFilterCustom[item.name].forEach(val => {
+                    //     val.ValFr = "";
+                    //     val.ValTo = "";
+                    //     val.Operator = "Contains";
+                    // })
+
+                    item.isFiltered = false;
+                    // item.filterType = "VLF";
+                })
+
+                this.byId(sSourceTabId).getBinding("rows").filter(oFilter, "Application");
+                this.setActiveRowHighlight(sSourceTabId.replace("Tab",""));
+                
+                sap.ui.getCore().byId("colFilterList").getItems().forEach(item => item.setIcon("sap-icon://text-align-justified"));
+
+                var vGmc = this.byId(sSourceTabId).getModel("gmc").getData().results.filter((item,index) => index === 0)[0].GMC;
+
+                if (this.getView().getModel("ui").getProperty("/activeGmc") !== vGmc) {
+                    this.byId(sSourceTabId).getModel("gmc").getData().results.forEach(item => {
+                        if (item.GMC === vGmc) { item.ACTIVE = "X"; }
+                        else { item.ACTIVE = ""; }
+                    });
+
+                    this.setActiveRowHighlight(sSourceTabId.replace("Tab",""));
+                    this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
+                    this.getAttributes(false);
+                    this.getMaterials(false);
+                }
+
+                this.getView().getModel("counts").setProperty("/gmc", this.byId(sSourceTabId).getModel("gmc").getData().results.length);
+                this.byId(sSourceTabId).getColumns().forEach(col => {                   
+                    col.setProperty("filtered", false);
+                })
             },
 
             onColFilterCancel: function(oEvent) {
-                this._oViewSettingsDialog["zuigmc2.view.FilterDialog"].close();
+                this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"].close();
+            },
+
+            onColFilterConfirm: function(oEvent) {
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+                var aColumnItems = oDialog.getModel().getProperty("/items");
+                var oColumnValues = oDialog.getModel().getProperty("/values");
+                var oFilterCustom = oDialog.getModel().getProperty("/custom");
+                var sSourceTabId = oDialog.getModel().getData().sourceTabId;
+                oDialog.close();
+
+                var aFilter = [];
+                var oFilter = null;
+                var oSourceTableColumns = this.byId(sSourceTabId).getColumns();
+               
+                aColumnItems.forEach(item => {
+                    var oColumn = oSourceTableColumns.filter(fItem => fItem.getAggregation("label").getProperty("text") === item.label)[0];
+                    var vDataType = item.type;
+                    var aColFilter = [];
+                    var oColFilter = null;
+
+                    if (item.filterType === "VLF" && oColumnValues[item.name].filter(fItem => fItem.Selected === false).length > 0) {
+                        oColumnValues[item.name].forEach(val => {
+                            if (val.Selected) {
+                                if (val.Value === "(blank)") {
+                                    aColFilter.push(new Filter(item.name, this.getConnector("EQ"), ""));
+                                    aColFilter.push(new Filter(item.name, this.getConnector("EQ"), null));
+                                }
+                                else if (item.type === "BOOLEAN") {
+                                    if (val.Value === "Yes") {
+                                        aColFilter.push(new Filter(item.name, this.getConnector("EQ"), true))
+                                    }
+                                    else {
+                                        aColFilter.push(new Filter(item.name, this.getConnector("EQ"), false))
+                                    }
+                                }
+                                else {
+                                    aColFilter.push(new Filter(item.name, this.getConnector("EQ"), val.Value))
+                                }
+                            }
+                        })
+
+                        oColFilter = new Filter(aColFilter, false);
+                        aFilter.push(new Filter(oColFilter));
+
+                        oColumn.setProperty("filtered", true);
+                        item.isFiltered = true;
+                    }
+                    else if (item.filterType === "UDF" && oFilterCustom[item.name].ValFr !== "") {
+                        if (oFilterCustom[item.name].ValTo !== "") {
+                            aFilter.push(new Filter(item.name, this.getConnector("BT"), oFilterCustom[item.name].ValFr, oFilterCustom[item.name].ValTo));
+                        }
+                        else {
+                            aFilter.push(new Filter(item.name, this.getConnector(oFilterCustom[item.name].Operator), oFilterCustom[item.name].ValFr));
+                        }
+
+                        oColumn.setProperty("filtered", true);
+                        item.isFiltered = true;
+                    }
+                    else {
+                        oColumn.setProperty("filtered", false);
+                        item.isFiltered = false;
+                    }
+                })
+                
+                if (aFilter.length > 0) {
+                    oFilter = new Filter(aFilter, true);
+                }
+                else {
+                    oFilter = "";
+                }
+
+                console.log(oFilter)
+                this.byId(sSourceTabId).getBinding("rows").filter(oFilter, "Application");
+                
+                if (oFilter !== "") {
+                    if (sSourceTabId === "gmcTab") {
+                        if (this.byId(sSourceTabId).getBinding("rows").aIndices.length === 0) {
+                            this.getView().getModel("ui").setProperty("/activeGmc", '');
+                            this.getView().getModel("ui").setProperty("/activeMattyp", '');
+                            this.getView().getModel("counts").setProperty("/gmc", 0);
+                            this.getView().getModel("counts").setProperty("/materials", 0);
+                            this.getView().getModel("counts").setProperty("/attributes", 0);
+    
+                            this.getView().setModel(new JSONModel({
+                                results: []
+                            }), "materials");
+    
+                            this.getView().setModel(new JSONModel({
+                                results: []
+                            }), "attributes");
+                        }
+                        else {
+                            var vGmc = this.byId(sSourceTabId).getModel("gmc").getData().results.filter((item,index) => index === this.byId(sSourceTabId).getBinding("rows").aIndices[0])[0].GMC;
+
+                            if (this.getView().getModel("ui").getProperty("/activeGmc") !== vGmc) {
+                                this.byId(sSourceTabId).getModel("gmc").getData().results.forEach(item => {
+                                    if (item.GMC === vGmc) { item.ACTIVE = "X"; }
+                                    else { item.ACTIVE = ""; }
+                                });
+
+                                this.setActiveRowHighlight(sSourceTabId.replace("Tab",""));
+                                this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
+                                this.getAttributes(false);
+                                this.getMaterials(false);
+                            }
+
+                            this.getView().getModel("counts").setProperty("/gmc", this.byId(sSourceTabId).getBinding("rows").aIndices.length);
+                        }
+                    }
+                }
+                else {
+                    this.getView().getModel("counts").setProperty("/gmc", this.byId(sSourceTabId).getModel("gmc").getData().results.length);
+                }
+            },
+
+            onFilterItemPress: function(oEvent) {
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+                var aColumnItems = oDialog.getModel().getProperty("/items");
+                var oColumnValues = oDialog.getModel().getProperty("/values");
+                var oFilterCustom = oDialog.getModel().getProperty("/custom");
+                var oSearchValues = oDialog.getModel().getProperty("/search");
+                var vSelectedItem = oEvent.getSource().getSelectedItem().getProperty("title");
+                var vSelectedColumn = "";              
+
+                oDialog.getModel().getProperty("/items").forEach(item => {
+                    if (item.label === vSelectedItem) { 
+                        vSelectedColumn = item.name 
+                    }
+                })
+
+                oDialog.getModel().setProperty("/currValues", jQuery.extend(true, [], oColumnValues[vSelectedColumn]));
+                oDialog.getModel().setProperty("/rowCount", oColumnValues[vSelectedColumn].length);
+                oDialog.getModel().setProperty("/selectedItem", vSelectedItem);
+                oDialog.getModel().setProperty("/selectedColumn", vSelectedColumn);
+                oDialog.getModel().setProperty("/reset", false);
+                oDialog.getModel().setProperty("/customColFilterOperator", oFilterCustom[vSelectedColumn].Operator);
+                oDialog.getModel().setProperty("/customColFilterFrVal", oFilterCustom[vSelectedColumn].ValFr);
+                oDialog.getModel().setProperty("/customColFilterToVal", oFilterCustom[vSelectedColumn].ValTo);
+
+                var vSearchText = oSearchValues[vSelectedColumn];
+                // sap.ui.getCore().byId("searchFilterValue").setValue(vSearchText);
+                // this.onSearchFilterValue(vSearchText); 
+                sap.ui.getCore().byId("searchFilterValue").setValue("");
+
+                var bAddSelection = false;
+                var iStartSelection = -1, iEndSelection = -1;
+                var oTableValues = sap.ui.getCore().byId("filterValuesTab");
+                oTableValues.clearSelection();
+                oColumnValues[vSelectedColumn].forEach((row, idx) => {
+                    if (row.Selected) { 
+                        if (iStartSelection === -1) iStartSelection = idx;
+                        iEndSelection = idx;
+                    }
+                    
+                    if (!row.Selected || idx === (oColumnValues[vSelectedColumn].length - 1)) {
+                        if (iStartSelection !== -1) { 
+                            if (!bAddSelection) { oTableValues.setSelectionInterval(iStartSelection, iEndSelection); }
+                            else { oTableValues.addSelectionInterval(iStartSelection, iEndSelection); }
+                            
+                            bAddSelection = true;
+                            oDialog.getModel().setProperty("/reset", false);
+                        } 
+
+                        iStartSelection = -1;
+                        iEndSelection = -1;
+                    }
+                })
+
+                var vFilterType = aColumnItems.filter(fItem => fItem.name === vSelectedColumn)[0].filterType;
+                var vDataType = aColumnItems.filter(fItem => fItem.name === vSelectedColumn)[0].type;
+
+                if (vFilterType === "UDF") {
+                    sap.ui.getCore().byId("rbtnUDF").setSelected(true);
+                    sap.ui.getCore().byId("panelUDF").setVisible(true);
+                    sap.ui.getCore().byId("panelVLF").setVisible(false);
+                }
+                else {
+                    sap.ui.getCore().byId("rbtnVLF").setSelected(true);
+                    sap.ui.getCore().byId("panelUDF").setVisible(false);
+                    sap.ui.getCore().byId("panelVLF").setVisible(true);
+                }
+
+                if (sap.ui.getCore().byId("customColFilterOperator").getSelectedKey() === "BT") {
+                    sap.ui.getCore().byId("panelUDFTo").setVisible(true);
+                }
+                else {
+                    sap.ui.getCore().byId("panelUDFTo").setVisible(false);
+                }
+
+                if (vDataType === "BOOLEAN") {
+                    sap.ui.getCore().byId("rbtnUDF").setVisible(false);
+                    sap.ui.getCore().byId("lblUDF").setVisible(false);
+                }
+                else {
+                    sap.ui.getCore().byId("rbtnUDF").setVisible(true);
+                    sap.ui.getCore().byId("lblUDF").setVisible(true);
+                }
+
+                if (vDataType === "NUMBER") {
+                    sap.ui.getCore().byId("customColFilterFrVal").setType("Number");
+                    sap.ui.getCore().byId("customColFilterToVal").setType("Number");
+                }
+                else {
+                    sap.ui.getCore().byId("customColFilterFrVal").setType("Text");
+                    sap.ui.getCore().byId("customColFilterToVal").setType("Text");
+                }
+
+                if (vDataType === "DATETIME") {
+                    sap.ui.getCore().byId("customColFilterFrVal").setVisible(false);
+                    sap.ui.getCore().byId("customColFilterToVal").setVisible(false);
+                    sap.ui.getCore().byId("customColFilterFrDate").setVisible(true);
+                    sap.ui.getCore().byId("customColFilterToDate").setVisible(true);
+                }
+                else {
+                    sap.ui.getCore().byId("customColFilterFrVal").setVisible(true);
+                    sap.ui.getCore().byId("customColFilterToVal").setVisible(true);
+                    sap.ui.getCore().byId("customColFilterFrDate").setVisible(false);
+                    sap.ui.getCore().byId("customColFilterToDate").setVisible(false);
+                }
+
+                if (vDataType !== "STRING") {
+                    if (sap.ui.getCore().byId("customColFilterOperator").getItems().filter(item => item.getKey() === "Contains").length > 0) {
+                        sap.ui.getCore().byId("customColFilterOperator").removeItem(3);
+                        sap.ui.getCore().byId("customColFilterOperator").removeItem(2);
+                    }
+                }
+                else {
+                    if (sap.ui.getCore().byId("customColFilterOperator").getItems().filter(item => item.getKey() === "Contains").length === 0) {
+                        sap.ui.getCore().byId("customColFilterOperator").insertItem(
+                            new sap.ui.core.Item({
+                                key: "Contains", 
+                                text: "Contains"
+                            }), 2
+                        );
+    
+                        sap.ui.getCore().byId("customColFilterOperator").insertItem(
+                            new sap.ui.core.Item({
+                                key: "NotContains", 
+                                text: "Not Contains"
+                            }), 3
+                        );
+                    }
+                }
+
+                oDialog.getModel().setProperty("/reset", true);
+            },
+
+            onFilterValuesSelectionChange: function(oEvent) { 
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+                
+                if (oDialog.getModel().getProperty("/reset")) {
+                    var aColumnItems = oDialog.getModel().getProperty("/items");
+                    var oColumnValues = oDialog.getModel().getProperty("/values");
+                    var oCurrColumnValues = oDialog.getModel().getProperty("/currValues");
+                    var vSelectedColumn = oDialog.getModel().getProperty("/selectedColumn");
+                    var vSelectedItem = oDialog.getModel().getProperty("/selectedItem");
+                    var oTableValues = sap.ui.getCore().byId("filterValuesTab");
+                    var bFiltered = false;
+                    
+                    oCurrColumnValues.forEach((item, idx) => {
+                        if (oTableValues.isIndexSelected(idx)) { 
+                            item.Selected = true;
+                            oColumnValues[vSelectedColumn].filter(fItem => fItem.Value === item.Value).forEach(val => val.Selected = true);
+                        }
+                        else { 
+                            bFiltered = true;
+                            item.Selected = false;
+                            oColumnValues[vSelectedColumn].filter(fItem => fItem.Value === item.Value).forEach(val => val.Selected = false);
+                        }
+                    })
+                    console.log(oCurrColumnValues)
+                    if (bFiltered) { 
+                        sap.ui.getCore().byId("rbtnVLF").setSelected(true); 
+                        sap.ui.getCore().byId("panelUDF").setVisible(false);
+                        sap.ui.getCore().byId("panelVLF").setVisible(true);
+                        aColumnItems.forEach(item => {
+                            if (item.name === vSelectedColumn) {
+                                item.filterType = "VLF";
+                            }
+                        })
+                    }
+
+                    // if (oColumnValues[vSelectedColumn].filter(fItem => fItem.Selected === true).length === 0) {
+                    //     MessageBox.information("Please select at least one (1) value.");
+                    // }
+                    // else {
+                        var vFilterType = aColumnItems.filter(fItem => fItem.name === vSelectedColumn)[0].filterType;
+                        var oItem = sap.ui.getCore().byId("colFilterList").getItems().filter(fItem => fItem.getTitle() === vSelectedItem)[0];
+
+                        if (vFilterType === "VLF") {
+                            if (bFiltered) {
+                                oItem.setIcon("sap-icon://filter");
+                            }
+                            else {
+                                oItem.setIcon("sap-icon://text-align-justified");
+                            }
+                        }
+                    // }
+                }
+            },
+
+            onSearchFilterValue: function(oEvent) {
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];   
+                var oColumnValues = oDialog.getModel().getProperty("/values");
+                var oCurrColumnValues = []; //oDialog.getModel().getProperty("/currValues");
+                var oSearchValues = oDialog.getModel().getProperty("/search");
+                var vSelectedColumn = oDialog.getModel().getProperty("/selectedColumn");
+                var oTableValues = sap.ui.getCore().byId("filterValuesTab");
+                var sQuery = "";
+                var bAddSelection = false;
+                var iStartSelection = -1, iEndSelection = -1;
+
+                if (typeof(oEvent) === "string") {
+                    sQuery = oEvent;
+                }
+                else {
+                    sQuery = oEvent.getParameter("query");
+                }
+
+                if (sQuery) {
+                    oColumnValues[vSelectedColumn].forEach(val => {
+                        if (val.Value.toLocaleLowerCase().indexOf(sQuery.toLocaleLowerCase()) >= 0) {
+                            oCurrColumnValues.push(val);
+                        }
+                    })
+                }
+                else {
+                    oCurrColumnValues = oColumnValues[vSelectedColumn];
+                }
+
+                oSearchValues[vSelectedColumn] = sQuery;
+                oDialog.getModel().setProperty("/search", oSearchValues);
+                oDialog.getModel().setProperty("/currValues", oCurrColumnValues);
+                oDialog.getModel().setProperty("/rowCount", oCurrColumnValues.length);
+                oDialog.getModel().setProperty("/reset", false);
+
+                var oCopyCurrColumnValues = jQuery.extend(true, [], oCurrColumnValues)
+                oTableValues.clearSelection();
+
+                oCopyCurrColumnValues.forEach((row, idx) => {
+                    if (row.Selected) { 
+                        if (iStartSelection === -1) iStartSelection = idx;
+                        iEndSelection = idx;
+                    }
+                    
+                    if (!row.Selected || idx === (oCopyCurrColumnValues.length - 1)) {
+                        if (iStartSelection !== -1) { 
+                            if (!bAddSelection) { oTableValues.setSelectionInterval(iStartSelection, iEndSelection); }
+                            else { oTableValues.addSelectionInterval(iStartSelection, iEndSelection); }
+                            
+                            bAddSelection = true;
+                            oDialog.getModel().setProperty("/reset", false);
+                        } 
+
+                        iStartSelection = -1;
+                        iEndSelection = -1;
+                    }
+                })
+
+                oDialog.getModel().setProperty("/reset", true);
+            },
+
+            onCustomColFilterChange: function(oEvent) {
+                if (oEvent.getSource().getId() === "customColFilterOperator") {
+                    if (sap.ui.getCore().byId("customColFilterOperator").getSelectedKey() === "BT") {
+                        sap.ui.getCore().byId("panelUDFTo").setVisible(true);
+                    }
+                    else {
+                        sap.ui.getCore().byId("panelUDFTo").setVisible(false);
+                    }
+                }
+
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+                var aColumnItems = oDialog.getModel().getProperty("/items");
+                var vSelectedColumn = oDialog.getModel().getProperty("/selectedColumn");
+                var vSelectedItem = oDialog.getModel().getProperty("/selectedItem");
+                var oFilterCustom = oDialog.getModel().getProperty("/custom");
+                var sOperator = sap.ui.getCore().byId("customColFilterOperator").getSelectedKey();
+                var vDataType = aColumnItems.filter(fItem => fItem.name === vSelectedColumn)[0].type;
+                var sValueFr = sap.ui.getCore().byId("customColFilterFrVal").getValue();
+                var sValueTo = sap.ui.getCore().byId("customColFilterToVal").getValue();
+
+                if (vDataType === "DATETIME") {
+                    sValueFr = sap.ui.getCore().byId("customColFilterFrDate").getValue();
+                    sValueTo = sap.ui.getCore().byId("customColFilterToDate").getValue();
+                }
+
+                oFilterCustom[vSelectedColumn].Operator = sOperator;
+                oFilterCustom[vSelectedColumn].ValFr = sValueFr;
+                oFilterCustom[vSelectedColumn].ValTo = sValueTo;
+                oDialog.getModel().setProperty("/custom", oFilterCustom);
+
+                if (sValueFr !== "") { 
+                    sap.ui.getCore().byId("rbtnUDF").setSelected(true); 
+                    sap.ui.getCore().byId("panelUDF").setVisible(true);
+                    sap.ui.getCore().byId("panelVLF").setVisible(false);
+                    aColumnItems.forEach(item => {
+                        if (item.name === vSelectedColumn) {
+                            item.filterType = "UDF";
+                        }
+                    })                    
+                }
+
+                var vFilterType = aColumnItems.filter(fItem => fItem.name === vSelectedColumn)[0].filterType;
+                var oItem = sap.ui.getCore().byId("colFilterList").getItems().filter(fItem => fItem.getTitle() === vSelectedItem)[0];
+
+                if (vFilterType === "UDF") {
+                    if (sValueFr !== "") {
+                        oItem.setIcon("sap-icon://filter");
+                    }
+                    else {
+                        oItem.setIcon("sap-icon://text-align-justified");
+                    }
+                }                
+            },
+
+            onSetUseColFilter: function(oEvent) {                
+                var oDialog = this._oViewSettingsDialog["zuigmc2.view.GenericFilterDialog"];
+                var vSelectedColumn = oDialog.getModel().getProperty("/selectedColumn");
+                var aColumnItems = oDialog.getModel().getProperty("/items");
+
+                aColumnItems.forEach(item => {
+                    if (item.name === vSelectedColumn && oEvent.getParameter("selected")) {
+                        item.filterType = oEvent.getParameter("id").replace("rbtn", "");
+                    }
+                })
+
+                if (oEvent.getParameter("id") === "rbtnUDF") {
+                    sap.ui.getCore().byId("panelUDF").setVisible(true);
+                    sap.ui.getCore().byId("panelVLF").setVisible(false);
+                }
+                else {
+                    sap.ui.getCore().byId("panelUDF").setVisible(false);
+                    sap.ui.getCore().byId("panelVLF").setVisible(true);
+                }
             },
 
             onCellClickGMC: function(oEvent) {
@@ -2535,11 +3265,44 @@ sap.ui.define([
                     case "EQ":
                         oConnector = sap.ui.model.FilterOperator.EQ
                         break;
-                      case "Contains":
+                    case "NE":
+                        oConnector = sap.ui.model.FilterOperator.NE
+                        break;
+                    case "GT":
+                        oConnector = sap.ui.model.FilterOperator.GT
+                        break;
+                    case "GE":
+                        oConnector = sap.ui.model.FilterOperator.GE
+                        break; 
+                    case "LT":
+                        oConnector = sap.ui.model.FilterOperator.LT
+                        break;
+                    case "LE":
+                        oConnector = sap.ui.model.FilterOperator.LE
+                        break;
+                    case "BT":
+                        oConnector = sap.ui.model.FilterOperator.BT
+                        break;
+                    case "Contains":
                         oConnector = sap.ui.model.FilterOperator.Contains
                         break;
-                      default:
-                        // code block
+                    case "NotContains":
+                        oConnector = sap.ui.model.FilterOperator.NotContains
+                        break;
+                    case "StartsWith":
+                        oConnector = sap.ui.model.FilterOperator.StartsWith
+                        break;
+                    case "NotStartsWith":
+                        oConnector = sap.ui.model.FilterOperator.NotStartsWith
+                        break;
+                    case "EndsWith":
+                        oConnector = sap.ui.model.FilterOperator.EndsWith
+                        break;
+                    case "NotEndsWith":
+                        oConnector = sap.ui.model.FilterOperator.NotEndsWith
+                        break;
+                    default:
+                        oConnector = sap.ui.model.FilterOperator.Contains
                         break;
                 }
 
@@ -3107,7 +3870,7 @@ sap.ui.define([
                     }
 
                     console.log(_param);
-                    return;
+                    // return;
 
                     var oModel = this.getOwnerComponent().getModel();
 
@@ -3688,7 +4451,7 @@ sap.ui.define([
                 //         else row.removeStyleClass("activeRow")
                 //     })
                 // }
-            }
+            },
 
         });
     });
