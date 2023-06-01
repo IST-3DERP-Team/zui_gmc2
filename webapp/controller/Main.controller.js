@@ -24,12 +24,13 @@ sap.ui.define([
 
             onInit: function () {
                 this.getAppAction();
-
-                var oModel = this.getOwnerComponent().getModel();               
-                var _this = this; 
                 this.validationErrors = [];
                 this.showLoadingDialog('Loading...');
                 this._sActiveTable = "gmcTab";
+
+                var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+                var oModel = this.getOwnerComponent().getModel();               
+                var _this = this; 
 
                 this.getView().setModel(new JSONModel({
                     activeGmc: '',
@@ -40,7 +41,13 @@ sap.ui.define([
                 }), "ui");
 
                 oModel.read('/SBURscSet', { 
-                    success: function (data, response) {
+                    success: function (data, response) {                        
+                        var vSBU = _this.getView().getModel("ui").getProperty("/sbu");
+                        console.log("get SBU", vSBU);
+                        if (!(vSBU === undefined || vSBU === "")) {
+                            return;
+                        }
+
                         if (data.results.length === 1) {
                             _this.getView().getModel("ui").setProperty("/sbu", data.results[0].SBU);
                             // _this.getColumns();
@@ -90,7 +97,7 @@ sap.ui.define([
                             _this.byId("btnColPropMatl").setEnabled(false);
                             _this.byId("searchFieldMatl").setEnabled(false);
                             _this.byId("btnTabLayoutMatl").setEnabled(false);
-                        }
+                        }                        
                     },
                     error: function (err) { }
                 })
@@ -208,8 +215,22 @@ sap.ui.define([
                         sap.m.MessageBox.error(err);
                     }
                 });
+
+                oRouter.getRoute("RouteMain").attachPatternMatched(this._onPatternMatched, this);
             },
 
+            _onPatternMatched : function (oEvent) {
+                this._pSBU =  oEvent.getParameter("arguments").sbu;
+                this._pGMC =  oEvent.getParameter("arguments").gmc;
+                console.log("SBU: " + this._pSBU);
+                console.log("GMC: " + this._pGMC);
+
+                if (this._pGMC !== undefined) {
+                    this.getView().getModel("ui").setProperty("/sbu", this._pSBU);
+                    this.onSBUChange();
+                }
+            },
+            
             getAppAction: async function() {
                 if (sap.ushell.Container !== undefined) {
                     const fullHash = new HashChanger().getHash(); 
@@ -314,8 +335,14 @@ sap.ui.define([
                     },                    
                     success: function (data, response) {
                         var oJSONModel = new sap.ui.model.json.JSONModel();
+                        var oResult = data.results;
 
                         if (data.results.length > 0) {
+                            if (_this._pGMC !== undefined) {
+                                oResult = data.results.filter(fItem => fItem.GMC === _this._pGMC);
+                                data["results"] = oResult;
+                            }
+
                             data.results.sort((a,b) => (a.GMC > b.GMC ? 1 : -1));
 
                             data.results.forEach((item, index) => {
