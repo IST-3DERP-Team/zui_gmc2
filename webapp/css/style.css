@@ -68,3 +68,7 @@
 .cursorPointer {
     cursor: pointer;
 }
+
+.sapMDialogScroll {
+    height: 98%;
+}
