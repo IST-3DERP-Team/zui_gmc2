@@ -61,20 +61,20 @@ sap.ui.define([
                         else {
                             _this.closeLoadingDialog();
 
-                            var oCBoxSBU = _this.byId('cboxSBU');
-                            if (!_this._oPopover) {
-                                Fragment.load({
-                                    name: "zuigmc2.view.Popover",
-                                    controller: this
-                                }).then(function(oPopover){
-                                    _this._oPopover = oPopover;
-                                    _this.getView().addDependent(_this._oPopover);                                    
-                                    _this._oPopover.openBy(oCBoxSBU);
-                                    _this._oPopover.setTitle("Select SBU");
-                                }.bind(_this));
-                            } else {
-                                this._oPopover.openBy(oCBoxSBU);
-                            }
+                            // var oCBoxSBU = _this.byId('cboxSBU');
+                            // if (!_this._oPopover) {
+                            //     Fragment.load({
+                            //         name: "zuigmc2.view.Popover",
+                            //         controller: this
+                            //     }).then(function(oPopover){
+                            //         _this._oPopover = oPopover;
+                            //         _this.getView().addDependent(_this._oPopover);                                    
+                            //         _this._oPopover.openBy(oCBoxSBU);
+                            //         _this._oPopover.setTitle("Select SBU");
+                            //     }.bind(_this));
+                            // } else {
+                            //     this._oPopover.openBy(oCBoxSBU);
+                            // }
 
                             _this.byId("btnColPropAttr").setEnabled(false); 
                             _this.byId("btnAddGMC").setEnabled(false);
@@ -990,6 +990,65 @@ sap.ui.define([
                     }),
                     visible: false
                 }));
+
+                //date/number sorting
+                table.attachSort(function(oEvent) {
+                    var sPath = oEvent.getParameter("column").getSortProperty();
+                    var bDescending = false;
+                    
+                    table.getColumns().forEach(col => {
+                        if (col.getSorted()) {
+                            col.setSorted(false);
+                        }
+                    })
+                    
+                    oEvent.getParameter("column").setSorted(true); //sort icon initiator
+
+                    if (oEvent.getParameter("sortOrder") === "Descending") {
+                        bDescending = true;
+                        oEvent.getParameter("column").setSortOrder("Descending") //sort icon Descending
+                    }
+                    else {
+                        oEvent.getParameter("column").setSortOrder("Ascending") //sort icon Ascending
+                    }
+
+                    var oSorter = new sap.ui.model.Sorter(sPath, bDescending ); //sorter(columnData, If Ascending(false) or Descending(True))
+                    var oColumn = aColumns.filter(fItem => fItem.ColumnName === oEvent.getParameter("column").getProperty("sortProperty"));
+                    var columnType = oColumn[0].DataType;
+
+                    if (columnType === "DATETIME") {
+                        oSorter.fnCompare = function(a, b) {
+                            // parse to Date object
+                            var aDate = new Date(a);
+                            var bDate = new Date(b);
+
+                            if (bDate === null) { return -1; }
+                            if (aDate === null) { return 1; }
+                            if (aDate < bDate) { return -1; }
+                            if (aDate > bDate) { return 1; }
+
+                            return 0;
+                        };
+                    }
+                    else if (columnType === "NUMBER") {
+                        oSorter.fnCompare = function(a, b) {
+                            // parse to Date object
+                            var aNumber = +a;
+                            var bNumber = +b;
+
+                            if (bNumber === null) { return -1; }
+                            if (aNumber === null) { return 1; }
+                            if (aNumber < bNumber) { return -1; }
+                            if (aNumber > bNumber) { return 1; }
+
+                            return 0;
+                        };
+                    }
+                    
+                    table.getBinding('rows').sort(oSorter);
+                    // prevent internal sorting by table
+                    oEvent.preventDefault();
+                });
 
                 TableFilter.updateColumnMenu(model + "Tab", this);
             },
@@ -2489,54 +2548,52 @@ sap.ui.define([
             onCellClickGMC: function(oEvent) {
                 var vGmc = oEvent.getParameters().rowBindingContext.getObject().GMC;
                 
-                this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
-                this.getMaterials(false);
-                this.getAttributes(false);
-                this.byId("searchFieldAttr").setProperty("value", "");
-                this.byId("searchFieldMatl").setProperty("value", "");
-
-                var oTable = this.byId('attributesTab');
-                var oColumns = oTable.getColumns();
-
-                for (var i = 0, l = oColumns.length; i < l; i++) {
-                    // if (oColumns[i].getFiltered()) {
-                    //     oColumns[i].filter("");
-                    // }
-
-                    if (oColumns[i].getSorted()) {
-                        oColumns[i].setSorted(false);
-                    }
-                }
-
-                oTable = this.byId('materialsTab');
-                oColumns = oTable.getColumns();
-
-                for (var i = 0, l = oColumns.length; i < l; i++) {
-                    // if (oColumns[i].getFiltered()) {
-                    //     oColumns[i].filter("");
-                    // }
-
-                    if (oColumns[i].getSorted()) {
-                        oColumns[i].setSorted(false);
-                    }
-                }
-
-                TableFilter.removeColFilters("attributesTab", this);
-                TableFilter.removeColFilters("materialsTab", this);
-
-                if (oEvent.getParameters().rowBindingContext) {
-                    var oTable = oEvent.getSource(); //this.byId("ioMatListTab");
-                    var sRowPath = oEvent.getParameters().rowBindingContext.sPath;
-
-                    oTable.getModel("gmc").getData().results.forEach(row => row.ACTIVE = "");
-                    oTable.getModel("gmc").setProperty(sRowPath + "/ACTIVE", "X"); 
-                    
-                    oTable.getRows().forEach(row => {
-                        if (row.getBindingContext("gmc") && row.getBindingContext("gmc").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
-                            row.addStyleClass("activeRow");
+                if (this.getView().getModel("ui").getData().activeGmc !== vGmc) {
+                    this.getView().getModel("ui").setProperty("/activeGmc", vGmc);
+                    this.getMaterials(false);
+                    this.getAttributes(false);
+                    this.byId("searchFieldAttr").setProperty("value", "");
+                    this.byId("searchFieldMatl").setProperty("value", "");
+    
+                    var oTable = this.byId('attributesTab');
+                    var oColumns = oTable.getColumns();
+    
+                    for (var i = 0, l = oColumns.length; i < l; i++) {
+                        // if (oColumns[i].getFiltered()) {
+                        //     oColumns[i].filter("");
+                        // }
+    
+                        if (oColumns[i].getSorted()) {
+                            oColumns[i].setSorted(false);
                         }
-                        else row.removeStyleClass("activeRow")
-                    })
+                    }
+    
+                    oTable = this.byId('materialsTab');
+                    oColumns = oTable.getColumns();
+    
+                    for (var i = 0, l = oColumns.length; i < l; i++) {
+                        if (oColumns[i].getSorted()) {
+                            oColumns[i].setSorted(false);
+                        }
+                    }
+    
+                    TableFilter.removeColFilters("attributesTab", this);
+                    TableFilter.removeColFilters("materialsTab", this);
+    
+                    if (oEvent.getParameters().rowBindingContext) {
+                        var oTable = oEvent.getSource(); //this.byId("ioMatListTab");
+                        var sRowPath = oEvent.getParameters().rowBindingContext.sPath;
+    
+                        oTable.getModel("gmc").getData().results.forEach(row => row.ACTIVE = "");
+                        oTable.getModel("gmc").setProperty(sRowPath + "/ACTIVE", "X"); 
+                        
+                        oTable.getRows().forEach(row => {
+                            if (row.getBindingContext("gmc") && row.getBindingContext("gmc").sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
+                                row.addStyleClass("activeRow");
+                            }
+                            else row.removeStyleClass("activeRow")
+                        })
+                    }
                 }
             },
 
@@ -3366,7 +3423,25 @@ sap.ui.define([
                                 }
                                 else row.removeStyleClass("activeRow")
                             })
-                        }                        
+                        } 
+                        
+                        var oTableAttrib = this.byId('attributesTab');
+                        var oColumns = oTableAttrib.getColumns();
+
+                        for (var i = 0, l = oColumns.length; i < l; i++) {
+                            if (oColumns[i].getSorted()) {
+                                oColumns[i].setSorted(false);
+                            }
+                        }
+
+                        var oTableMatl = this.byId('materialsTab');
+                        oColumns = oTableMatl.getColumns();
+
+                        for (var i = 0, l = oColumns.length; i < l; i++) {
+                            if (oColumns[i].getSorted()) {
+                                oColumns[i].setSorted(false);
+                            }
+                        }
                     }
                     else if (oTable.getId().indexOf("attributesTab") >= 0) {
                         if (this.byId(oEvent.srcControl.sId).getBindingContext("attributes")) {
