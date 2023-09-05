@@ -137,7 +137,7 @@
             "routes": [
                 {
                     "name": "RouteMain",
-                    "pattern": "",
+                    "pattern": ":sbu:/:gmc:",
                     "target": [
                         "TargetMain"
                     ]
@@ -148,7 +148,6 @@
                     "viewType": "XML",
                     "transition": "slide",
                     "clearControlAggregation": false,
-                    "viewId": "Main",
                     "viewName": "Main"
                 }
             }

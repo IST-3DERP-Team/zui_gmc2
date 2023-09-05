@@ -64,3 +64,11 @@
 .activeRow {
     background-color: #e1ebf3 !important;
 }
+
+.cursorPointer {
+    cursor: pointer;
+}
+
+.sapMDialogScroll {
+    height: 98%;
+}

@@ -5,8 +5,8 @@
         xmlns:uit="sap.ui.table"
         id="fragment-1" 
         fragmentName="fragment1">
-    <Dialog contentWidth="440px" 
-        contentHeight="350px"
+    <Dialog contentWidth="1000px" 
+        contentHeight="500px"
         title="Filter by"
         resizable="true"
         draggable="true">
@@ -27,27 +27,47 @@
             visibleRowCount="{/rowCount}"
             paste="onPaste">
             <uit:columns>
-                <uit:Column width="12rem">
+                <uit:Column width="200px">
                     <Label text="Column" />
                     <uit:template>
                         <Text text="{label}" wrapping="false" />
                     </uit:template>
                 </uit:Column>
-                <uit:Column width="15rem">
+                <uit:Column width="200px" visible="false">
+                    <Label text="Connector" />
+                    <uit:template>
+                        <Select id="GmcCon" selectedKey="{connector}">
+                            <core:Item key="LIKE" text="Contains" />
+                            <core:Item key="EQ" text="Equal To" />
+                            <core:Item key="NE" text="Not Equal To" />
+                            <core:Item key="GT" text="Greater Than" />
+                            <core:Item key="GTE" text="Greater Than Or Equal" />
+                            <core:Item key="LT" text="Less Than" />
+                            <core:Item key="LTE" text="Less Than Or Equal" />
+                            <!-- <core:Item key="NLIKE" text="Does Not Contain" />
+                            <core:Item key="BEGIN" text="Begins With" />
+                            <core:Item key="END" text="Ends With" /> -->
+                        </Select>
+                    </uit:template>
+                </uit:Column>
+                <uit:Column width="250px">
                     <Label text="Value" />
                     <uit:template>
                         <Input value="{value}"/>
                     </uit:template>
                 </uit:Column>
-                <uit:Column width="10rem" visible="false">
-                    <Label text="Connector" />
+                <!-- <uit:Column width="50px">
+                    <Label text="Value" />
                     <uit:template>
-                        <Select id="GmcCon" selectedKey="{connector}">
-                            <core:Item key="EQ" text="Equal" />
-                            <core:Item key="Contains" text="Contains" />
-                        </Select>
+                        <Text text="to"/>
                     </uit:template>
                 </uit:Column>
+                <uit:Column width="250px">
+                    <Label text="Value" />
+                    <uit:template>
+                        <Input value="{value}"/>
+                    </uit:template>
+                </uit:Column> -->
             </uit:columns>
         </uit:Table>    
     </Dialog>

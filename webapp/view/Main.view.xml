@@ -270,58 +270,72 @@
                                 placeholder="Filter"
                                 value=""
                                 search="filterGlobally"
+                                visible="false"
                                 width="15rem"/>
-                            <ToolbarSeparator/>
+                            <!-- <ToolbarSeparator/> -->
                             <Button id="btnAddGMC" 
                                 icon="sap-icon://add"
-                                press="onCreateGMC"
+                                press="onCreateGMC" 
+                                tooltip="{ddtext>/ADD}"
                                 visible="true"/>
                             <Button id="btnEditGMC" 
                                 icon="sap-icon://edit"
                                 press="onEditGMC"
-                                tooltip="Edit"
+                                tooltip="{ddtext>/EDIT}"
                                 visible="true"/>
                             <Button id="btnSaveGMC" 
                                 icon="sap-icon://save"
                                 press=".onSaveChanges('gmc')" 
+                                tooltip="{ddtext>/SAVE}"
                                 visible="false" />
                             <Button id="btnCancelGMC" 
                                 icon="sap-icon://sys-cancel"
                                 press="onCancelGMC" 
+                                tooltip="{ddtext>/CANCEL}"
                                 visible="false" />                                        
                             <Button id="btnDeleteGMC" 
                                 icon="sap-icon://delete"
                                 press="onDeleteGMC"
+                                tooltip="{ddtext>/DELETE}"
                                 visible="true"/>
                             <Button id="btnRefreshGMC" 
                                 icon="sap-icon://refresh"
                                 press="onRefreshGMC"
+                                tooltip="{ddtext>/REFRESH}"
                                 visible="true"/> 
                             <Button id="btnSortGMC" 
                                 icon="sap-icon://sort"
                                 press="onColSort"
+                                tooltip="{ddtext>/SORT}"
                                 visible="true" />
-                            <Button id="btnFilterGMC" 
+                            <!-- <Button id="btnFilterGMC" 
                                 icon="sap-icon://filter"
                                 press="onColFilter"
-                                visible="true" />
+                                tooltip="{ddtext>/FILTER}"
+                                visible="true">
+                                <customData>
+                                    <core:CustomData key="TableId" value="gmcTab" />
+                                </customData>
+                            </Button> -->
                             <Button id="btnFullScreenHdr" 
                                 icon="sap-icon://full-screen"
                                 press="onTableResize('Hdr','Max')"
+                                tooltip="{ddtext>/FULLSCREEN}"
                                 visible="true" />
                             <Button id="btnExitFullScreenHdr" 
                                 icon="sap-icon://exit-full-screen"
                                 press="onTableResize('Hdr','Min')"
+                                tooltip="{ddtext>/EXITFULLSCREEN}"
                                 visible="false" />
                             <Button id="btnColPropGMC" 
                                 icon="sap-icon://table-column"
                                 press="onColumnProp"
-                                tooltip="Columns"
+                                tooltip="{ddtext>/COLUMNS}"
                                 visible="true" />
                             <Button id="btnTabLayoutGMC" 
                                 icon="sap-icon://grid" 
                                 press="onSaveTableLayout"
-                                tooltip="Save Table Layout" 
+                                tooltip="{ddtext>/SAVELAYOUT}"
                                 visible="true" />                                 
                         </Toolbar>
                     </uiT:extension>
@@ -366,50 +380,58 @@
                                             placeholder="Filter"
                                             value=""
                                             search="filterGlobally"
+                                            visible="false"
                                             width="15rem"/>
-                                        <ToolbarSeparator/>
+                                        <!-- <ToolbarSeparator/> -->
                                         <Button id="btnEditAttr" 
                                             icon="sap-icon://edit"
                                             press=".onEditAttr"
-                                            tooltip="Edit"
+                                            tooltip="{ddtext>/EDIT}"
                                             visible="true" />
                                         <Button id="btnSaveAttr" 
                                             icon="sap-icon://save"
                                             press=".onSaveChanges('attributes')" 
+                                            tooltip="{ddtext>/SAVE}"
                                             visible="false" />
                                         <Button id="btnCancelAttr" 
                                             icon="sap-icon://sys-cancel"
                                             press="onCancelAttr" 
+                                            tooltip="{ddtext>/CANCEL}"
                                             visible="false" /> 
                                         <Button id="btnRefreshAttr" 
                                             icon="sap-icon://refresh"
                                             press=".onRefreshAttr"
+                                            tooltip="{ddtext>/REFRESH}"
                                             visible="true" />
                                         <Button id="btnSortAttr" 
                                             icon="sap-icon://sort"
                                             press=".onColSort"
+                                            tooltip="{ddtext>/SORT}"
                                             visible="true" />
-                                        <Button id="btnFilterAttr" 
+                                        <!-- <Button id="btnFilterAttr" 
                                             icon="sap-icon://filter"
                                             press=".onColFilter"
-                                            visible="true" />
+                                            tooltip="{ddtext>/FILTER}"
+                                            visible="true" /> -->
                                         <Button id="btnFullScreenAttr" 
                                             icon="sap-icon://full-screen"
                                             press="onTableResize('Attr','Max')"
+                                            tooltip="{ddtext>/FULLSCREEN}"
                                             visible="true" />
                                         <Button id="btnExitFullScreenAttr" 
                                             icon="sap-icon://exit-full-screen"
                                             press="onTableResize('Attr','Min')"
+                                            tooltip="{ddtext>/EXITFULLSCREEN}"
                                             visible="false" />
                                         <Button id="btnColPropAttr" 
                                             icon="sap-icon://table-column"
                                             press="onColumnProp"
-                                            tooltip="Columns"
+                                            tooltip="{ddtext>/COLUMNS}"
                                             visible="true" />
                                         <Button id="btnTabLayoutAttr" 
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
-                                            tooltip="Save Table Layout" 
+                                            tooltip="{ddtext>/SAVELAYOUT}"
                                             visible="true" />                                             
                                     </Toolbar>
                                 </uiT:extension>
@@ -442,37 +464,43 @@
                                             placeholder="Filter"
                                             value=""
                                             search="filterGlobally"
+                                            visible="false"
                                             width="15rem"/>
-                                        <ToolbarSeparator/>
+                                        <!-- <ToolbarSeparator/> -->
                                         <Button id="refreshMaterialsButton" 
                                             icon="sap-icon://refresh"
                                             press=".onRefreshMatl"
+                                            tooltip="{ddtext>/REFRESH}"
                                             visible="true" />
                                         <Button id="sortMaterialsButton" 
                                             icon="sap-icon://sort"
                                             press=".onColSort"
+                                            tooltip="{ddtext>/SORT}"
                                             visible="true" />
-                                        <Button id="filterMaterialsButton" 
+                                        <!-- <Button id="filterMaterialsButton" 
                                             icon="sap-icon://filter"
                                             press=".onColFilter"
-                                            visible="true" />
+                                            tooltip="{ddtext>/FILTER}"
+                                            visible="true" /> -->
                                         <Button id="btnFullScreenMatl" 
                                             icon="sap-icon://full-screen"
                                             press="onTableResize('Matl','Max')"
+                                            tooltip="{ddtext>/FULLSCREEN}"
                                             visible="true" />
                                         <Button id="btnExitFullScreenMatl" 
                                             icon="sap-icon://exit-full-screen"
                                             press="onTableResize('Matl','Min')"
+                                            tooltip="{ddtext>/EXITFULLSCREEN}"
                                             visible="false" />
                                         <Button id="btnColPropMatl" 
                                             icon="sap-icon://table-column"
                                             press="onColumnProp"
-                                            tooltip="Columns"
+                                            tooltip="{ddtext>/COLUMNS}"
                                             visible="true" />
                                         <Button id="btnTabLayoutMatl" 
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
-                                            tooltip="Save Table Layout" 
+                                            tooltip="{ddtext>/SAVELAYOUT}"
                                             visible="true" />                                             
                                     </Toolbar>
                                 </uiT:extension>
