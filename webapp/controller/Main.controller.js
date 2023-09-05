@@ -106,7 +106,7 @@ sap.ui.define([
                 this._DiscardChangesDialog = null;
 
                 this._aEntitySet = {
-                    gmc: "GMCSet", attributes: "GMCAttribSet", materials: "GMCMaterialSet"
+                    gmc: "GMCHdr2Set", attributes: "GMCAttribSet", materials: "GMCMaterialSet"
                 };
 
                 this._aColumns = {};
@@ -261,11 +261,12 @@ sap.ui.define([
 
                 var vSBU = this.getView().getModel("ui").getData().sbu;
 
-                oModel.read('/GMCSet', { 
+                oModel.read('/GMCHdr2Set', { 
                     urlParameters: {
                         "$filter": "SBU eq '" + vSBU + "'"
                     },                    
                     success: function (data, response) {
+                        console.log("GMCHdr",data);
                         var oJSONModel = new sap.ui.model.json.JSONModel();
 
                         if (data.results.length > 0) {
@@ -441,7 +442,7 @@ sap.ui.define([
                 var oModel = this.getOwnerComponent().getModel();
                 
                 oModel.metadataLoaded().then(() => {
-                    this.getDynamicColumns(oColumns, "GMCHDR", "ZERP_MATGMC");
+                    this.getDynamicColumns(oColumns, "GMCHDR2", "ZDV_3DERP_GMCHDR");
                     
                     setTimeout(() => {
                         this.getDynamicColumns(oColumns, "GMCATTRIB", "ZERP_GMCATTRIB");
@@ -508,14 +509,20 @@ sap.ui.define([
                 
                 oModel.read("/ColumnsSet", {
                     success: function (oData, oResponse) {
-                        // console.log(oData);
+                        console.log("ColumnSet",oData);
                         oJSONColumnsModel.setData(oData);
                         // me.getView().setModel(oJSONColumnsModel, "columns"); //set the view model
 
                         if (oData.results.length > 0) {
                             // console.log(modCode)
-                            if (modCode === 'GMCHDR') {
-                                // console.log(oData.results)
+                            if (modCode === 'GMCHDR2') {
+                                
+                                oData.results.forEach((item, index) => {
+                                     if (item.ColumnName === 'UEBTK'){
+                                        item.DataType = 'BOOLEAN';
+                                     }     
+                                });
+                                console.log("ColumnSet",oData.results);
                                 var aColumns = me.setTableColumns(oColumns["gmc"], oData.results);                               
                                 // console.log(aColumns);
                                 me._aColumns["gmc"] = aColumns["columns"];
@@ -1448,7 +1455,6 @@ sap.ui.define([
             onSaveChanges(arg) {
                 var aNewRows = this.getView().getModel(arg).getData().results.filter(item => item.New === true);
                 var aEditedRows = this.getView().getModel(arg).getData().results.filter(item => item.Edited === true);
-                
                 if (this.validationErrors.length === 0)
                 {
                     if (aNewRows.length > 0) {
@@ -1974,6 +1980,7 @@ sap.ui.define([
                                                             if (iDeleted === aDataToDelete.length) {
                                                                 me.closeLoadingDialog();
                                                                 MessageBox.information("Selected record(s) successfully deleted.");
+                                                                this.onRefreshGMC();
                                                             }
                                                         },
                                                         error: function() {
@@ -2007,7 +2014,7 @@ sap.ui.define([
                 var _this = this;
                 var vSBU = this.getView().getModel("ui").getData().sbu;
 
-                oModel.read('/GMCSet', {
+                oModel.read('/GMCHdr2Set', {
                     urlParameters: {
                         "$filter": "SBU eq '" + vSBU + "'"
                     },                     
@@ -2541,7 +2548,7 @@ sap.ui.define([
                     var vItemValue = vColProp[0].valueHelp.items.value;
                     var vItemDesc = vColProp[0].valueHelp.items.text;
                     var sEntity = vColProp[0].valueHelp.items.path;
-
+                    this.dialogEntity=sEntity;
                     oModel.read(sEntity, {
                         success: function (data, response) {
                             data.results.forEach(item => {
@@ -2613,7 +2620,6 @@ sap.ui.define([
                     // console.log()
                     if (oSelectedItem) {
                         this._inputSource.setValue(oSelectedItem.getTitle());
-
                         if (this._inputId.indexOf("iptAttribcd") >= 0) {
                             this._valueHelpDialog.getModel().getData().items.filter(item => item.VHTitle === oSelectedItem.getTitle())
                                 .forEach(item => {
@@ -2623,24 +2629,40 @@ sap.ui.define([
                                 })
                         }
                         else {
-                            var sRowPath = this._inputSource.getBindingInfo("value").binding.oContext.sPath;
-
-                            if (this._inputValue !== oSelectedItem.getTitle()) {                                
-                                this.getView().getModel(sTable).setProperty(sRowPath + '/Edited', true);
-
-                                if (sTable === 'gmc') this._isGMCEdited = true;
-                                if (sTable === 'attributes') this._isAttrEdited= true;
-
-                                sap.ushell.Container.setDirtyFlag(true);
-                            }
-
-                            if (this._inputSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
+                            if(this.dialogEntity==="/PurcValKeyRscSet"){
+                                var sRowPath = this._inputSource.getBindingInfo("value").binding.oContext.sPath;
                                 this._valueHelpDialog.getModel().getData().items.filter(item => item.VHTitle === oSelectedItem.getTitle())
-                                    .forEach(item => {
-                                        this.getView().getModel(sTable).setProperty(sRowPath + '/PROCESSCD', item.Processcd);
-                                    })
+                                .forEach(item => {
+                                    this.getView().getModel("gmc").setProperty(sRowPath + '/UEBTO', item.Uebto);
+                                    this.getView().getModel("gmc").setProperty(sRowPath + '/UNTTO', item.Untto);
+                                    this.getView().getModel("gmc").setProperty(sRowPath + '/UEBTK', item.Uebtk);
+                                    //oModel.setProperty(this._inputSourceCtx.getPath() + '/UEBTK', item.Uebtk === "X" ? true : false);*/
+                                });
                             }
+                            else{
+                                var sRowPath = this._inputSource.getBindingInfo("value").binding.oContext.sPath;
+                                if (this._inputValue !== oSelectedItem.getTitle()) {                                
+                                    this.getView().getModel(sTable).setProperty(sRowPath + '/Edited', true);
+
+                                    if (sTable === 'gmc') this._isGMCEdited = true;
+                                    if (sTable === 'attributes') this._isAttrEdited= true;
+
+                                    sap.ushell.Container.setDirtyFlag(true);
+                                }
+
+                                if (this._inputSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
+                                    this._valueHelpDialog.getModel().getData().items.filter(item => item.VHTitle === oSelectedItem.getTitle())
+                                        .forEach(item => {
+                                            this.getView().getModel(sTable).setProperty(sRowPath + '/PROCESSCD', item.Processcd);
+                                        })
+                                }
+                            }
+                            
                         }
+
+                        
+
+                        
                     }
 
                     this._inputSource.setValueState("None");
@@ -2708,7 +2730,6 @@ sap.ui.define([
 
             setRowReadMode(arg) {
                 var oTable = this.byId(arg + "Tab");
-
                 oTable.getColumns().forEach((col, idx) => {                    
                     this._aColumns[arg].filter(item => item.label === col.getLabel().getText())
                         .forEach(ci => {
@@ -2942,6 +2963,7 @@ sap.ui.define([
                     MessageBox.information("At least one description should be specified.");
                 }
                 else {
+                    var aNewRows = this.getView().getModel("gmc").getData().results.filter(item => item.New === true);
                     this.showLoadingDialog('Processing...');
 
                     var _descen = _aDescen.join(', ');
@@ -2980,6 +3002,7 @@ sap.ui.define([
                         "Voluom": aNewRows[0].VOLUOM,
                         "Cusmatcd": aNewRows[0].CUSMATCD,
                         "Processcd": aNewRows[0].PROCESSCD,
+                        "Ekwsl":aNewRows[0].EKWSL,
                         "GMCAttribParamSet": _paramAttrib,
                         "RetMsgSet": [{ "Seq": "1" }]
                     }
@@ -3345,8 +3368,8 @@ sap.ui.define([
                 };
 
                 if (oTable.getBindingInfo("rows").model === "gmc") {
-                    oParam['TYPE'] = "GMCHDR";
-                    oParam['TABNAME'] = "ZERP_MATGMC";
+                    oParam['TYPE'] = "GMCHDR2";
+                    oParam['TABNAME'] = "ZDV_3DERP_GMCHDR";
                 }
                 else if (oTable.getBindingInfo("rows").model === "attributes") {
                     oParam['TYPE'] = "GMCATTRIB";

@@ -29,8 +29,8 @@ server:
       configuration:
         service:
           - urlPath: /sap/opu/odata/sap/ZGW_3DERP_GMC_SRV/
-            metadataXmlPath: ./webapp/localService/metadata.xml
-            mockdataRootPath: ./webapp/localService/mockdata
+            metadataXmlPath: ./webapp/localService/mainService/metadata.xml
+            mockdataRootPath: ./webapp/localService/mainService/mockdata
             generateMockData: true
           - urlPath: /sap/opu/odata/sap/ZGW_3DERP_COMMON_SRV/
             metadataXmlPath: ./webapp/localService/ZGW_3DERP_COMMON_SRV/metadata.xml
