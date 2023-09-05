@@ -45,7 +45,7 @@ sap.ui.define([
                     updTable: ''
                 }), "ui");
 
-                oModel.read('/SBURscSet', { 
+                oModel.read('/SBURscSet', {     
                     success: function (data, response) {                        
                         var vSBU = _this.getView().getModel("ui").getProperty("/sbu");
                         console.log("get SBU", vSBU);
@@ -1486,8 +1486,14 @@ sap.ui.define([
 
             setRowEditMode(arg) {
                 this.getView().getModel(arg).getData().results.forEach(item => item.Edited = false);
-
                 var oTable = this.byId(arg + "Tab");
+                var me = this;
+
+                var oInputEventDelegate = {
+                    onkeydown: function(oEvent){
+                        me.onInputKeyDown(oEvent);
+                    },
+                };
                 
                 oTable.getColumns().forEach((col, idx) => {
                     var oValueHelp = false;
@@ -1502,8 +1508,6 @@ sap.ui.define([
                                     col.setTemplate(new sap.m.CheckBox({selected: "{" + arg + ">" + ci.name + "}", editable: true}));
                                 }
                                 else if (oValueHelp) {
-                                    // console.log(ci.name)
-                                    // console.log(ci.valueHelp["suggestionItems"].text)
                                     col.setTemplate(new sap.m.Input({
                                         // id: "ipt" + ci.name,
                                         type: "Text",
@@ -1525,7 +1529,7 @@ sap.ui.define([
                                             templateShareable: false
                                         },
                                         change: this.onValueHelpLiveInputChange.bind(this)
-                                    }));
+                                    }).addEventDelegate(oInputEventDelegate));
                                 }
                                 else if (ci.type === "NUMBER") {
                                     col.setTemplate(new sap.m.Input({
@@ -1533,7 +1537,7 @@ sap.ui.define([
                                         textAlign: sap.ui.core.TextAlign.Right,
                                         value: "{path:'" + arg + ">" + ci.name + "', type:'sap.ui.model.odata.type.Decimal', formatOptions:{ minFractionDigits:" + ci.scale + ", maxFractionDigits:" + ci.scale + " }, constraints:{ precision:" + ci.precision + ", scale:" + ci.scale + " }}",
                                         liveChange: this.onNumberLiveChange.bind(this)
-                                    }));
+                                    }).addEventDelegate(oInputEventDelegate));
                                 }
                                 else {
                                     if (ci.maxLength !== null) {
@@ -1541,13 +1545,13 @@ sap.ui.define([
                                             value: "{" + arg + ">" + ci.name + "}",
                                             maxLength: +ci.maxLength,
                                             liveChange: this.onInputLiveChange.bind(this)
-                                        }));
+                                        }).addEventDelegate(oInputEventDelegate));
                                     }
                                     else {
                                         col.setTemplate(new sap.m.Input({
                                             value: "{" + arg + ">" + ci.name + "}",
                                             liveChange: this.onInputLiveChange.bind(this)
-                                        }));
+                                        }).addEventDelegate(oInputEventDelegate));
                                     }
                                 }                                
                             }
@@ -3473,6 +3477,85 @@ sap.ui.define([
                             })
                         }
                     }                   
+                }
+            },
+
+            onInputKeyDown(oEvent) {
+                if (oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") {
+                    //prevent increase/decrease of number value
+                    oEvent.preventDefault();
+
+                    var sTableId = oEvent.srcControl.oParent.oParent.sId;
+                    var oTable = this.byId(sTableId);
+                    var sModelName = oEvent.srcControl.getBindingInfo("value").parts[0].model;
+                    var sColumnName = oEvent.srcControl.getBindingInfo("value").parts[0].path;
+                    var sCurrentRowIndex = +oEvent.srcControl.oParent.getBindingContext(sModelName).sPath.replace("/results/", "");
+                    var sColumnIndex = -1;
+                    var sCurrentRow = -1;
+                    var sNextRow = -1;
+                    var sActiveRow = -1;
+                    var iFirstVisibleRowIndex = oTable.getFirstVisibleRow();
+                    var iVisibleRowCount = oTable.getVisibleRowCount();
+
+                    oTable.getModel().setProperty(oEvent.srcControl.oParent.getBindingContext(sModelName).sPath + "/" + oEvent.srcControl.getBindingInfo("value").parts[0].path, oEvent.srcControl.getValue());
+
+                    //get active row (arrow down)
+                    oTable.getBinding("rows").aIndices.forEach((item, index) => {
+                        if (item === sCurrentRowIndex) { sCurrentRow = index; }
+                        if (sCurrentRow !== -1 && sActiveRow === -1) { 
+                            if ((sCurrentRow + 1) === index) { sActiveRow = item }
+                            else if ((index + 1) === oTable.getBinding("rows").aIndices.length) { sActiveRow = item }
+                        }
+                    })
+                    
+                    //clear active row
+                    oTable.getModel(sModelName).getData().results.forEach(row => row.ACTIVE = "");
+
+                    //get next row to focus and active row (arrow up)
+                    if (oEvent.key === "ArrowUp") { 
+                        if (sCurrentRow !== 0) {
+                            sActiveRow = oTable.getBinding("rows").aIndices.filter((fItem, fIndex) => fIndex === (sCurrentRow - 1))[0];
+                        }
+                        else { sActiveRow = oTable.getBinding("rows").aIndices[0] }
+
+                        sCurrentRow = sCurrentRow === 0 ? sCurrentRow : sCurrentRow - iFirstVisibleRowIndex;
+                        sNextRow = sCurrentRow === 0 ? 0 : sCurrentRow - 1;
+                    }
+                    else if (oEvent.key === "ArrowDown") { 
+                        sCurrentRow = sCurrentRow - iFirstVisibleRowIndex;
+                        sNextRow = sCurrentRow + 1;
+                    }
+
+                    //set active row
+                    oTable.getModel(sModelName).setProperty("/results/" + sActiveRow + "/ACTIVE", "X");
+
+                    //auto-scroll up/down
+                    if (oEvent.key === "ArrowDown" && (sNextRow + 1) < oTable.getModel(sModelName).getData().results.length && (sNextRow + 1) > iVisibleRowCount) {
+                        oTable.setFirstVisibleRow(iFirstVisibleRowIndex + 1);
+                    }   
+                    else if (oEvent.key === "ArrowUp" && sCurrentRow === 0 && sNextRow === 0 && iFirstVisibleRowIndex !== 0) { 
+                        oTable.setFirstVisibleRow(iFirstVisibleRowIndex - 1);
+                    }
+
+                    //get the cell to focus
+                    oTable.getRows()[sCurrentRow].getCells().forEach((cell, index) => {
+                        if (cell.getBindingInfo("value") !== undefined) {
+                            if (cell.getBindingInfo("value").parts[0].path === sColumnName) { sColumnIndex = index; }
+                        }
+                    })
+                    
+                    if (oEvent.key === "ArrowDown") {
+                        sNextRow = sNextRow === iVisibleRowCount ? sNextRow - 1 : sNextRow;
+                    }
+
+                    //set focus on cell
+                    setTimeout(() => {
+                        oTable.getRows()[sNextRow].getCells()[sColumnIndex].focus();
+                        oTable.getRows()[sNextRow].getCells()[sColumnIndex].getFocusDomRef().select();
+                    }, 100);
+
+                    //set row highlight
+                    this.setActiveRowHighlight(sModelName);
                 }
             },
 
