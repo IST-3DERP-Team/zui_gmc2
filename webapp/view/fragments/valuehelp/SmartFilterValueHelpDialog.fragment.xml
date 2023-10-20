@@ -1,0 +1,41 @@
+<core:FragmentDefinition
+	xmlns="sap.ui.comp.valuehelpdialog"
+	xmlns:m="sap.m"
+	xmlns:fb="sap.ui.comp.filterbar"
+	xmlns:core="sap.ui.core">
+	<ValueHelpDialog 
+		title="Material Type"
+		ok=".onCustomSmartFilterValueHelpOkPress"
+		cancel=".onCustomSmartFilterValueHelpCancelPress"
+		afterClose=".onCustomSmartFilterValueHelpAfterClose"
+		supportRanges="true"
+		key="MaterialType"
+		descriptionKey="Description"
+	>
+		<filterBar>
+			<fb:FilterBar advancedMode="true" search=".onFilterBarSearch">
+				<fb:filterGroupItems>
+					<fb:FilterGroupItem 
+						groupName="__$INTERNAL$"
+						name="MaterialType"
+						label="Material Type"
+						visibleInFilterBar="true">
+						<fb:control>
+							<m:Input name="MaterialType" />
+						</fb:control>
+					</fb:FilterGroupItem>
+					<fb:FilterGroupItem 
+						groupName="__$INTERNAL$"
+						name="Description"
+						label="Description"
+						visibleInFilterBar="true"
+					>
+						<fb:control>
+							<m:Input name="Description" />
+						</fb:control>
+					</fb:FilterGroupItem>
+				</fb:filterGroupItems>
+			</fb:FilterBar>
+		</filterBar>
+	</ValueHelpDialog>
+</core:FragmentDefinition>

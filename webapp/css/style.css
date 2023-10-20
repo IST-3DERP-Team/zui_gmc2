@@ -36,10 +36,14 @@
     color: red !important;
 }
 
-.sapMBtn .sapMBtnInner {
+.sapMLabelRequired, .sapMLabelRequired::before {
+    color: #c75858 !important;
+}
+
+/* .sapMBtn .sapMBtnInner {
     background: lightgrey;
     border: none;
-}
+} */
 
 .selHdrKeyFontStyle {
     font-style: italic;

@@ -5,6 +5,7 @@
     xmlns="sap.m"
     height="100%"
     xmlns:uiL="sap.ui.layout"
+    xmlns:smartfilterbar="sap.ui.comp.smartfilterbar"
     xmlns:uiT="sap.ui.table">  
     <Page id="page" enableScrolling="false" class="sapUiNoContentPadding" showHeader="false">
         <dependents>
@@ -229,10 +230,79 @@
                     </IconTabBar>
                 </uiL:flexContent>
             </uiL:FixFlex> -->
-            <VBox fitContainer="true" class="sidePadding">
+            <VBox fitContainer="true">
+                <smartfilterbar:SmartFilterBar id="smartFilterBar" entitySet="ZVB_3DERP_GMC_FILTERS" search="onSearch" persistencyKey="3DERP_pKey" showClearButton="true" showClearOnFB="true">
+                    <smartfilterbar:controlConfiguration>
+                        <smartfilterbar:ControlConfiguration key="SBU" label="{ddtext>/SBU}" groupId="_BASIC" mandatory="mandatory" width="50px">
+                            <smartfilterbar:customControl>
+                                <ComboBox id="cboxSBU"
+                                    selectedKey="{ui>/sbu}"
+                                    change="onSBUChange"
+                                    items="{
+                                        path: '/ZVB_3DERP_SBU_SH'
+                                    }">
+                                    <core:Item key="{SBU}" text="{SBU}" />
+                                </ComboBox>                                  
+                            </smartfilterbar:customControl>
+                        </smartfilterbar:ControlConfiguration>
+                    </smartfilterbar:controlConfiguration>
+
+                    <smartfilterbar:controlConfiguration>
+                        <smartfilterbar:ControlConfiguration key="GMC" label="{ddtext>/GMC}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" />
+                    </smartfilterbar:controlConfiguration>
+
+                    <!-- <smartfilterbar:controlConfiguration>
+                        <smartfilterbar:ControlConfiguration key="MATTYP" label="{ddtext>/MATTYP}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" />
+                    </smartfilterbar:controlConfiguration> -->
+
+                    <smartfilterbar:controlConfiguration>
+                        <smartfilterbar:ControlConfiguration key="MATTYP" label="{ddtext>/MATTYP}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" width="15rem" >
+                            <smartfilterbar:customControl>
+                                <MultiInput id="multiInputMatTyp"
+                                    change="onCustomSmartFilterValueHelpChange"
+                                    valueHelpRequest=".onCustomSmartFilterValueHelp"
+                                    maxSuggestionWidth="350px"
+                                    suggestionRows="{
+                                        path: 'materialType>/results',
+                                        sorter: { path: 'MaterialType' },
+                                        length: 1000,
+                                        templateShareable: false
+                                    }">
+                                    <suggestionColumns>
+                                        <Column width="100px">
+                                            <Label text="Material Type"/>
+                                        </Column>
+                                        <Column width="200px">
+                                            <Label text="Description"/>
+                                        </Column>
+                                    </suggestionColumns>
+                                    <suggestionRows>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <Label text="{materialType>MaterialType}" />
+                                                <Label text="{materialType>Description}" />
+                                            </cells>
+                                        </ColumnListItem>
+                                    </suggestionRows>
+                                </MultiInput>
+                            </smartfilterbar:customControl>
+                        </smartfilterbar:ControlConfiguration>
+                    </smartfilterbar:controlConfiguration>
+
+                    <smartfilterbar:controlConfiguration>
+                        <smartfilterbar:ControlConfiguration key="MATGRPCD" label="{ddtext>/MATGRPCD}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" />
+                    </smartfilterbar:controlConfiguration>
+
+                    <smartfilterbar:layoutData>
+                        <FlexItemData growFactor="0"/>
+                    </smartfilterbar:layoutData>
+                </smartfilterbar:SmartFilterBar>
+
                 <uiT:Table id="gmcTab"
+                    class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
                     rows="{gmc>/results}"
                     visibleRowCountMode="Auto"
+                    minAutoRowCount="1"
                     showColumnVisibilityMenu="true"
                     enableColumnFreeze="true"
                     enableCellFilter="true"
@@ -251,8 +321,8 @@
                         <uiT:RowSettings highlight="{= ${gmc>Edited} === true ? 'Warning' : null}" />
                     </uiT:rowSettingsTemplate>
                     <uiT:extension>
-                        <Toolbar>
-                            <Label text="SBU: " />
+                        <OverflowToolbar>
+                            <!-- <Label text="SBU: " />
                             <ComboBox id="cboxSBU"
                                 width="100px"
                                 change="onSBUChange"
@@ -262,7 +332,7 @@
                                 }"
                                 class="marginTopNone">
                                 <core:Item key="{SBU}" text="{SBU}" />
-                            </ComboBox>
+                            </ComboBox> -->
                             <Text text="{counts>/gmc} GMC" class="selHdrKeyFontStyle" />
                             <ToolbarSpacer/>
                             <SearchField
@@ -327,22 +397,23 @@
                                 press="onTableResize('Hdr','Min')"
                                 tooltip="{ddtext>/EXITFULLSCREEN}"
                                 visible="false" />
-                            <Button id="btnColPropGMC" 
+                            <!-- <Button id="btnColPropGMC" 
                                 icon="sap-icon://table-column"
                                 press="onColumnProp"
                                 tooltip="{ddtext>/COLUMNS}"
-                                visible="true" />
+                                visible="true" /> -->
                             <Button id="btnTabLayoutGMC" 
                                 icon="sap-icon://grid" 
                                 press="onSaveTableLayout"
                                 tooltip="{ddtext>/SAVELAYOUT}"
                                 visible="true" />                                 
-                        </Toolbar>
+                        </OverflowToolbar>
                     </uiT:extension>
                     <uiT:layoutData>
                         <FlexItemData growFactor="1" baseSize="0%"/>
                     </uiT:layoutData>                     
                 </uiT:Table>
+
                 <IconTabBar id="itbDetail"
                     expanded="{device>/isNoPhone}" 
                     expandable="false"
@@ -352,8 +423,10 @@
                     <items>
                         <IconTabFilter text="Attributes" key="attributes">
                             <uiT:Table id="attributesTab"
+                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
                                 rows="{attributes>/results}"
                                 visibleRowCountMode="Auto"
+                                minAutoRowCount="1"
                                 showColumnVisibilityMenu="true"
                                 enableColumnFreeze="true"
                                 enableCellFilter="true"
@@ -372,7 +445,7 @@
                                     <uiT:RowSettings highlight="{= ${attributes>Edited} === true ? 'Warning' : null}" />
                                 </uiT:rowSettingsTemplate>                                    
                                 <uiT:extension>
-                                    <Toolbar>
+                                    <OverflowToolbar>
                                         <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} Attributes )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
                                         <SearchField
@@ -423,25 +496,27 @@
                                             press="onTableResize('Attr','Min')"
                                             tooltip="{ddtext>/EXITFULLSCREEN}"
                                             visible="false" />
-                                        <Button id="btnColPropAttr" 
+                                        <!-- <Button id="btnColPropAttr" 
                                             icon="sap-icon://table-column"
                                             press="onColumnProp"
                                             tooltip="{ddtext>/COLUMNS}"
-                                            visible="true" />
+                                            visible="false" /> -->
                                         <Button id="btnTabLayoutAttr" 
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
                                             tooltip="{ddtext>/SAVELAYOUT}"
                                             visible="true" />                                             
-                                    </Toolbar>
+                                    </OverflowToolbar>
                                 </uiT:extension>
                             </uiT:Table>
                         </IconTabFilter>
                         <IconTabFilter text="Materials" key="materials">
                             <uiT:Table id="materialsTab"
+                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
                                 rows="{materials>/results}"
                                 visibleRowCountMode="Auto"
-                                showColumnVisibilityMenu="true"
+                                minAutoRowCount="1"
+                                showColumnVisibilityMenu="true"                                
                                 enableColumnFreeze="true"
                                 enableCellFilter="true"
                                 selectionMode="Single"
@@ -456,7 +531,7 @@
                                 columnSelect="onColumnUpdated"
                                 columnVisibility="onColumnUpdated">
                                 <uiT:extension>
-                                    <Toolbar>
+                                    <OverflowToolbar>
                                         <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} Materials )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
                                         <SearchField
@@ -492,17 +567,17 @@
                                             press="onTableResize('Matl','Min')"
                                             tooltip="{ddtext>/EXITFULLSCREEN}"
                                             visible="false" />
-                                        <Button id="btnColPropMatl" 
+                                        <!-- <Button id="btnColPropMatl" 
                                             icon="sap-icon://table-column"
                                             press="onColumnProp"
                                             tooltip="{ddtext>/COLUMNS}"
-                                            visible="true" />
+                                            visible="false" /> -->
                                         <Button id="btnTabLayoutMatl" 
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
                                             tooltip="{ddtext>/SAVELAYOUT}"
                                             visible="true" />                                             
-                                    </Toolbar>
+                                    </OverflowToolbar>
                                 </uiT:extension>
                             </uiT:Table>
                         </IconTabFilter>

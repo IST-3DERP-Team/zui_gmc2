@@ -5,7 +5,7 @@
         xmlns:uit="sap.ui.table"
         id="fragment-1" 
         fragmentName="fragment1">
-    <Dialog contentWidth="900px"
+    <Dialog contentWidth="1125px"
         contentHeight="500px"
         title="Material Classifications"
         resizable="true"
@@ -23,39 +23,37 @@
             visibleRowCount="{/rowCount}"
             paste="onPaste">
             <uit:columns>
-                <uit:Column width="7rem">
-                    <Label text="Classification" />
+                <uit:Column width="20rem">
+                    <Text text="{ddtext>/MATTYPCLS}" />
                     <uit:template>
-                        <Text text="{class>MATTYPCLS}" wrapping="false" />
+                        <Text text="{class>MATTYPCLSDESC}" wrapping="false" />
                     </uit:template>
                 </uit:Column>
                 <uit:Column width="9rem">
-                    <Label text="Attribute" />
+                    <Text text="{ddtext>/ATTRIBCD}" />
                     <uit:template>
                         <Input id="iptAttribcd"
                             type="Text"
                             enabled="true"
                             value="{class>ATTRIBCD}"
-                            change="onAtrribcdChange"
+                            textFormatMode="Key"
                             showValueHelp="true"
-                            valueHelpRequest="handleValueHelp"
+                            valueHelpRequest="handleStaticValueHelp"
                             showSuggestion="true" 
                             maxSuggestionWidth="500px"
-                            suggestionItems="{path:'/MatTypeAttribSet', templateShareable:false}">
-                            <suggestionItems>
-                                <core:ListItem text="{Attribcd}" key="{Attribcd}" additionalText="{Shorttext}" />
-                            </suggestionItems>
+                            change="onAtrribcdChange"
+                            >
                         </Input>
                     </uit:template>
                 </uit:Column>
                 <uit:Column width="20rem">
-                    <Label text="Description (EN)" />
+                    <Text text="{ddtext>/DESCEN}" />
                     <uit:template>
                         <Input value="{class>DESCEN}" enabled="true" />
                     </uit:template>
                 </uit:Column>
                 <uit:Column width="20rem">
-                    <Label text="Description (CN)" />
+                    <Text text="{ddtext>/DESCZH}" />
                     <uit:template>
                         <Input value="{class>DESCZH}" enabled="true" />
                     </uit:template>

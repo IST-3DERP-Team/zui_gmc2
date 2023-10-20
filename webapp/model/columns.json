@@ -8,7 +8,7 @@
             "ValueHelp": {"show": true, "items": {"path": "mattyp", "value": "Mattyp", "text": "Desc"},
                 "SuggestionItems": {"path": "mattyp>/", "text": "{mattyp>Mattyp}", "additionalText": "{mattyp>Desc}",  "maxSuggestionWidth": "350px"},
                 "columns": "tvh_mattyp"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Matgrpcd", "position": 2, "type": "Edm.String", "visible": true, "required": true, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": true, "items": {"path": "/MatGrpRscSet", "value": "Matkl", "text": "Wgbez"},
@@ -16,7 +16,7 @@
             "ValueHelp": {"show": true, "items": {"path": "matgrp", "value": "Matkl", "text": "Wgbez"},
                 "SuggestionItems": {"path": "matgrp>/", "text": "{matgrp>Matkl}", "additionalText": "{matgrp>Wgbez}",  "maxSuggestionWidth": "250px"},
                 "columns": "tvh_matgrp"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Descen", "position": 3, "type": "Edm.String", "visible": true, "required": false, "width": "350px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
@@ -28,7 +28,7 @@
             "ValueHelp": {"show": true, "items": {"path": "uom", "value": "Msehi", "text": "Msehl"},
                 "SuggestionItems": {"path": "uom>/", "text": "{uom>Msehi}", "additionalText": "{uom>Msehl}",  "maxSuggestionWidth": "300px"},
                 "columns": "tvh_uom"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Orderuom", "position": 6, "type": "Edm.String", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": true, "items": {"path": "/UOMRscSet", "value": "Msehi", "text": "Msehl"},
@@ -36,7 +36,7 @@
             "ValueHelp": {"show": true, "items": {"path": "uom", "value": "Msehi", "text": "Msehl"},
                 "SuggestionItems": {"path": "uom>/", "text": "{uom>Msehi}", "additionalText": "{uom>Msehl}",  "maxSuggestionWidth": "300px"},
                 "columns": "tvh_uom"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Issuom", "position": 7, "type": "Edm.String", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": true, "items": {"path": "/UOMRscSet", "value": "Msehi", "text": "Msehl"},
@@ -44,7 +44,7 @@
             "ValueHelp": {"show": true, "items": {"path": "uom", "value": "Msehi", "text": "Msehl"},
                 "SuggestionItems": {"path": "uom>/", "text": "{uom>Msehi}", "additionalText": "{uom>Msehl}",  "maxSuggestionWidth": "300px"},
                 "columns": "tvh_uom"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Grswt", "position": 8, "type": "Edm.Decimal", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
@@ -56,7 +56,7 @@
             "ValueHelp": {"show": true, "items": {"path": "wtuom", "value": "Msehi", "text": "Msehl"},
                 "SuggestionItems": {"path": "wtuom>/", "text": "{wtuom>Msehi}", "additionalText": "{wtuom>Msehl}",  "maxSuggestionWidth": "300px"},
                 "columns": "tvh_uom"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Volume", "position": 11, "type": "Edm.Decimal", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
@@ -66,16 +66,28 @@
             "ValueHelp": {"show": true, "items": {"path": "uom", "value": "Msehi", "text": "Msehl"},
                 "SuggestionItems": {"path": "uom>/", "text": "{uom>Msehi}", "additionalText": "{uom>Msehl}",  "maxSuggestionWidth": "300px"},
                 "columns": "tvh_uom"
-            }
+            }, "TextFormatMode": "ValueKey"
         },
         {"name": "Cusmatcd", "position": 13, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
         {"name": "Processcd", "position": 14, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": true, "items": {"path": "/ProcessRscSet", "value": "Processcd", "text": "Desc1"},
-            "suggestionItems": {"path": "/ProcessRscSet", "text": "{Processcd}", "additionalText": "{Desc1}", "maxSuggestionWidth": "320px"}}},
+                "suggestionItems": {"path": "/ProcessRscSet", "text": "{Processcd}", "additionalText": "{Desc1}", "maxSuggestionWidth": "320px"}},
+            "ValueHelp": {"show": true, "items": {"path": "process", "value": "Processcd", "text": "Desc1"},
+                "SuggestionItems": {"path": "process>/", "text": "{process>Processcd}", "additionalText": "{process>Desc1}",  "maxSuggestionWidth": "300px"},
+                "columns": "tvh_process"
+            }, "TextFormatMode": "ValueKey"
+        },
+
         {"name": "Ekwsl", "position": 22, "type": "Edm.String", "visible": true, "required": false, "width": "125px", "hideOnChange": false,"showable": true, "sort": "",
-        "valueHelp": {"show": true, "items": {"path": "/PurcValKeyRscSet", "value": "Ekwsl", "text": "Untto + Uebto"},
-        "suggestionItems": {"path": "/PurcValKeyRscSet", "text": "{Ekwsl}"}}},
+            "valueHelp": {"show": true, "items": {"path": "/PurcValKeyRscSet", "value": "Ekwsl", "text": "Ekwsl"},
+                "suggestionItems": {"path": "/PurcValKeyRscSet", "text": "{Ekwsl}" }},
+            "ValueHelp": {"show": true, "items": {"path": "purvalkey", "value": "Ekwsl", "text": "Ekwsl"},
+                "SuggestionItems": {"path": "purvalkey>/", "text": "{purvalkey>Ekwsl}" },
+                "columns": "tvh_purvalkey"
+            }
+        },
+
         {"name": "Untto", "position": 16, "type": "Edm.String", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
         "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
         {"name": "Deleted", "position": 17, "type": "Edm.Boolean", "visible": true, "required": false, "width": "100px", "hideOnChange": true, "showable": true, "sort": "",
@@ -95,7 +107,12 @@
         {"name": "Seq", "position": 0, "type": "Edm.Decimal", "visible": true, "required": false, "width": "100px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
         {"name": "Mattypcls", "position": 1, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
-            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""},
+            "ValueHelp": {"show": true, "items": {"path": "mattypcls", "value": "MATTYPCLS", "text": "SHORTTEXT"},
+                "SuggestionItems": {"path": "mattypcls>/", "text": "{mattypcls>MATTYPCLS}", "additionalText": "{mattypcls>SHORTTEXT}",  "maxSuggestionWidth": "300px"},
+                "columns": "tvh_mattypcls"
+            }, "TextFormatMode": "ValueKey"        
+        },
         {"name": "Attribcd", "position": 2, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": true, "items": {"path": "/MatTypeAttribSet", "value": "Attribcd", "text": "Shorttext"},
                 "suggestionItems": {"path": "/MatTypeAttribSet", "text": "{Attribcd}", "additionalText": "{Shorttext}", "maxSuggestionWidth": "500px"}},
@@ -124,6 +141,16 @@
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
         {"name": "Deleted", "position": -1, "type": "Edm.String", "visible": false, "required": false, "width": "150px", "hideOnChange": false, "showable": false, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}}        
+    ],
+    "class": [
+        {"name": "ATTRIBCD", "position": 2, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
+            "valueHelp": {"show": true, "items": {"path": "/MatTypeAttribSet", "value": "Attribcd", "text": "Shorttext"},
+                "suggestionItems": {"path": "/MatTypeAttribSet", "text": "{Attribcd}", "additionalText": "{Shorttext}", "maxSuggestionWidth": "500px"}},
+            "ValueHelp": {"show": true, "items": {"path": "attrib", "value": "Attribcd", "text": "Shorttext"},
+                "SuggestionItems": {"path": "attrib>/", "text": "{attrib>Attribcd}", "additionalText": "{attrib>Shorttext}",  "maxSuggestionWidth": "500px"},
+                "columns": "tvh_attrib"
+            }
+        }
     ],
     "materials": [
         {"name": "Matno", "position": 0, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
@@ -195,6 +222,12 @@
         {"ColumnName": "Updatedby", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "Updateddt", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false}
     ],
+    "tvh_purvalkey": [
+        {"ColumnName": "Ekwsl", "DataType": "STRING", "ColumnWidth": "100px", "Visible": true, "Key": true, "Value": true},
+        {"ColumnName": "Untto", "DataType": "STRING", "ColumnWidth": "100px", "Visible": true, "Key": false, "Value": false},
+        {"ColumnName": "Uebto", "DataType": "STRING", "ColumnWidth": "100px", "Visible": true, "Key": false, "Value": false},
+        {"ColumnName": "Uebtk", "DataType": "BOOLEAN", "ColumnWidth": "100px", "Visible": true, "Key": false, "Value": false}
+    ],
     "tvh_attrib": [
         {"ColumnName": "Attribcd", "DataType": "STRING", "ColumnWidth": "150px", "Visible": true, "Key": true, "Value": true},
         {"ColumnName": "Shorttext", "DataType": "STRING", "ColumnWidth": "250px", "Visible": true, "Key": false, "Value": false},
@@ -203,6 +236,17 @@
         {"ColumnName": "Mattypcls", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "Shorttext2", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "Deleted", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false}
-
+    ],
+    "tvh_mattypcls": [
+        {"ColumnName": "MATTYP", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "MATTYPCLS", "DataType": "STRING", "ColumnWidth": "100px", "Visible": true, "Key": true, "Value": false},
+        {"ColumnName": "SHORTTEXT", "DataType": "STRING", "ColumnWidth": "250px", "Visible": true, "Key": false, "Value": true},
+        {"ColumnName": "INCLINDESC", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "SHORTTEXT2", "DataType": "STRING", "ColumnWidth": "250px", "Visible": true, "Key": false, "Value": false},
+        {"ColumnName": "SEQ", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "GMCCLS", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "ATTRIB", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "USGCLS", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "DELETED", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false}
     ]
 }

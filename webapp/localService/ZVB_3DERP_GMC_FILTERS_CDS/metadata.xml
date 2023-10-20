@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMON',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Common.v1" Alias="Common"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_CAPABILITIES',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Capabilities.V1" Alias="Capabilities"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_COMMUNICATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.Communication.v1" Alias="Communication"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_AGGREGATION',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="Org.OData.Aggregation.V1" Alias="Aggregation"/>
+    </edmx:Reference>
+    <edmx:Reference Uri="./sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Vocabularies(TechnicalName='%2FIWBEP%2FVOC_PERSONALDATA',Version='0001',SAP__Origin='')/$value" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+        <edmx:Include Namespace="com.sap.vocabularies.PersonalData.v1" Alias="PersonalData"/>
+    </edmx:Reference>
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZVB_3DERP_GMC_FILTERS_CDS" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="ZVB_3DERP_GENUOM_SHType" sap:label="UOM" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="UOM"/>
+                </Key>
+                <Property Name="UOM" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Internal UoM" sap:quickinfo="Unit of Measurement" sap:semantics="unit-of-measure"/>
+                <Property Name="DESCRIPTION" Type="Edm.String" MaxLength="30" sap:label="UoM Text" sap:quickinfo="Unit of Measurement Text (Maximum 30 Characters)"/>
+                <Property Name="ANDEC" Type="Edm.Int16" sap:label="Decimal Rounding" sap:quickinfo="No. of decimal places for rounding"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_GMCHDRType" sap:label="3DERP : GMC Header" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="gmc"/>
+                    <PropertyRef Name="mattyp"/>
+                </Key>
+                <Property Name="gmc" Type="Edm.String" Nullable="false" MaxLength="10" sap:label="GMC"/>
+                <Property Name="mattyp" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:label="Material type"/>
+                <Property Name="sbu" Type="Edm.String" MaxLength="5" sap:display-format="UpperCase" sap:label="SBU" sap:quickinfo="ERP SBU"/>
+                <Property Name="descen" Type="Edm.String" MaxLength="500" sap:label="GMC Description (EN)"/>
+                <Property Name="desczh" Type="Edm.String" MaxLength="500" sap:label="GMC Description (ZH)"/>
+                <Property Name="baseuom" Type="Edm.String" MaxLength="3" sap:label="Base Unit of Measure" sap:semantics="unit-of-measure"/>
+                <Property Name="orderuom" Type="Edm.String" MaxLength="3" sap:label="Order Unit" sap:quickinfo="Purchase Order Unit of Measure" sap:semantics="unit-of-measure"/>
+                <Property Name="issuom" Type="Edm.String" MaxLength="3" sap:label="Unit of issue" sap:semantics="unit-of-measure"/>
+                <Property Name="grswt" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="orderuom" sap:label="Gross weight"/>
+                <Property Name="netwt" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="orderuom" sap:label="Net weight"/>
+                <Property Name="wtuom" Type="Edm.String" MaxLength="3" sap:label="Weight unit" sap:quickinfo="Weight Unit" sap:semantics="unit-of-measure"/>
+                <Property Name="volume" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="orderuom" sap:label="Volume"/>
+                <Property Name="processcd" Type="Edm.String" MaxLength="10" sap:label="Process Code"/>
+                <Property Name="deleted" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Deleted" sap:quickinfo="Deleted? X=Yes, ''=No"/>
+                <Property Name="createdby" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By"/>
+                <Property Name="updatedby" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Updated By"/>
+                <Property Name="untto" Type="Edm.Decimal" Precision="3" Scale="1" sap:label="Underdel. Tolerance" sap:quickinfo="Underdelivery Tolerance"/>
+                <Property Name="uebto" Type="Edm.Decimal" Precision="3" Scale="1" sap:label="Overdeliv. Tolerance" sap:quickinfo="Overdelivery Tolerance"/>
+                <Property Name="ekwsl" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Purchasing value key" sap:quickinfo="Purchasing Value Key"/>
+                <Property Name="uebtk" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Unltd Overdelivery" sap:quickinfo="Indicator: Unlimited Overdelivery Allowed"/>
+                <Property Name="voluom" Type="Edm.String" MaxLength="3" sap:label="Volume unit" sap:semantics="unit-of-measure"/>
+                <Property Name="matgrpcd" Type="Edm.String" MaxLength="9" sap:display-format="UpperCase" sap:label="Material Group"/>
+                <Property Name="cusmatcd" Type="Edm.String" MaxLength="100"/>
+                <Property Name="createddt" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Created Date"/>
+                <Property Name="updateddt" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Last Change" sap:quickinfo="Date of Last Change"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_GMC_FILTERSType" sap:label="GMC Filters" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SBU"/>
+                    <PropertyRef Name="GMC"/>
+                </Key>
+                <Property Name="SBU" Type="Edm.String" Nullable="false" MaxLength="1" sap:value-list="standard"/>
+                <Property Name="GMC" Type="Edm.String" Nullable="false" MaxLength="10" sap:label="GMC" sap:value-list="standard"/>
+                <Property Name="MATTYP" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Material type" sap:value-list="standard"/>
+                <Property Name="descen" Type="Edm.String" MaxLength="500" sap:label="GMC Description (EN)"/>
+                <Property Name="desczh" Type="Edm.String" MaxLength="500" sap:label="GMC Description (ZH)"/>
+                <Property Name="baseuom" Type="Edm.String" MaxLength="3" sap:label="Base Unit of Measure" sap:value-list="standard" sap:semantics="unit-of-measure"/>
+                <Property Name="orderuom" Type="Edm.String" MaxLength="3" sap:label="Order Unit" sap:quickinfo="Purchase Order Unit of Measure" sap:value-list="standard" sap:semantics="unit-of-measure"/>
+                <Property Name="issuom" Type="Edm.String" MaxLength="3" sap:label="Unit of issue" sap:value-list="standard" sap:semantics="unit-of-measure"/>
+                <Property Name="grswt" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="orderuom" sap:label="Gross weight"/>
+                <Property Name="netwt" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="orderuom" sap:label="Net weight"/>
+                <Property Name="wtuom" Type="Edm.String" MaxLength="3" sap:label="Weight unit" sap:quickinfo="Weight Unit" sap:value-list="standard" sap:semantics="unit-of-measure"/>
+                <Property Name="volume" Type="Edm.Decimal" Precision="13" Scale="3" sap:unit="orderuom" sap:label="Volume"/>
+                <Property Name="voluom" Type="Edm.String" MaxLength="3" sap:label="Volume unit" sap:value-list="standard" sap:semantics="unit-of-measure"/>
+                <Property Name="processcd" Type="Edm.String" MaxLength="10" sap:label="Process Code" sap:value-list="standard"/>
+                <Property Name="untto" Type="Edm.Decimal" Precision="3" Scale="1" sap:label="Underdel. Tolerance" sap:quickinfo="Underdelivery Tolerance"/>
+                <Property Name="uebto" Type="Edm.Decimal" Precision="3" Scale="1" sap:label="Overdeliv. Tolerance" sap:quickinfo="Overdelivery Tolerance"/>
+                <Property Name="ekwsl" Type="Edm.String" MaxLength="4" sap:display-format="UpperCase" sap:label="Purchasing value key" sap:quickinfo="Purchasing Value Key" sap:value-list="standard"/>
+                <Property Name="uebtk" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Unltd Overdelivery" sap:quickinfo="Indicator: Unlimited Overdelivery Allowed"/>
+                <Property Name="MATGRPCD" Type="Edm.String" MaxLength="9" sap:display-format="UpperCase" sap:label="Material Group"/>
+                <Property Name="cusmatcd" Type="Edm.String" MaxLength="100"/>
+                <Property Name="deleted" Type="Edm.Boolean" sap:display-format="UpperCase" sap:label="Deleted" sap:quickinfo="Deleted? X=Yes, ''=No"/>
+                <Property Name="createdby" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Created By"/>
+                <Property Name="createddt" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Created Date"/>
+                <Property Name="updatedby" Type="Edm.String" MaxLength="12" sap:display-format="UpperCase" sap:label="Updated By"/>
+                <Property Name="updateddt" Type="Edm.DateTime" Precision="0" sap:display-format="Date" sap:label="Last Change" sap:quickinfo="Date of Last Change"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_MATTYPE_SHType" sap:label="3DERP: Material Type" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SBU"/>
+                    <PropertyRef Name="MaterialType"/>
+                </Key>
+                <Property Name="SBU" Type="Edm.String" Nullable="false" MaxLength="5" sap:display-format="UpperCase" sap:label="SBU" sap:quickinfo="ERP SBU"/>
+                <Property Name="MaterialType" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:label="Material type"/>
+                <Property Name="Description" Type="Edm.String" MaxLength="25" sap:label="Material Type Descr." sap:quickinfo="Description of Material Type"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_PROCPROD_SHType" sap:label="Production Process" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="PROCESSCD"/>
+                </Key>
+                <Property Name="PROCESSCD" Type="Edm.String" Nullable="false" MaxLength="10" sap:label="Process Code"/>
+                <Property Name="DESC1" Type="Edm.String" MaxLength="50" sap:label="Description"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_PURVALKEY_SHType" sap:label="Purch Value Key" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="EKWSL"/>
+                </Key>
+                <Property Name="EKWSL" Type="Edm.String" Nullable="false" MaxLength="4" sap:display-format="UpperCase" sap:label="Purchasing value key" sap:quickinfo="Purchasing Value Key"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_SBU_SHType" sap:label="3DERP: SBU" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SBU"/>
+                </Key>
+                <Property Name="SBU" Type="Edm.String" Nullable="false" MaxLength="5" sap:display-format="UpperCase" sap:label="SBU" sap:quickinfo="ERP SBU"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_VOLUOM_SHType" sap:label="Volume UOM" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="UOM"/>
+                </Key>
+                <Property Name="UOM" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Internal UoM" sap:quickinfo="Unit of Measurement" sap:semantics="unit-of-measure"/>
+                <Property Name="DESCRIPTION" Type="Edm.String" MaxLength="30" sap:label="UoM Text" sap:quickinfo="Unit of Measurement Text (Maximum 30 Characters)"/>
+                <Property Name="ANDEC" Type="Edm.Int16" sap:label="Decimal Rounding" sap:quickinfo="No. of decimal places for rounding"/>
+            </EntityType>
+            <EntityType Name="ZVB_3DERP_WTUOM_SHType" sap:label="Weight UOM" sap:value-list="true" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="UOM"/>
+                </Key>
+                <Property Name="UOM" Type="Edm.String" Nullable="false" MaxLength="3" sap:label="Internal UoM" sap:quickinfo="Unit of Measurement" sap:semantics="unit-of-measure"/>
+                <Property Name="DESCRIPTION" Type="Edm.String" MaxLength="30" sap:label="UoM Text" sap:quickinfo="Unit of Measurement Text (Maximum 30 Characters)"/>
+                <Property Name="ANDEC" Type="Edm.Int16" sap:label="Decimal Rounding" sap:quickinfo="No. of decimal places for rounding"/>
+            </EntityType>
+            <EntityContainer Name="ZVB_3DERP_GMC_FILTERS_CDS_Entities" m:IsDefaultEntityContainer="true" sap:message-scope-supported="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="ZVB_3DERP_GENUOM_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GENUOM_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_GMCHDR" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMCHDRType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_GMC_FILTERS" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_MATTYPE_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_MATTYPE_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_PROCPROD_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_PROCPROD_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_PURVALKEY_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_PURVALKEY_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_SBU_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_SBU_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_VOLUOM_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_VOLUOM_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+                <EntitySet Name="ZVB_3DERP_WTUOM_SH" EntityType="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_WTUOM_SHType" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1"/>
+            </EntityContainer>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/SBU" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="3DERP: SBU"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_SBU_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="SBU"/>
+                                    <PropertyValue Property="ValueListProperty" String="SBU"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/GMC" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="3DERP : GMC Header"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_GMCHDR"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="GMC"/>
+                                    <PropertyValue Property="ValueListProperty" String="gmc"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="mattyp"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="sbu"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="descen"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="desczh"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="baseuom"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="orderuom"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="issuom"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="grswt"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="netwt"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="wtuom"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="volume"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="processcd"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="deleted"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="createdby"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="updatedby"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="untto"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="uebto"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ekwsl"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="uebtk"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="voluom"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="matgrpcd"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="cusmatcd"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="createddt"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="updateddt"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/MATTYP" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="3DERP: Material Type"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_MATTYPE_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="MATTYP"/>
+                                    <PropertyValue Property="ValueListProperty" String="MaterialType"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="SBU"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="Description"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/baseuom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="UOM"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_GENUOM_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="baseuom"/>
+                                    <PropertyValue Property="ValueListProperty" String="UOM"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ANDEC"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/orderuom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="UOM"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_GENUOM_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="orderuom"/>
+                                    <PropertyValue Property="ValueListProperty" String="UOM"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ANDEC"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/issuom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="UOM"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_GENUOM_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="issuom"/>
+                                    <PropertyValue Property="ValueListProperty" String="UOM"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ANDEC"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/wtuom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Weight UOM"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_WTUOM_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="wtuom"/>
+                                    <PropertyValue Property="ValueListProperty" String="UOM"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ANDEC"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/voluom" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Volume UOM"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_VOLUOM_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="voluom"/>
+                                    <PropertyValue Property="ValueListProperty" String="UOM"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESCRIPTION"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="ANDEC"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/processcd" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Production Process"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_PROCPROD_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="processcd"/>
+                                    <PropertyValue Property="ValueListProperty" String="PROCESSCD"/>
+                                </Record>
+                                <Record Type="Common.ValueListParameterDisplayOnly">
+                                    <PropertyValue Property="ValueListProperty" String="DESC1"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERSType/ekwsl" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Common.ValueList">
+                    <Record>
+                        <PropertyValue Property="Label" String="Purch Value Key"/>
+                        <PropertyValue Property="CollectionPath" String="ZVB_3DERP_PURVALKEY_SH"/>
+                        <PropertyValue Property="SearchSupported" Bool="false"/>
+                        <PropertyValue Property="Parameters">
+                            <Collection>
+                                <Record Type="Common.ValueListParameterInOut">
+                                    <PropertyValue Property="LocalDataProperty" PropertyPath="ekwsl"/>
+                                    <PropertyValue Property="ValueListProperty" String="EKWSL"/>
+                                </Record>
+                            </Collection>
+                        </PropertyValue>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <Annotations Target="ZVB_3DERP_GMC_FILTERS_CDS.ZVB_3DERP_GMC_FILTERS_CDS_Entities" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+                <Annotation Term="Aggregation.ApplySupported">
+                    <Record>
+                        <PropertyValue Property="Transformations">
+                            <Collection>
+                                <String>aggregate</String>
+                                <String>groupby</String>
+                                <String>filter</String>
+                            </Collection>
+                        </PropertyValue>
+                        <PropertyValue Property="Rollup" EnumMember="None"/>
+                    </Record>
+                </Annotation>
+            </Annotations>
+            <atom:link rel="self" href="http://190.92.230.65:8000/sap/opu/odata/sap/ZVB_3DERP_GMC_FILTERS_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://190.92.230.65:8000/sap/opu/odata/sap/ZVB_3DERP_GMC_FILTERS_CDS/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
