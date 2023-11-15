@@ -199,7 +199,7 @@ sap.ui.define([
 
                 this.setSmartFilterModel();
                 var oModelSmartFilter = this.getOwnerComponent().getModel("ZVB_3DERP_GMC_FILTERS_CDS");
-
+                
                 oModelSmartFilter.read("/ZVB_3DERP_SBU_SH", {
                     success: function (oData, oResponse) {
                         var vSBU = _this.getView().getModel("ui").getProperty("/sbu");
@@ -207,7 +207,7 @@ sap.ui.define([
                         if (!(vSBU === undefined || vSBU === "")) {
                             return;
                         }
-
+                        
                         if (oData.results.length === 1) {
                             _this.getView().getModel("ui").setProperty("/sbu", oData.results[0].SBU);
                             // _this.getColumns();
@@ -377,6 +377,7 @@ sap.ui.define([
                 if (this._pGMC !== undefined) {
                     this.getView().getModel("ui").setProperty("/sbu", this._pSBU);
                     this.onSBUChange();
+                    this.onSearch();
                 }
             },
             
