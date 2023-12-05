@@ -248,5 +248,30 @@
         {"ColumnName": "ATTRIB", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "USGCLS", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "DELETED", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false}
+    ],
+    "cusmat": [
+        {"name": "GMC", "position": 0, "type": "Edm.String", "visible": false, "required": false, "width": "100px", "hideOnChange": true, "showable": true, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+        {"name": "KDGRP", "position": 1, "type": "Edm.String", "visible": true, "required": true, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
+            "valueHelp": {"show": true, "source": "", "value": "", "desc": ""},
+            "ValueHelp": {"show": true, "items": {"path": "cusgrp", "value": "KDGRP", "text": "KTEXT"},
+                "SuggestionItems": {"path": "cusgrp>/", "text": "{cusgrp>KDGRP}", "additionalText": "{cusgrp>KTEXT}",  "maxSuggestionWidth": "300px"},
+                "columns": "tvh_cusgrp"
+            }, "TextFormatMode": "ValueKey"        
+        },
+        {"name": "CUSMATCD", "position": 2, "type": "Edm.String", "visible": true, "required": true, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+        {"name": "CREATEDBY", "position": 5, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+        {"name": "CREATEDDT", "position": 6, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+        {"name": "UPDATEDBY", "position": 7, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": false, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+        {"name": "UPDATEDDT", "position": 8, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": false, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}}    
+    ],
+    "tvh_cusgrp": [
+        {"ColumnName": "KDGRP", "DataType": "STRING", "ColumnWidth": "100px", "Visible": true, "Key": true, "Value": false},
+        {"ColumnName": "KTEXT", "DataType": "STRING", "ColumnWidth": "200px", "Visible": true, "Key": false, "Value": true}
     ]
 }

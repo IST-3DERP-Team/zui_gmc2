@@ -333,7 +333,7 @@
                                 class="marginTopNone">
                                 <core:Item key="{SBU}" text="{SBU}" />
                             </ComboBox> -->
-                            <Text text="{counts>/gmc} GMC" class="selHdrKeyFontStyle" />
+                            <Text text="{counts>/gmc} {ddtext>/ITEMS}" class="selHdrKeyFontStyle" />
                             <ToolbarSpacer/>
                             <SearchField
                                 id="searchFieldGMC"
@@ -446,7 +446,7 @@
                                 </uiT:rowSettingsTemplate>                                    
                                 <uiT:extension>
                                     <OverflowToolbar>
-                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} Attributes )" class="selHdrKeyFontStyle" />
+                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
                                         <SearchField
                                             id="searchFieldAttr"
@@ -532,7 +532,7 @@
                                 columnVisibility="onColumnUpdated">
                                 <uiT:extension>
                                     <OverflowToolbar>
-                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} Materials )" class="selHdrKeyFontStyle" />
+                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
                                         <ToolbarSpacer/>
                                         <SearchField
                                             id="searchFieldMatl"
@@ -573,6 +573,79 @@
                                             tooltip="{ddtext>/COLUMNS}"
                                             visible="false" /> -->
                                         <Button id="btnTabLayoutMatl" 
+                                            icon="sap-icon://grid" 
+                                            press="onSaveTableLayout"
+                                            tooltip="{ddtext>/SAVELAYOUT}"
+                                            visible="true" />                                             
+                                    </OverflowToolbar>
+                                </uiT:extension>
+                            </uiT:Table>
+                        </IconTabFilter>
+                        <IconTabFilter text="Customer Material" key="cusmat">
+                            <uiT:Table id="cusmatTab"
+                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                                rows="{cusmat>/results}"
+                                visibleRowCountMode="Auto"
+                                minAutoRowCount="1"
+                                showColumnVisibilityMenu="true"                                
+                                enableColumnFreeze="true"
+                                enableCellFilter="true"
+                                selectionMode="MultiToggle"
+                                selectionBehavior="RowSelector"
+                                firstVisibleRowChanged="onFirstVisibleRowChanged"
+                                cellClick="onCellClick"
+                                sort="onSort"
+                                filter="onFilter"
+                                columnFreeze="onColumnUpdated"
+                                columnMove="onColumnUpdated"
+                                columnResize="onColumnUpdated"
+                                columnSelect="onColumnUpdated"
+                                columnVisibility="onColumnUpdated">
+                                <uiT:extension>
+                                    <OverflowToolbar>
+                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/cusmat} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
+                                        <ToolbarSpacer/>
+                                        <Button id="btnAddCusMat" 
+                                            icon="sap-icon://add"
+                                            press="onCreateCusMat" 
+                                            tooltip="{ddtext>/ADD}"
+                                            visible="true"/>
+                                        <Button id="btnEditCusMat" 
+                                            icon="sap-icon://edit"
+                                            press="onEditCusMat"
+                                            tooltip="{ddtext>/EDIT}"
+                                            visible="false"/>
+                                        <Button id="btnSaveCusMat" 
+                                            icon="sap-icon://save"
+                                            press=".onSaveChanges('cusmat')" 
+                                            tooltip="{ddtext>/SAVE}"
+                                            visible="false" />
+                                        <Button id="btnCancelCusMat" 
+                                            icon="sap-icon://sys-cancel"
+                                            press="onCancelCusMat" 
+                                            tooltip="{ddtext>/CANCEL}"
+                                            visible="false" /> 
+                                        <Button id="btnDeleteCusMat" 
+                                            icon="sap-icon://delete"
+                                            press="onDeleteCusMat"
+                                            tooltip="{ddtext>/DELETE}"
+                                            visible="true"/>
+                                        <Button id="btnRefreshCusMat" 
+                                            icon="sap-icon://refresh"
+                                            press=".onRefreshCusMat"
+                                            tooltip="{ddtext>/REFRESH}"
+                                            visible="true" />
+                                        <Button id="btnFullScreenCusMat" 
+                                            icon="sap-icon://full-screen"
+                                            press="onTableResize('CusMat','Max')"
+                                            tooltip="{ddtext>/FULLSCREEN}"
+                                            visible="true" />
+                                        <Button id="btnExitFullScreenCusMat" 
+                                            icon="sap-icon://exit-full-screen"
+                                            press="onTableResize('CusMat','Min')"
+                                            tooltip="{ddtext>/EXITFULLSCREEN}"
+                                            visible="false" />
+                                        <Button id="btnTabLayoutCusMat" 
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
                                             tooltip="{ddtext>/SAVELAYOUT}"
