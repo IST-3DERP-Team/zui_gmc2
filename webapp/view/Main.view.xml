@@ -406,7 +406,16 @@
                                 icon="sap-icon://grid" 
                                 press="onSaveTableLayout"
                                 tooltip="{ddtext>/SAVELAYOUT}"
-                                visible="true" />                                 
+                                visible="true" /> 
+                            <Button id="btnDataWrapGMC" 
+                                text="{= ${ui>/dataWrap/gmcTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                press="onWrapText"
+                                tooltip="{= ${ui>/dataWrap/gmcTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                visible="true" >
+                                <customData>
+                                    <core:CustomData key="TableId" value="gmcTab" />
+                                </customData>
+                            </Button>
                         </OverflowToolbar>
                     </uiT:extension>
                     <uiT:layoutData>
@@ -505,7 +514,16 @@
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
                                             tooltip="{ddtext>/SAVELAYOUT}"
-                                            visible="true" />                                             
+                                            visible="true" />
+                                        <Button id="btnDataWrapAttr" 
+                                            text="{= ${ui>/dataWrap/attributesTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                            press="onWrapText"
+                                            tooltip="{= ${ui>/dataWrap/attributesTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                            visible="true" >
+                                            <customData>
+                                                <core:CustomData key="TableId" value="attributesTab" />
+                                            </customData>
+                                        </Button>
                                     </OverflowToolbar>
                                 </uiT:extension>
                             </uiT:Table>
@@ -576,7 +594,16 @@
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
                                             tooltip="{ddtext>/SAVELAYOUT}"
-                                            visible="true" />                                             
+                                            visible="true" />
+                                        <Button id="btnDataWrapMatl" 
+                                            text="{= ${ui>/dataWrap/materialsTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                            press="onWrapText"
+                                            tooltip="{= ${ui>/dataWrap/materialsTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                            visible="true" >
+                                            <customData>
+                                                <core:CustomData key="TableId" value="materialsTab" />
+                                            </customData>
+                                        </Button>
                                     </OverflowToolbar>
                                 </uiT:extension>
                             </uiT:Table>
@@ -649,7 +676,16 @@
                                             icon="sap-icon://grid" 
                                             press="onSaveTableLayout"
                                             tooltip="{ddtext>/SAVELAYOUT}"
-                                            visible="true" />                                             
+                                            visible="true" />
+                                        <Button id="btnDataWrapCusMat" 
+                                            text="{= ${ui>/dataWrap/cusmatTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                            press="onWrapText"
+                                            tooltip="{= ${ui>/dataWrap/cusmatTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                            visible="true" >
+                                            <customData>
+                                                <core:CustomData key="TableId" value="cusmatTab" />
+                                            </customData>
+                                        </Button>
                                     </OverflowToolbar>
                                 </uiT:extension>
                             </uiT:Table>

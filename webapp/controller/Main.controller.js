@@ -56,7 +56,13 @@ sap.ui.define([
                     sbu: '',
                     currsbu: '',
                     dataMode: 'INIT',
-                    updTable: ''
+                    updTable: '',
+                    dataWrap: {
+                        gmcTab: false,
+                        attributesTab: false,
+                        materialsTab: false,
+                        cusmatTab: false
+                    }
                 }), "ui");
 
                 this._oMultiInput = this.getView().byId("multiInputMatTyp");
@@ -298,6 +304,8 @@ sap.ui.define([
                 oDDTextParam.push({CODE: "ITEMS"}); 
                 oDDTextParam.push({CODE: "INFO_DATA_SAVE"}); 
                 oDDTextParam.push({CODE: "INFO_DATA_DELETED"}); 
+                oDDTextParam.push({CODE: "WRAP"}); 
+                oDDTextParam.push({CODE: "UNWRAP"}); 
 
                 oModelCaps.create("/CaptionMsgSet", { CaptionMsgItems: oDDTextParam  }, {
                     method: "POST",
@@ -1104,6 +1112,7 @@ sap.ui.define([
                         precision: prop.Length,
                         scale: prop.Decimal,
                         TextFormatMode: oColumnLocalProp.length === 0 ? "Key" : oColumnLocalProp[0].TextFormatMode,
+                        WrapText: prop.WrapText
                     })
                 })
 
@@ -1248,7 +1257,7 @@ sap.ui.define([
                     // console.log(col)
                     if (col.type === "STRING" || col.type === "DATETIME") {
                         var oText = new sap.m.Text({
-                            wrapping: false,
+                            wrapping: col.WrapText === "X" ? true : false,
                             tooltip: "{" + model + ">" + col.name + "}"
                         })
                         
@@ -1312,7 +1321,7 @@ sap.ui.define([
                             template: new sap.m.Text({
                                 text: "{path:'" + model + ">" + col.name + "', type:'sap.ui.model.odata.type.Decimal', formatOptions:{ minFractionDigits:" + col.scale + ", maxFractionDigits:" + col.scale + " }, constraints:{ precision:" + col.precision + ", scale:" + col.scale + " }}",
                                 // text: "{" + model + ">" + col.name + "}",
-                                wrapping: false, 
+                                wrapping: col.WrapText === "X" ? true : false, 
                                 tooltip: "{" + model + ">" + col.name + "}"
                             }),
                             visible: col.visible
@@ -1338,6 +1347,9 @@ sap.ui.define([
                     }
                 })
 
+                var vWrap = aColumns[0].WrapText === "X" ? true : false;
+                this.getView().getModel("ui").setProperty("/dataWrap/" + model + "Tab", vWrap);
+
                 table.addColumn(new sap.ui.table.Column({
                     id: model + "ColACTIVE",
                     width: "100px",
@@ -1346,7 +1358,7 @@ sap.ui.define([
                     label: new sap.m.Text({text: "Active"}),
                     template: new sap.m.Text({
                         text: "{" + model + ">ACTIVE}",
-                        wrapping: false, 
+                        wrapping: vWrap, 
                         tooltip: "{" + model + ">ACTIVE}"
                     }),
                     visible: false
@@ -4998,7 +5010,8 @@ sap.ui.define([
                         SORTORDER: column.mProperties.sortOrder,
                         SORTSEQ: "1",
                         VISIBLE: column.mProperties.visible,
-                        WIDTH: column.mProperties.width.replace('px','')
+                        WIDTH: column.mProperties.width.replace('px',''),
+                        WRAPTEXT: this.getView().getModel("ui").getData().dataWrap[this._sActiveTable] === true ? "X" : ""
                     });
 
                     ctr++;
@@ -5282,6 +5295,19 @@ sap.ui.define([
                 //         else row.removeStyleClass("activeRow")
                 //     })
                 // }
+            },
+
+            onWrapText: function(oEvent) {
+                this._sActiveTable = oEvent.getSource().data("TableId");
+                var vWrap = this.getView().getModel("ui").getData().dataWrap[this._sActiveTable];
+                
+                this.byId(this._sActiveTable).getColumns().forEach(col => {
+                    var oTemplate = col.getTemplate();
+                    oTemplate.setWrapping(!vWrap);
+                    col.setTemplate(oTemplate);
+                })
+
+                this.getView().getModel("ui").setProperty("/dataWrap/" + [this._sActiveTable], !vWrap);
             },
 
             //******************************************* */
