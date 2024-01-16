@@ -271,6 +271,7 @@ sap.ui.define([
             this._inputId = oSource.getId();
             this._inputValue = oSource.getValue();
             this._inputField = oSource.getBindingInfo("value").parts[0].path;
+            this._sActiveTable = oSource.getBindingInfo("value").parts[0].model + "Tab";
 
             await this._tableValueHelp.filterValueHelpItems(this._inputField, this._sActiveTable, this);
 
@@ -427,18 +428,21 @@ sap.ui.define([
 
                 this._tableValueHelpDialog.setModel(oVHModel);
                 this.getView().addDependent(this._tableValueHelpDialog);
+
+                var oTable = this._tableValueHelpDialog.getContent()[0].getAggregation("items")[0];
+                oTable.attachCellClick(this._tableValueHelp.handleTableValueHelpSelect.bind(this));
+                // sap.ui.getCore().byId("tvhSearchField").attachSearch(this._tableValueHelp.handleTableValueHelpFilter);           
+                // sap.ui.getCore().byId("btnTVHCancel").attachPress(me._tableValueHelp.handleTableValueHelpCancel.bind(me));
+                this._tableValueHelpDialog.getContent()[0].getItems()[0].getExtension()[0].getContent()[3].attachSearch(this._tableValueHelp.handleTableValueHelpFilter);
+                this._tableValueHelpDialog.getButtons()[0].attachPress(this._tableValueHelp.handleTableValueHelpCancel.bind(this));
             }
             else {
                 this._tableValueHelpDialog.setModel(oVHModel);
             }
 
             this._tableValueHelpDialog.open();
+
             var oTable = this._tableValueHelpDialog.getContent()[0].getAggregation("items")[0];
-            oTable.attachCellClick(this._tableValueHelp.handleTableValueHelpSelect.bind(this));
-            // sap.ui.getCore().byId("tvhSearchField").attachSearch(this._tableValueHelp.handleTableValueHelpFilter);           
-            // sap.ui.getCore().byId("btnTVHCancel").attachPress(me._tableValueHelp.handleTableValueHelpCancel.bind(me));
-            this._tableValueHelpDialog.getContent()[0].getItems()[0].getExtension()[0].getContent()[3].attachSearch(this._tableValueHelp.handleTableValueHelpFilter);
-            this._tableValueHelpDialog.getButtons()[0].attachPress(this._tableValueHelp.handleTableValueHelpCancel.bind(this));
 
             //bind columns to the table
             oTable.getModel().setProperty("/columns", oColumns.columns);
@@ -503,6 +507,19 @@ sap.ui.define([
 
             // sap.ui.getCore().byId("tvhSearchField").setProperty("value", "");
             this._tableValueHelpDialog.getContent()[0].getItems()[0].getExtension()[0].getContent()[3].setProperty("value", "");
+
+            if (this._inputField.toUpperCase() === "ATTRIBCD") {
+                var oRow = this.getView().getModel("attributes").getProperty(this._inputSource.oParent.getBindingContext("attributes").sPath);
+
+                if (this._inputSource.getBindingInfo("suggestionRows") == undefined) {
+                    this.bindAttribute(this._inputSource);
+                }
+                else {
+                    if (this._inputSource.getBindingInfo("suggestionRows").path.replace("/", "") !== oRow.MATTYPCLS) {
+                        this.bindAttribute(this._inputSource);
+                    }
+                }
+            }
         },
 
         handleStaticTableValueHelp: async function (oEvent, oThis) {
@@ -767,7 +784,9 @@ sap.ui.define([
         handleTableValueHelpSelect: function (oEvent) {
             var sRowPath = oEvent.getParameters().rowBindingContext.sPath;
             this._inputSource.setSelectedKey(oEvent.getSource().getModel().getProperty(sRowPath + "/VHKey"));
-            this._inputSource.setValueState("None");
+            this._inputSource.setValueState("None");            
+            this._inputSource.fireChangeEvent();
+            // console.log(this._inputSource)
             this._tableValueHelpDialog.close(); 
         }, 
 
@@ -813,9 +832,20 @@ sap.ui.define([
 
             var promise = new Promise((resolve, reject) => {
                 if ((sTableId === "attributesTab" || sTableId === "classTab") && sColumnName.toUpperCase() === "ATTRIBCD") {
-                    var sRowPath = me._inputSource.getBindingInfo("value").binding.oContext.sPath;
+                    var sRowPath = "";
+                    var sTableModel = me._inputSource.getBindingInfo("value").parts[0].model;
+
+                    if (me._inputSource.getBindingInfo("value").binding.oContext !== undefined) {
+                        sRowPath = me._inputSource.getBindingInfo("value").binding.oContext.sPath;
+                    }
+                    else {
+                        sRowPath = me._inputSource.oParent.getBindingContext(sTableModel).sPath;
+                    }
+
                     var vMattypcls = me.getView().getModel(sTableId.replace("Tab", "")).getProperty(sRowPath + '/MATTYPCLS');
                     var vh = me.getView().getModel("attribute").getData()[vMattypcls];
+
+                    if (vh === undefined) { vh = []; }
                     me.getView().setModel(new JSONModel(vh), "attrib");
                 }
 

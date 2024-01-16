@@ -78,29 +78,31 @@
                 "columns": "tvh_process"
             }, "TextFormatMode": "ValueKey"
         },
-
-        {"name": "Ekwsl", "position": 22, "type": "Edm.String", "visible": true, "required": false, "width": "125px", "hideOnChange": false,"showable": true, "sort": "",
+        {"name": "Umren", "position": 15, "type": "Edm.Decimal", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
+        "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},        
+        {"name": "Umrez", "position": 16, "type": "Edm.Decimal", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
+        "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},        
+        {"name": "Ekwsl", "position": 17, "type": "Edm.String", "visible": true, "required": false, "width": "125px", "hideOnChange": false,"showable": true, "sort": "",
             "valueHelp": {"show": true, "items": {"path": "/PurcValKeyRscSet", "value": "Ekwsl", "text": "Ekwsl"},
                 "suggestionItems": {"path": "/PurcValKeyRscSet", "text": "{Ekwsl}" }},
             "ValueHelp": {"show": true, "items": {"path": "purvalkey", "value": "Ekwsl", "text": "Ekwsl"},
-                "SuggestionItems": {"path": "purvalkey>/", "text": "{purvalkey>Ekwsl}" },
+                "SuggestionItems": {"path": "purvalkey>/", "text": "{purvalkey>Ekwsl}", "maxSuggestionWidth": "500px" },
                 "columns": "tvh_purvalkey"
             }
         },
-
-        {"name": "Untto", "position": 16, "type": "Edm.String", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
+        {"name": "Untto", "position": 18, "type": "Edm.String", "visible": true, "required": false, "width": "120px", "hideOnChange": false, "showable": true, "sort": "",
         "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
-        {"name": "Deleted", "position": 17, "type": "Edm.Boolean", "visible": true, "required": false, "width": "100px", "hideOnChange": true, "showable": true, "sort": "",
+        {"name": "Deleted", "position": 19, "type": "Edm.Boolean", "visible": true, "required": false, "width": "100px", "hideOnChange": true, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
-        {"name": "Createdby", "position": 18, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
+        {"name": "Createdby", "position": 20, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
-        {"name": "Createddt", "position": 19, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
+        {"name": "Createddt", "position": 21, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
-        {"name": "Updatedby", "position": 20, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
+        {"name": "Updatedby", "position": 22, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
-        {"name": "Updateddt", "position": 21, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
+        {"name": "Updateddt", "position": 23, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
-        {"name": "Sbu", "position": 22, "type": "Edm.String", "visible": false, "required": false, "width": "70px", "hideOnChange": false, "showable": false, "sort": "",
+        {"name": "Sbu", "position": 24, "type": "Edm.String", "visible": false, "required": false, "width": "70px", "hideOnChange": false, "showable": false, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}}    
     ],
     "attributes": [
@@ -234,7 +236,7 @@
         {"ColumnName": "Mandt", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "Mattyp", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
         {"ColumnName": "Mattypcls", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
-        {"ColumnName": "Shorttext2", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false},
+        {"ColumnName": "Shorttext2", "DataType": "STRING", "ColumnWidth": "250px", "Visible": true, "Key": false, "Value": false},
         {"ColumnName": "Deleted", "DataType": "STRING", "ColumnWidth": "100px", "Visible": false, "Key": false, "Value": false}
     ],
     "tvh_mattypcls": [
@@ -260,6 +262,8 @@
             }, "TextFormatMode": "ValueKey"        
         },
         {"name": "CUSMATCD", "position": 2, "type": "Edm.String", "visible": true, "required": true, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
+            "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
+        {"name": "CUSMATDESC", "position": 2, "type": "Edm.String", "visible": true, "required": true, "width": "150px", "hideOnChange": false, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},
         {"name": "CREATEDBY", "position": 5, "type": "Edm.String", "visible": true, "required": false, "width": "150px", "hideOnChange": true, "showable": true, "sort": "",
             "valueHelp": {"show": false, "source": "", "value": "", "desc": ""}},

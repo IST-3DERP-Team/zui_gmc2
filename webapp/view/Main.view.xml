@@ -17,219 +17,6 @@
             <core:CommandExecution id="CE_REFRESH" command="Refresh" enabled="true" execute=".onRefresh" />
         </dependents>
         <content>
-            <!-- <uiL:FixFlex id="fixFlexGMC" class="fixFlexFixedSize sidePadding" fixContentSize="50%">
-                <uiL:fixContent>
-                        <uiT:Table id="gmcTab"
-                            rows="{gmc>/results}"
-                            visibleRowCountMode="Auto"
-                            showColumnVisibilityMenu="true"
-                            enableColumnFreeze="true"
-                            enableCellFilter="true"
-                            selectionMode="MultiToggle"
-                            cellClick="onCellClickGMC"
-                            filter="onFiltered"
-                            sort="onSorted">
-                            <uiT:rowSettingsTemplate>
-                                <uiT:RowSettings highlight="{= ${gmc>Edited} === true ? 'Warning' : null}" />
-                            </uiT:rowSettingsTemplate>
-                            <uiT:extension>
-                                <Toolbar>
-                                    <Label text="SBU: " />
-                                    <ComboBox id="cboxSBU"
-                                        change="onSBUChange"
-                                        selectedKey="{ui>/sbu}"
-                                        items="{
-                                            path: '/SBURscSet'
-                                        }"
-                                        class="marginTopNone">
-                                        <core:Item key="{SBU}" text="{SBU}" />
-                                    </ComboBox>
-                                    <ToolbarSpacer/>
-                                    <SearchField
-                                        id="searchFieldGMC"
-                                        placeholder="Filter"
-                                        value=""
-                                        search="filterGlobally"
-                                        width="15rem"/>
-                                    <ToolbarSeparator/>
-                                    <Button id="btnAddGMC" 
-                                        icon="sap-icon://add"
-                                        press="onCreateGMC"
-                                        visible="true"/>
-                                    <Button id="btnEditGMC" 
-                                        icon="sap-icon://edit"
-                                        press="onEditGMC"
-                                        tooltip="Edit"
-                                        visible="true"/>
-                                    <Button id="btnSaveGMC" 
-                                        icon="sap-icon://save"
-                                        press=".onSave('gmc')" 
-                                        visible="false" />
-                                    <Button id="btnCancelGMC" 
-                                        icon="sap-icon://sys-cancel"
-                                        press="onCancelGMC" 
-                                        visible="false" />                                        
-                                    <Button id="btnDeleteGMC" 
-                                        icon="sap-icon://delete"
-                                        press="onDeleteGMC"
-                                        visible="true"/>
-                                    <Button id="btnRefreshGMC" 
-                                        icon="sap-icon://refresh"
-                                        press="onRefreshGMC"
-                                        visible="true"/> 
-                                    <Button id="btnSortGMC" 
-                                        icon="sap-icon://sort"
-                                        press="onColSort"
-                                        visible="true" />
-                                    <Button id="btnFilterGMC" 
-                                        icon="sap-icon://filter"
-                                        press="onColFilter"
-                                        visible="true" />
-                                    <Button id="btnFullScreenHdr" 
-                                        icon="sap-icon://full-screen"
-                                        press="onTableResize('Hdr','Max')"
-                                        visible="true" />
-                                    <Button id="btnExitFullScreenHdr" 
-                                        icon="sap-icon://exit-full-screen"
-                                        press="onTableResize('Hdr','Min')"
-                                        visible="false" />
-                                    <Button id="btnColPropGMC" 
-                                        icon="sap-icon://table-column"
-                                        press="onColumnProp"
-                                        tooltip="Columns"
-                                        visible="true" />
-                                </Toolbar>
-                            </uiT:extension>
-                        </uiT:Table>  
-                </uiL:fixContent> 
-                <uiL:flexContent>
-                    <IconTabBar id="itbDetail"
-                        expanded="{device>/isNoPhone}" 
-                        expandable="false" 
-                        class="tabColor" 
-                        select="onSelectTab"
-                        headerBackgroundDesign="Transparent" 
-                        stretchContentHeight="true" 
-                        applyContentPadding="false">
-                        <items>
-                            <IconTabFilter text="Attributes" key="attributes">
-                                <uiT:Table id="attributesTab"
-                                    rows="{attributes>/results}"
-                                    visibleRowCountMode="Auto"
-                                    showColumnVisibilityMenu="true"
-                                    enableColumnFreeze="true"
-                                    enableCellFilter="true"
-                                    selectionMode="Single"
-                                    sort="onSorted"> 
-                                    <uiT:rowSettingsTemplate>
-                                        <uiT:RowSettings highlight="{= ${attributes>Edited} === true ? 'Warning' : null}" />
-                                    </uiT:rowSettingsTemplate>                                    
-                                    <uiT:extension>
-                                        <Toolbar>
-                                            <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />
-                                            <ToolbarSpacer/>
-                                            <SearchField
-                                                id="searchFieldAttr"
-                                                placeholder="Filter"
-                                                value=""
-                                                search="filterGlobally"
-                                                width="15rem"/>
-                                            <ToolbarSeparator/>
-                                            <Button id="btnEditAttr" 
-                                                icon="sap-icon://edit"
-                                                press=".onEditAttr"
-                                                tooltip="Edit"
-                                                visible="true" />
-                                            <Button id="btnSaveAttr" 
-                                                icon="sap-icon://save"
-                                                press=".onSave('attributes')" 
-                                                visible="false" />
-                                            <Button id="btnCancelAttr" 
-                                                icon="sap-icon://sys-cancel"
-                                                press="onCancelAttr" 
-                                                visible="false" /> 
-                                            <Button id="btnRefreshAttr" 
-                                                icon="sap-icon://refresh"
-                                                press=".onRefreshAttr"
-                                                visible="true" />
-                                            <Button id="btnSortAttr" 
-                                                icon="sap-icon://sort"
-                                                press=".onColSort"
-                                                visible="true" />
-                                            <Button id="btnFilterAttr" 
-                                                icon="sap-icon://filter"
-                                                press=".onColFilter"
-                                                visible="true" />
-                                            <Button id="btnFullScreenAttr" 
-                                                icon="sap-icon://full-screen"
-                                                press="onTableResize('Attr','Max')"
-                                                visible="true" />
-                                            <Button id="btnExitFullScreenAttr" 
-                                                icon="sap-icon://exit-full-screen"
-                                                press="onTableResize('Attr','Min')"
-                                                visible="false" />
-                                            <Button id="btnColPropAttr" 
-                                                icon="sap-icon://table-column"
-                                                press="onColumnProp"
-                                                tooltip="Columns"
-                                                visible="true" />                                                
-                                        </Toolbar>
-                                    </uiT:extension>
-                                </uiT:Table>
-                            </IconTabFilter>
-                            <IconTabFilter text="Materials" key="materials">
-                                <uiT:Table id="materialsTab"
-                                    rows="{materials>/results}"
-                                    visibleRowCountMode="Auto"
-                                    showColumnVisibilityMenu="true"
-                                    enableColumnFreeze="true"
-                                    enableCellFilter="true"
-                                    selectionMode="Single"
-                                    sort="onSorted">
-                                    <uiT:extension>
-                                        <Toolbar>
-                                            <Text text="GMC: {ui>/activeGmc}" class="selHdrKeyFontStyle" />
-                                            <ToolbarSpacer/>
-                                            <SearchField
-                                                id="searchFieldMatl"
-                                                placeholder="Filter"
-                                                value=""
-                                                search="filterGlobally"
-                                                width="15rem"/>
-                                            <ToolbarSeparator/>
-                                            <Button id="refreshMaterialsButton" 
-                                                icon="sap-icon://refresh"
-                                                press=".onRefreshMatl"
-                                                visible="true" />
-                                            <Button id="sortMaterialsButton" 
-                                                icon="sap-icon://sort"
-                                                press=".onColSort"
-                                                visible="true" />
-                                            <Button id="filterMaterialsButton" 
-                                                icon="sap-icon://filter"
-                                                press=".onColFilter"
-                                                visible="true" />
-                                            <Button id="btnFullScreenMatl" 
-                                                icon="sap-icon://full-screen"
-                                                press="onTableResize('Matl','Max')"
-                                                visible="true" />
-                                            <Button id="btnExitFullScreenMatl" 
-                                                icon="sap-icon://exit-full-screen"
-                                                press="onTableResize('Matl','Min')"
-                                                visible="false" />
-                                            <Button id="btnColPropMatl" 
-                                                icon="sap-icon://table-column"
-                                                press="onColumnProp"
-                                                tooltip="Columns"
-                                                visible="true" />                                                
-                                        </Toolbar>
-                                    </uiT:extension>
-                                </uiT:Table>
-                            </IconTabFilter>
-                        </items>
-                    </IconTabBar>
-                </uiL:flexContent>
-            </uiL:FixFlex> -->
             <VBox fitContainer="true">
                 <smartfilterbar:SmartFilterBar id="smartFilterBar" entitySet="ZVB_3DERP_GMC_FILTERS" search="onSearch" persistencyKey="3DERP_pKey" showClearButton="true" showClearOnFB="true">
                     <smartfilterbar:controlConfiguration>
@@ -248,14 +35,18 @@
                     </smartfilterbar:controlConfiguration>
 
                     <smartfilterbar:controlConfiguration>
-                        <smartfilterbar:ControlConfiguration key="GMC" label="{ddtext>/GMC}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" />
+                        <smartfilterbar:ControlConfiguration key="GMC" label="{ddtext>/GMC}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" >
+                            <smartfilterbar:customControl>
+                                <MultiInput id="sffGMC" name="GMC" />
+                            </smartfilterbar:customControl>
+                        </smartfilterbar:ControlConfiguration>
                     </smartfilterbar:controlConfiguration>
 
                     <!-- <smartfilterbar:controlConfiguration>
                         <smartfilterbar:ControlConfiguration key="MATTYP" label="{ddtext>/MATTYP}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" />
                     </smartfilterbar:controlConfiguration> -->
 
-                    <smartfilterbar:controlConfiguration>
+                    <!-- <smartfilterbar:controlConfiguration>
                         <smartfilterbar:ControlConfiguration key="MATTYP" label="{ddtext>/MATTYP}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" width="15rem" >
                             <smartfilterbar:customControl>
                                 <MultiInput id="multiInputMatTyp"
@@ -264,7 +55,6 @@
                                     maxSuggestionWidth="350px"
                                     suggestionRows="{
                                         path: 'materialType>/results',
-                                        sorter: { path: 'MaterialType' },
                                         length: 1000,
                                         templateShareable: false
                                     }">
@@ -287,10 +77,22 @@
                                 </MultiInput>
                             </smartfilterbar:customControl>
                         </smartfilterbar:ControlConfiguration>
+                    </smartfilterbar:controlConfiguration> -->
+
+                    <smartfilterbar:controlConfiguration>
+                        <smartfilterbar:ControlConfiguration key="MATTYP" label="{ddtext>/MATTYP}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" >
+                            <smartfilterbar:customControl>
+                                <MultiInput id="sffMATTYP" name="MATTYP" maxSuggestionWidth="350px"  />
+                            </smartfilterbar:customControl>
+                        </smartfilterbar:ControlConfiguration>
                     </smartfilterbar:controlConfiguration>
 
                     <smartfilterbar:controlConfiguration>
-                        <smartfilterbar:ControlConfiguration key="MATGRPCD" label="{ddtext>/MATGRPCD}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" />
+                        <smartfilterbar:ControlConfiguration key="MATGRPCD" label="{ddtext>/MATGRPCD}" groupId="_BASIC" preventInitialDataFetchInValueHelpDialog="false" >
+                            <smartfilterbar:customControl>
+                                <MultiInput id="sffMATGRPCD" name="MATGRPCD" maxSuggestionWidth="300px" />
+                            </smartfilterbar:customControl>
+                        </smartfilterbar:ControlConfiguration>
                     </smartfilterbar:controlConfiguration>
 
                     <smartfilterbar:layoutData>
@@ -298,403 +100,495 @@
                     </smartfilterbar:layoutData>
                 </smartfilterbar:SmartFilterBar>
 
-                <uiT:Table id="gmcTab"
-                    class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
-                    rows="{gmc>/results}"
-                    visibleRowCountMode="Auto"
-                    minAutoRowCount="1"
-                    showColumnVisibilityMenu="true"
-                    enableColumnFreeze="true"
-                    enableCellFilter="true"
-                    selectionMode="MultiToggle"
-                    firstVisibleRowChanged="onFirstVisibleRowChanged"
-                    cellClick="onCellClickGMC"
-                    rowSelectionChange="onRowSelectionChange"
-                    sort="onSort"
-                    filter="onFilter"
-                    columnFreeze="onColumnUpdated"
-                    columnMove="onColumnUpdated"
-                    columnResize="onColumnUpdated"
-                    columnSelect="onColumnUpdated"
-                    columnVisibility="onColumnUpdated">
-                    <uiT:rowSettingsTemplate>
-                        <uiT:RowSettings highlight="{= ${gmc>Edited} === true ? 'Warning' : null}" />
-                    </uiT:rowSettingsTemplate>
-                    <uiT:extension>
-                        <OverflowToolbar>
-                            <!-- <Label text="SBU: " />
-                            <ComboBox id="cboxSBU"
-                                width="100px"
-                                change="onSBUChange"
-                                selectedKey="{ui>/sbu}"
-                                items="{
-                                    path: '/SBURscSet'
-                                }"
-                                class="marginTopNone">
-                                <core:Item key="{SBU}" text="{SBU}" />
-                            </ComboBox> -->
-                            <Text text="{counts>/gmc} {ddtext>/ITEMS}" class="selHdrKeyFontStyle" />
-                            <ToolbarSpacer/>
-                            <SearchField
-                                id="searchFieldGMC"
-                                placeholder="Filter"
-                                value=""
-                                search="filterGlobally"
-                                visible="false"
-                                width="15rem"/>
-                            <!-- <ToolbarSeparator/> -->
-                            <Button id="btnAddGMC" 
-                                icon="sap-icon://add"
-                                press="onCreateGMC" 
-                                tooltip="{ddtext>/ADD}"
-                                visible="true"/>
-                            <Button id="btnEditGMC" 
-                                icon="sap-icon://edit"
-                                press="onEditGMC"
-                                tooltip="{ddtext>/EDIT}"
-                                visible="true"/>
-                            <Button id="btnSaveGMC" 
-                                icon="sap-icon://save"
-                                press=".onSaveChanges('gmc')" 
-                                tooltip="{ddtext>/SAVE}"
-                                visible="false" />
-                            <Button id="btnCancelGMC" 
-                                icon="sap-icon://sys-cancel"
-                                press="onCancelGMC" 
-                                tooltip="{ddtext>/CANCEL}"
-                                visible="false" />                                        
-                            <Button id="btnDeleteGMC" 
-                                icon="sap-icon://delete"
-                                press="onDeleteGMC"
-                                tooltip="{ddtext>/DELETE}"
-                                visible="true"/>
-                            <Button id="btnRefreshGMC" 
-                                icon="sap-icon://refresh"
-                                press="onRefreshGMC"
-                                tooltip="{ddtext>/REFRESH}"
-                                visible="true"/> 
-                            <Button id="btnSortGMC" 
-                                icon="sap-icon://sort"
-                                press="onColSort"
-                                tooltip="{ddtext>/SORT}"
-                                visible="true" />
-                            <!-- <Button id="btnFilterGMC" 
-                                icon="sap-icon://filter"
-                                press="onColFilter"
-                                tooltip="{ddtext>/FILTER}"
-                                visible="true">
-                                <customData>
-                                    <core:CustomData key="TableId" value="gmcTab" />
-                                </customData>
-                            </Button> -->
-                            <Button id="btnFullScreenHdr" 
-                                icon="sap-icon://full-screen"
-                                press="onTableResize('Hdr','Max')"
-                                tooltip="{ddtext>/FULLSCREEN}"
-                                visible="true" />
-                            <Button id="btnExitFullScreenHdr" 
-                                icon="sap-icon://exit-full-screen"
-                                press="onTableResize('Hdr','Min')"
-                                tooltip="{ddtext>/EXITFULLSCREEN}"
-                                visible="false" />
-                            <!-- <Button id="btnColPropGMC" 
-                                icon="sap-icon://table-column"
-                                press="onColumnProp"
-                                tooltip="{ddtext>/COLUMNS}"
-                                visible="true" /> -->
-                            <Button id="btnTabLayoutGMC" 
-                                icon="sap-icon://grid" 
-                                press="onSaveTableLayout"
-                                tooltip="{ddtext>/SAVELAYOUT}"
-                                visible="true" /> 
-                            <Button id="btnDataWrapGMC" 
-                                text="{= ${ui>/dataWrap/gmcTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                press="onWrapText"
-                                tooltip="{= ${ui>/dataWrap/gmcTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                visible="true" >
-                                <customData>
-                                    <core:CustomData key="TableId" value="gmcTab" />
-                                </customData>
-                            </Button>
-                        </OverflowToolbar>
-                    </uiT:extension>
-                    <uiT:layoutData>
-                        <FlexItemData growFactor="1" baseSize="0%"/>
-                    </uiT:layoutData>                     
-                </uiT:Table>
+                <uiL:Splitter orientation="Vertical" height="100%">
+                    <Panel id="panelHdr" width="100%" height="100%" class="sapUiNoContentPadding">
+                        <uiT:Table id="gmcTab"
+                            class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                            rows="{gmc>/results}"
+                            visibleRowCountMode="Auto"
+                            minAutoRowCount="1"
+                            showColumnVisibilityMenu="true"
+                            enableColumnFreeze="true"
+                            enableCellFilter="true"
+                            selectionMode="MultiToggle"
+                            alternateRowColors="true"
+                            firstVisibleRowChanged="onFirstVisibleRowChanged"
+                            cellClick="onCellClickGMC"
+                            rowSelectionChange="onRowSelectionChange"
+                            sort="onSort"
+                            filter="onFilter"
+                            columnFreeze="onColumnUpdated"
+                            columnMove="onColumnUpdated"
+                            columnResize="onColumnUpdated"
+                            columnSelect="onColumnUpdated"
+                            columnVisibility="onColumnUpdated">
+                            <uiT:rowSettingsTemplate>
+                                <uiT:RowSettings highlight="{= ${gmc>Edited} === true ? 'Warning' : null}" />
+                            </uiT:rowSettingsTemplate>
+                            <uiT:extension>
+                                <OverflowToolbar>
+                                    <!-- <Label text="SBU: " />
+                                    <ComboBox id="cboxSBU"
+                                        width="100px"
+                                        change="onSBUChange"
+                                        selectedKey="{ui>/sbu}"
+                                        items="{
+                                            path: '/SBURscSet'
+                                        }"
+                                        class="marginTopNone">
+                                        <core:Item key="{SBU}" text="{SBU}" />
+                                    </ComboBox> -->
+                                    <Text text="{counts>/gmc} {ddtext>/ITEMS}" class="selHdrKeyFontStyle" />
+                                    <ToolbarSpacer/>
+                                    <SearchField
+                                        id="searchFieldGMC"
+                                        placeholder="Filter"
+                                        value=""
+                                        search="filterGlobally"
+                                        visible="false"
+                                        width="15rem"/>
+                                    <!-- <ToolbarSeparator/> -->
+                                    <Button id="btnAddGMC" 
+                                        icon="sap-icon://add"
+                                        press="onCreateGMC" 
+                                        tooltip="{ddtext>/ADD}"
+                                        visible="true"/>
+                                    <Button id="btnAddRowGMC" 
+                                        icon="sap-icon://add"
+                                        press="onAddRow"
+                                        visible="false" />
+                                    <Button id="btnRemoveRowGMC" 
+                                        icon="sap-icon://less"
+                                        press="onRemoveRow"
+                                        visible="false" />
+                                    <Button id="btnEditGMC" 
+                                        icon="sap-icon://edit"
+                                        press="onEditGMC"
+                                        tooltip="{ddtext>/EDIT}"
+                                        visible="true"/>
+                                    <Button id="btnSaveGMC" 
+                                        icon="sap-icon://save"
+                                        press=".onSaveChanges('gmc')" 
+                                        tooltip="{ddtext>/SAVE}"
+                                        visible="false" />
+                                    <Button id="btnCancelGMC" 
+                                        icon="sap-icon://sys-cancel"
+                                        press="onCancelGMC" 
+                                        tooltip="{ddtext>/CANCEL}"
+                                        visible="false" />                                        
+                                    <Button id="btnDeleteGMC" 
+                                        icon="sap-icon://delete"
+                                        press="onDeleteGMC"
+                                        tooltip="{ddtext>/DELETE}"
+                                        visible="true"/>
+                                    <Button id="btnRefreshGMC" 
+                                        icon="sap-icon://refresh"
+                                        press="onRefreshGMC"
+                                        tooltip="{ddtext>/REFRESH}"
+                                        visible="true"/> 
+                                    <Button id="btnSortGMC" 
+                                        icon="sap-icon://sort"
+                                        press="onColSort"
+                                        tooltip="{ddtext>/SORT}"
+                                        visible="true" />
+                                    <!-- <Button id="btnFilterGMC" 
+                                        icon="sap-icon://filter"
+                                        press="onColFilter"
+                                        tooltip="{ddtext>/FILTER}"
+                                        visible="true">
+                                        <customData>
+                                            <core:CustomData key="TableId" value="gmcTab" />
+                                        </customData>
+                                    </Button> -->
+                                    <Button id="btnFullScreenHdr" 
+                                        icon="sap-icon://full-screen"
+                                        press="onTableResize"
+                                        tooltip="{ddtext>/FULLSCREEN}"
+                                        visible="{= ${ui>/fullscreen/header} === true ? false : true}" >
+                                        <customData>
+                                            <core:CustomData key="TableId" value="gmcTab" />
+                                            <core:CustomData key="Fullscreen" value="1" />
+                                            <core:CustomData key="Part" value="header" />
+                                            <core:CustomData key="HeaderSize" value="100%" />
+                                            <core:CustomData key="DetailSize" value="0%" />
+                                        </customData>
+                                    </Button>
+                                    <Button id="btnExitFullScreenHdr" 
+                                        icon="sap-icon://exit-full-screen"
+                                        press="onTableResize"
+                                        tooltip="{ddtext>/EXITFULLSCREEN}"
+                                        visible="{ui>/fullscreen/header}" >
+                                        <customData>
+                                            <core:CustomData key="TableId" value="gmcTab" />
+                                            <core:CustomData key="Fullscreen" value="0" />
+                                            <core:CustomData key="Part" value="header" />
+                                            <core:CustomData key="HeaderSize" value="50%" />
+                                            <core:CustomData key="DetailSize" value="50%" />
+                                        </customData>
+                                    </Button>
+                                    <!-- <Button id="btnColPropGMC" 
+                                        icon="sap-icon://table-column"
+                                        press="onColumnProp"
+                                        tooltip="{ddtext>/COLUMNS}"
+                                        visible="true" /> -->
+                                    <Button id="btnTabLayoutGMC" 
+                                        icon="sap-icon://grid" 
+                                        press="onSaveTableLayout"
+                                        tooltip="{ddtext>/SAVELAYOUT}"
+                                        visible="true" /> 
+                                    <Button id="btnDataWrapGMC" 
+                                        text="{= ${ui>/dataWrap/gmcTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                        press="onWrapText"
+                                        tooltip="{= ${ui>/dataWrap/gmcTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                        visible="true" >
+                                        <customData>
+                                            <core:CustomData key="TableId" value="gmcTab" />
+                                        </customData>
+                                    </Button>
+                                </OverflowToolbar>
+                            </uiT:extension>
+                            <uiT:layoutData>
+                                <FlexItemData growFactor="1" baseSize="0%"/>
+                            </uiT:layoutData>                     
+                        </uiT:Table>
+                        <layoutData>
+                            <uiL:SplitterLayoutData size="{ui>/splitter/header}" id="splitterHdr" resizable="true" />
+                        </layoutData> 
+                    </Panel>
 
-                <IconTabBar id="itbDetail"
-                    expanded="{device>/isNoPhone}" 
-                    expandable="false"
-                    select="onSelectTab"
-                    stretchContentHeight="true" 
-                    applyContentPadding="false">
-                    <items>
-                        <IconTabFilter text="Attributes" key="attributes">
-                            <uiT:Table id="attributesTab"
-                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
-                                rows="{attributes>/results}"
-                                visibleRowCountMode="Auto"
-                                minAutoRowCount="1"
-                                showColumnVisibilityMenu="true"
-                                enableColumnFreeze="true"
-                                enableCellFilter="true"
-                                selectionMode="Single"
-                                selectionBehavior="RowSelector"
-                                firstVisibleRowChanged="onFirstVisibleRowChanged"
-                                cellClick="onCellClick"
-                                sort="onSort"
-                                filter="onFilter"
-                                columnFreeze="onColumnUpdated"
-                                columnMove="onColumnUpdated"
-                                columnResize="onColumnUpdated"
-                                columnSelect="onColumnUpdated"
-                                columnVisibility="onColumnUpdated"> 
-                                <uiT:rowSettingsTemplate>
-                                    <uiT:RowSettings highlight="{= ${attributes>Edited} === true ? 'Warning' : null}" />
-                                </uiT:rowSettingsTemplate>                                    
-                                <uiT:extension>
-                                    <OverflowToolbar>
-                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
-                                        <ToolbarSpacer/>
-                                        <SearchField
-                                            id="searchFieldAttr"
-                                            placeholder="Filter"
-                                            value=""
-                                            search="filterGlobally"
-                                            visible="false"
-                                            width="15rem"/>
-                                        <!-- <ToolbarSeparator/> -->
-                                        <Button id="btnEditAttr" 
-                                            icon="sap-icon://edit"
-                                            press=".onEditAttr"
-                                            tooltip="{ddtext>/EDIT}"
-                                            visible="true" />
-                                        <Button id="btnSaveAttr" 
-                                            icon="sap-icon://save"
-                                            press=".onSaveChanges('attributes')" 
-                                            tooltip="{ddtext>/SAVE}"
-                                            visible="false" />
-                                        <Button id="btnCancelAttr" 
-                                            icon="sap-icon://sys-cancel"
-                                            press="onCancelAttr" 
-                                            tooltip="{ddtext>/CANCEL}"
-                                            visible="false" /> 
-                                        <Button id="btnRefreshAttr" 
-                                            icon="sap-icon://refresh"
-                                            press=".onRefreshAttr"
-                                            tooltip="{ddtext>/REFRESH}"
-                                            visible="true" />
-                                        <Button id="btnSortAttr" 
-                                            icon="sap-icon://sort"
-                                            press=".onColSort"
-                                            tooltip="{ddtext>/SORT}"
-                                            visible="true" />
-                                        <!-- <Button id="btnFilterAttr" 
-                                            icon="sap-icon://filter"
-                                            press=".onColFilter"
-                                            tooltip="{ddtext>/FILTER}"
-                                            visible="true" /> -->
-                                        <Button id="btnFullScreenAttr" 
-                                            icon="sap-icon://full-screen"
-                                            press="onTableResize('Attr','Max')"
-                                            tooltip="{ddtext>/FULLSCREEN}"
-                                            visible="true" />
-                                        <Button id="btnExitFullScreenAttr" 
-                                            icon="sap-icon://exit-full-screen"
-                                            press="onTableResize('Attr','Min')"
-                                            tooltip="{ddtext>/EXITFULLSCREEN}"
-                                            visible="false" />
-                                        <!-- <Button id="btnColPropAttr" 
-                                            icon="sap-icon://table-column"
-                                            press="onColumnProp"
-                                            tooltip="{ddtext>/COLUMNS}"
-                                            visible="false" /> -->
-                                        <Button id="btnTabLayoutAttr" 
-                                            icon="sap-icon://grid" 
-                                            press="onSaveTableLayout"
-                                            tooltip="{ddtext>/SAVELAYOUT}"
-                                            visible="true" />
-                                        <Button id="btnDataWrapAttr" 
-                                            text="{= ${ui>/dataWrap/attributesTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                            press="onWrapText"
-                                            tooltip="{= ${ui>/dataWrap/attributesTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                            visible="true" >
-                                            <customData>
-                                                <core:CustomData key="TableId" value="attributesTab" />
-                                            </customData>
-                                        </Button>
-                                    </OverflowToolbar>
-                                </uiT:extension>
-                            </uiT:Table>
-                        </IconTabFilter>
-                        <IconTabFilter text="Materials" key="materials">
-                            <uiT:Table id="materialsTab"
-                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
-                                rows="{materials>/results}"
-                                visibleRowCountMode="Auto"
-                                minAutoRowCount="1"
-                                showColumnVisibilityMenu="true"                                
-                                enableColumnFreeze="true"
-                                enableCellFilter="true"
-                                selectionMode="Single"
-                                selectionBehavior="RowSelector"
-                                firstVisibleRowChanged="onFirstVisibleRowChanged"
-                                cellClick="onCellClick"
-                                sort="onSort"
-                                filter="onFilter"
-                                columnFreeze="onColumnUpdated"
-                                columnMove="onColumnUpdated"
-                                columnResize="onColumnUpdated"
-                                columnSelect="onColumnUpdated"
-                                columnVisibility="onColumnUpdated">
-                                <uiT:extension>
-                                    <OverflowToolbar>
-                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
-                                        <ToolbarSpacer/>
-                                        <SearchField
-                                            id="searchFieldMatl"
-                                            placeholder="Filter"
-                                            value=""
-                                            search="filterGlobally"
-                                            visible="false"
-                                            width="15rem"/>
-                                        <!-- <ToolbarSeparator/> -->
-                                        <Button id="refreshMaterialsButton" 
-                                            icon="sap-icon://refresh"
-                                            press=".onRefreshMatl"
-                                            tooltip="{ddtext>/REFRESH}"
-                                            visible="true" />
-                                        <Button id="sortMaterialsButton" 
-                                            icon="sap-icon://sort"
-                                            press=".onColSort"
-                                            tooltip="{ddtext>/SORT}"
-                                            visible="true" />
-                                        <!-- <Button id="filterMaterialsButton" 
-                                            icon="sap-icon://filter"
-                                            press=".onColFilter"
-                                            tooltip="{ddtext>/FILTER}"
-                                            visible="true" /> -->
-                                        <Button id="btnFullScreenMatl" 
-                                            icon="sap-icon://full-screen"
-                                            press="onTableResize('Matl','Max')"
-                                            tooltip="{ddtext>/FULLSCREEN}"
-                                            visible="true" />
-                                        <Button id="btnExitFullScreenMatl" 
-                                            icon="sap-icon://exit-full-screen"
-                                            press="onTableResize('Matl','Min')"
-                                            tooltip="{ddtext>/EXITFULLSCREEN}"
-                                            visible="false" />
-                                        <!-- <Button id="btnColPropMatl" 
-                                            icon="sap-icon://table-column"
-                                            press="onColumnProp"
-                                            tooltip="{ddtext>/COLUMNS}"
-                                            visible="false" /> -->
-                                        <Button id="btnTabLayoutMatl" 
-                                            icon="sap-icon://grid" 
-                                            press="onSaveTableLayout"
-                                            tooltip="{ddtext>/SAVELAYOUT}"
-                                            visible="true" />
-                                        <Button id="btnDataWrapMatl" 
-                                            text="{= ${ui>/dataWrap/materialsTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                            press="onWrapText"
-                                            tooltip="{= ${ui>/dataWrap/materialsTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                            visible="true" >
-                                            <customData>
-                                                <core:CustomData key="TableId" value="materialsTab" />
-                                            </customData>
-                                        </Button>
-                                    </OverflowToolbar>
-                                </uiT:extension>
-                            </uiT:Table>
-                        </IconTabFilter>
-                        <IconTabFilter text="Customer Material" key="cusmat">
-                            <uiT:Table id="cusmatTab"
-                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
-                                rows="{cusmat>/results}"
-                                visibleRowCountMode="Auto"
-                                minAutoRowCount="1"
-                                showColumnVisibilityMenu="true"                                
-                                enableColumnFreeze="true"
-                                enableCellFilter="true"
-                                selectionMode="MultiToggle"
-                                selectionBehavior="RowSelector"
-                                firstVisibleRowChanged="onFirstVisibleRowChanged"
-                                cellClick="onCellClick"
-                                sort="onSort"
-                                filter="onFilter"
-                                columnFreeze="onColumnUpdated"
-                                columnMove="onColumnUpdated"
-                                columnResize="onColumnUpdated"
-                                columnSelect="onColumnUpdated"
-                                columnVisibility="onColumnUpdated">
-                                <uiT:extension>
-                                    <OverflowToolbar>
-                                        <Text text="GMC: {ui>/activeGmc} ( {counts>/cusmat} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
-                                        <ToolbarSpacer/>
-                                        <Button id="btnAddCusMat" 
-                                            icon="sap-icon://add"
-                                            press="onCreateCusMat" 
-                                            tooltip="{ddtext>/ADD}"
-                                            visible="true"/>
-                                        <Button id="btnEditCusMat" 
-                                            icon="sap-icon://edit"
-                                            press="onEditCusMat"
-                                            tooltip="{ddtext>/EDIT}"
-                                            visible="false"/>
-                                        <Button id="btnSaveCusMat" 
-                                            icon="sap-icon://save"
-                                            press=".onSaveChanges('cusmat')" 
-                                            tooltip="{ddtext>/SAVE}"
-                                            visible="false" />
-                                        <Button id="btnCancelCusMat" 
-                                            icon="sap-icon://sys-cancel"
-                                            press="onCancelCusMat" 
-                                            tooltip="{ddtext>/CANCEL}"
-                                            visible="false" /> 
-                                        <Button id="btnDeleteCusMat" 
-                                            icon="sap-icon://delete"
-                                            press="onDeleteCusMat"
-                                            tooltip="{ddtext>/DELETE}"
-                                            visible="true"/>
-                                        <Button id="btnRefreshCusMat" 
-                                            icon="sap-icon://refresh"
-                                            press=".onRefreshCusMat"
-                                            tooltip="{ddtext>/REFRESH}"
-                                            visible="true" />
-                                        <Button id="btnFullScreenCusMat" 
-                                            icon="sap-icon://full-screen"
-                                            press="onTableResize('CusMat','Max')"
-                                            tooltip="{ddtext>/FULLSCREEN}"
-                                            visible="true" />
-                                        <Button id="btnExitFullScreenCusMat" 
-                                            icon="sap-icon://exit-full-screen"
-                                            press="onTableResize('CusMat','Min')"
-                                            tooltip="{ddtext>/EXITFULLSCREEN}"
-                                            visible="false" />
-                                        <Button id="btnTabLayoutCusMat" 
-                                            icon="sap-icon://grid" 
-                                            press="onSaveTableLayout"
-                                            tooltip="{ddtext>/SAVELAYOUT}"
-                                            visible="true" />
-                                        <Button id="btnDataWrapCusMat" 
-                                            text="{= ${ui>/dataWrap/cusmatTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                            press="onWrapText"
-                                            tooltip="{= ${ui>/dataWrap/cusmatTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
-                                            visible="true" >
-                                            <customData>
-                                                <core:CustomData key="TableId" value="cusmatTab" />
-                                            </customData>
-                                        </Button>
-                                    </OverflowToolbar>
-                                </uiT:extension>
-                            </uiT:Table>
-                        </IconTabFilter>
-                    </items>
-                    <layoutData>
-                        <FlexItemData growFactor="1" baseSize="0%"/>
-                    </layoutData>
-                </IconTabBar>                
+                    <Panel id="panelDtl" width="100%" height="100%" class="sapUiNoContentPadding">
+                        <IconTabBar id="itbDetail"
+                            expanded="{device>/isNoPhone}" 
+                            expandable="false"
+                            select="onSelectTab"
+                            stretchContentHeight="true" 
+                            applyContentPadding="false">
+                            <items>
+                                <IconTabFilter text="Attributes" key="attributes">
+                                    <uiT:Table id="attributesTab"
+                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                                        rows="{attributes>/results}"
+                                        visibleRowCountMode="Auto"
+                                        minAutoRowCount="1"
+                                        showColumnVisibilityMenu="true"
+                                        enableColumnFreeze="true"
+                                        enableCellFilter="true"
+                                        selectionMode="Single"
+                                        selectionBehavior="RowSelector"
+                                        alternateRowColors="true"
+                                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                                        cellClick="onCellClick"
+                                        sort="onSort"
+                                        filter="onFilter"
+                                        columnFreeze="onColumnUpdated"
+                                        columnMove="onColumnUpdated"
+                                        columnResize="onColumnUpdated"
+                                        columnSelect="onColumnUpdated"
+                                        columnVisibility="onColumnUpdated"> 
+                                        <uiT:rowSettingsTemplate>
+                                            <uiT:RowSettings highlight="{= ${attributes>Edited} === true ? 'Warning' : null}" />
+                                        </uiT:rowSettingsTemplate>                                    
+                                        <uiT:extension>
+                                            <OverflowToolbar>
+                                                <Text text="GMC: {ui>/activeGmc} ( {counts>/attributes} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
+                                                <ToolbarSpacer/>
+                                                <SearchField
+                                                    id="searchFieldAttr"
+                                                    placeholder="Filter"
+                                                    value=""
+                                                    search="filterGlobally"
+                                                    visible="false"
+                                                    width="15rem"/>
+                                                <!-- <ToolbarSeparator/> -->
+                                                <Button id="btnEditAttr" 
+                                                    icon="sap-icon://edit"
+                                                    press=".onEditAttr"
+                                                    tooltip="{ddtext>/EDIT}"
+                                                    visible="true" />
+                                                <Button id="btnSaveAttr" 
+                                                    icon="sap-icon://save"
+                                                    press=".onSaveChanges('attributes')" 
+                                                    tooltip="{ddtext>/SAVE}"
+                                                    visible="false" />
+                                                <Button id="btnCancelAttr" 
+                                                    icon="sap-icon://sys-cancel"
+                                                    press="onCancelAttr" 
+                                                    tooltip="{ddtext>/CANCEL}"
+                                                    visible="false" /> 
+                                                <Button id="btnRefreshAttr" 
+                                                    icon="sap-icon://refresh"
+                                                    press=".onRefreshAttr"
+                                                    tooltip="{ddtext>/REFRESH}"
+                                                    visible="true" />
+                                                <Button id="btnSortAttr" 
+                                                    icon="sap-icon://sort"
+                                                    press=".onColSort"
+                                                    tooltip="{ddtext>/SORT}"
+                                                    visible="true" />
+                                                <!-- <Button id="btnFilterAttr" 
+                                                    icon="sap-icon://filter"
+                                                    press=".onColFilter"
+                                                    tooltip="{ddtext>/FILTER}"
+                                                    visible="true" /> -->
+                                                <Button id="btnFullScreenAttr" 
+                                                    icon="sap-icon://full-screen"
+                                                    press="onTableResize"
+                                                    tooltip="{ddtext>/FULLSCREEN}"
+                                                    visible="{= ${ui>/fullscreen/detail} === true ? false : true}" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="attributesTab" />
+                                                        <core:CustomData key="Fullscreen" value="1" />
+                                                        <core:CustomData key="Part" value="detail" />
+                                                        <core:CustomData key="HeaderSize" value="0%" />
+                                                        <core:CustomData key="DetailSize" value="100%" />
+                                                    </customData>
+                                                </Button>
+                                                <Button id="btnExitFullScreenAttr" 
+                                                    icon="sap-icon://exit-full-screen"
+                                                    press="onTableResize"
+                                                    tooltip="{ddtext>/EXITFULLSCREEN}"
+                                                    visible="{ui>/fullscreen/detail}" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="attributesTab" />
+                                                        <core:CustomData key="Fullscreen" value="0" />
+                                                        <core:CustomData key="Part" value="detail" />
+                                                        <core:CustomData key="HeaderSize" value="50%" />
+                                                        <core:CustomData key="DetailSize" value="50%" />
+                                                    </customData>
+                                                </Button>
+                                                <!-- <Button id="btnColPropAttr" 
+                                                    icon="sap-icon://table-column"
+                                                    press="onColumnProp"
+                                                    tooltip="{ddtext>/COLUMNS}"
+                                                    visible="false" /> -->
+                                                <Button id="btnTabLayoutAttr" 
+                                                    icon="sap-icon://grid" 
+                                                    press="onSaveTableLayout"
+                                                    tooltip="{ddtext>/SAVELAYOUT}"
+                                                    visible="true" />
+                                                <Button id="btnDataWrapAttr" 
+                                                    text="{= ${ui>/dataWrap/attributesTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                                    press="onWrapText"
+                                                    tooltip="{= ${ui>/dataWrap/attributesTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                                    visible="true" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="attributesTab" />
+                                                    </customData>
+                                                </Button>
+                                            </OverflowToolbar>
+                                        </uiT:extension>
+                                    </uiT:Table>
+                                </IconTabFilter>
+                                <IconTabFilter text="Materials" key="materials">
+                                    <uiT:Table id="materialsTab"
+                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                                        rows="{materials>/results}"
+                                        visibleRowCountMode="Auto"
+                                        minAutoRowCount="1"
+                                        showColumnVisibilityMenu="true"                                
+                                        enableColumnFreeze="true"
+                                        enableCellFilter="true"
+                                        selectionMode="Single"
+                                        selectionBehavior="RowSelector"
+                                        alternateRowColors="true"
+                                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                                        cellClick="onCellClick"
+                                        sort="onSort"
+                                        filter="onFilter"
+                                        columnFreeze="onColumnUpdated"
+                                        columnMove="onColumnUpdated"
+                                        columnResize="onColumnUpdated"
+                                        columnSelect="onColumnUpdated"
+                                        columnVisibility="onColumnUpdated">
+                                        <uiT:extension>
+                                            <OverflowToolbar>
+                                                <Text text="GMC: {ui>/activeGmc} ( {counts>/materials} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
+                                                <ToolbarSpacer/>
+                                                <SearchField
+                                                    id="searchFieldMatl"
+                                                    placeholder="Filter"
+                                                    value=""
+                                                    search="filterGlobally"
+                                                    visible="false"
+                                                    width="15rem"/>
+                                                <!-- <ToolbarSeparator/> -->
+                                                <Button id="refreshMaterialsButton" 
+                                                    icon="sap-icon://refresh"
+                                                    press=".onRefreshMatl"
+                                                    tooltip="{ddtext>/REFRESH}"
+                                                    visible="true" />
+                                                <Button id="sortMaterialsButton" 
+                                                    icon="sap-icon://sort"
+                                                    press=".onColSort"
+                                                    tooltip="{ddtext>/SORT}"
+                                                    visible="true" />
+                                                <!-- <Button id="filterMaterialsButton" 
+                                                    icon="sap-icon://filter"
+                                                    press=".onColFilter"
+                                                    tooltip="{ddtext>/FILTER}"
+                                                    visible="true" /> -->
+                                                <Button id="btnFullScreenMatl" 
+                                                    icon="sap-icon://full-screen"
+                                                    press="onTableResize"
+                                                    tooltip="{ddtext>/FULLSCREEN}"
+                                                    visible="{= ${ui>/fullscreen/detail} === true ? false : true}" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="materialsTab" />
+                                                        <core:CustomData key="Fullscreen" value="1" />
+                                                        <core:CustomData key="Part" value="detail" />
+                                                        <core:CustomData key="HeaderSize" value="0%" />
+                                                        <core:CustomData key="DetailSize" value="100%" />
+                                                    </customData>
+                                                </Button>
+                                                <Button id="btnExitFullScreenMatl" 
+                                                    icon="sap-icon://exit-full-screen"
+                                                    press="onTableResize"
+                                                    tooltip="{ddtext>/EXITFULLSCREEN}"
+                                                    visible="{ui>/fullscreen/detail}" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="materialsTab" />
+                                                        <core:CustomData key="Fullscreen" value="0" />
+                                                        <core:CustomData key="Part" value="detail" />
+                                                        <core:CustomData key="HeaderSize" value="50%" />
+                                                        <core:CustomData key="DetailSize" value="50%" />
+                                                    </customData>
+                                                </Button>
+                                                <!-- <Button id="btnColPropMatl" 
+                                                    icon="sap-icon://table-column"
+                                                    press="onColumnProp"
+                                                    tooltip="{ddtext>/COLUMNS}"
+                                                    visible="false" /> -->
+                                                <Button id="btnTabLayoutMatl" 
+                                                    icon="sap-icon://grid" 
+                                                    press="onSaveTableLayout"
+                                                    tooltip="{ddtext>/SAVELAYOUT}"
+                                                    visible="true" />
+                                                <Button id="btnDataWrapMatl" 
+                                                    text="{= ${ui>/dataWrap/materialsTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                                    press="onWrapText"
+                                                    tooltip="{= ${ui>/dataWrap/materialsTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                                    visible="true" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="materialsTab" />
+                                                    </customData>
+                                                </Button>
+                                            </OverflowToolbar>
+                                        </uiT:extension>
+                                    </uiT:Table>
+                                </IconTabFilter>
+                                <IconTabFilter text="Customer Material" key="cusmat">
+                                    <uiT:Table id="cusmatTab"
+                                        class="sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                                        rows="{cusmat>/results}"
+                                        visibleRowCountMode="Auto"
+                                        minAutoRowCount="1"
+                                        showColumnVisibilityMenu="true"                                
+                                        enableColumnFreeze="true"
+                                        enableCellFilter="true"
+                                        selectionMode="MultiToggle"
+                                        selectionBehavior="RowSelector"
+                                        alternateRowColors="true"
+                                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                                        cellClick="onCellClick"
+                                        sort="onSort"
+                                        filter="onFilter"
+                                        columnFreeze="onColumnUpdated"
+                                        columnMove="onColumnUpdated"
+                                        columnResize="onColumnUpdated"
+                                        columnSelect="onColumnUpdated"
+                                        columnVisibility="onColumnUpdated">
+                                        <uiT:extension>
+                                            <OverflowToolbar>
+                                                <Text text="GMC: {ui>/activeGmc} ( {counts>/cusmat} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
+                                                <ToolbarSpacer/>
+                                                <Button id="btnAddCusMat" 
+                                                    icon="sap-icon://add"
+                                                    press="onCreateCusMat" 
+                                                    tooltip="{ddtext>/ADD}"
+                                                    visible="true"/>
+                                                <Button id="btnEditCusMat" 
+                                                    icon="sap-icon://edit"
+                                                    press="onEditCusMat"
+                                                    tooltip="{ddtext>/EDIT}"
+                                                    visible="true"/>
+                                                <Button id="btnSaveCusMat" 
+                                                    icon="sap-icon://save"
+                                                    press=".onSaveChanges('cusmat')" 
+                                                    tooltip="{ddtext>/SAVE}"
+                                                    visible="false" />
+                                                <Button id="btnCancelCusMat" 
+                                                    icon="sap-icon://sys-cancel"
+                                                    press="onCancelCusMat" 
+                                                    tooltip="{ddtext>/CANCEL}"
+                                                    visible="false" /> 
+                                                <Button id="btnDeleteCusMat" 
+                                                    icon="sap-icon://delete"
+                                                    press="onDeleteCusMat"
+                                                    tooltip="{ddtext>/DELETE}"
+                                                    visible="true"/>
+                                                <Button id="btnRefreshCusMat" 
+                                                    icon="sap-icon://refresh"
+                                                    press=".onRefreshCusMat"
+                                                    tooltip="{ddtext>/REFRESH}"
+                                                    visible="true" />
+                                                <Button id="btnFullScreenCusMat" 
+                                                    icon="sap-icon://full-screen"
+                                                    press="onTableResize"
+                                                    tooltip="{ddtext>/FULLSCREEN}"
+                                                    visible="{= ${ui>/fullscreen/detail} === true ? false : true}" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="cusmatTab" />
+                                                        <core:CustomData key="Fullscreen" value="1" />
+                                                        <core:CustomData key="Part" value="detail" />
+                                                        <core:CustomData key="HeaderSize" value="0%" />
+                                                        <core:CustomData key="DetailSize" value="100%" />
+                                                    </customData>
+                                                </Button>
+                                                <Button id="btnExitFullScreenCusMat" 
+                                                    icon="sap-icon://exit-full-screen"
+                                                    press="onTableResize"
+                                                    tooltip="{ddtext>/EXITFULLSCREEN}"
+                                                    visible="{ui>/fullscreen/detail}" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="cusmatTab" />
+                                                        <core:CustomData key="Fullscreen" value="0" />
+                                                        <core:CustomData key="Part" value="detail" />
+                                                        <core:CustomData key="HeaderSize" value="50%" />
+                                                        <core:CustomData key="DetailSize" value="50%" />
+                                                    </customData>
+                                                </Button>
+                                                <Button id="btnTabLayoutCusMat" 
+                                                    icon="sap-icon://grid" 
+                                                    press="onSaveTableLayout"
+                                                    tooltip="{ddtext>/SAVELAYOUT}"
+                                                    visible="true" />
+                                                <Button id="btnDataWrapCusMat" 
+                                                    text="{= ${ui>/dataWrap/cusmatTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                                    press="onWrapText"
+                                                    tooltip="{= ${ui>/dataWrap/cusmatTab} === true ? ${ddtext>/UNWRAP} : ${ddtext>/WRAP} }"
+                                                    visible="true" >
+                                                    <customData>
+                                                        <core:CustomData key="TableId" value="cusmatTab" />
+                                                    </customData>
+                                                </Button>
+                                            </OverflowToolbar>
+                                        </uiT:extension>
+                                    </uiT:Table>
+                                </IconTabFilter>
+                            </items>
+                            <layoutData>
+                                <FlexItemData growFactor="1" baseSize="0%"/>
+                            </layoutData>
+                        </IconTabBar> 
+                        <layoutData>
+                            <uiL:SplitterLayoutData size="{ui>/splitter/detail}" id="splitterDtl" />
+                        </layoutData> 
+                    </Panel>
+                
+                    <uiL:layoutData>
+                        <FlexItemData growFactor="{ui>/splittergf}" baseSize="0%"/>
+                    </uiL:layoutData>
+                </uiL:Splitter>
             </VBox>
         </content>
     </Page>

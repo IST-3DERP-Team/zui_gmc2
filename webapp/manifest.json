@@ -51,6 +51,15 @@
                     "localUri": "localService/ZVB_3DERP_GMC_FILTERS_CDS/metadata.xml",
                     "odataVersion": "2.0"
                 }
+            },
+            "ZGW_3DERP_RFC_SRV": {
+                "uri": "/sap/opu/odata/sap/ZGW_3DERP_RFC_SRV",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "localUri": "localService/ZGW_3DERP_RFC_SRV/metadata.xml",
+                    "odataVersion": "2.0"
+                }
             }
         }
     },
@@ -136,6 +145,18 @@
             },
             "ZVB_3DERP_GMC_FILTERS_CDS": {
                 "dataSource": "ZVB_3DERP_GMC_FILTERS_CDS",
+                "preload": true,
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "Inline",
+                    "refreshAfterChange": false,
+                    "metadataUrlParams": {
+                        "sap-value-list": "none"
+                    }
+                }
+            },
+            "ZGW_3DERP_RFC_SRV": {
+                "dataSource": "ZGW_3DERP_RFC_SRV",
                 "preload": true,
                 "settings": {
                     "defaultBindingMode": "TwoWay",

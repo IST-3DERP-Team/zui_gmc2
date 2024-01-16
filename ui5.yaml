@@ -17,11 +17,15 @@ server:
           url: https://ui5.sap.com
         backend:
           - path: /sap
-            url: http://190.92.230.65:8000 
+            url: http://190.92.230.65:8000
             client: '888'
             destination: LTD888_S4HANA2022
           - path: /sap
-            url: http://190.92.230.65:8000 
+            url: http://190.92.230.65:8000
+            client: '888'
+            destination: LTD888_S4HANA2022
+          - path: /sap/opu/odata/sap/ZGW_3DERP_RFC_SRV
+            url: http://190.92.230.65:8000
             client: '888'
             destination: LTD888_S4HANA2022
     - name: fiori-tools-appreload

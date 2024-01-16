@@ -15,12 +15,16 @@ server:
           url: https://ui5.sap.com
         backend:
           - path: /sap
-            url: http://190.92.230.65:8000 
-            client: '888'
+            url: http://190.92.230.65:8000
+            client: "888"
             destination: LTD888_S4HANA2022
           - path: /sap
-            url: http://190.92.230.65:8000 
-            client: '888'
+            url: http://190.92.230.65:8000
+            client: "888"
+            destination: LTD888_S4HANA2022
+          - path: /sap/opu/odata/sap/ZGW_3DERP_RFC_SRV
+            url: http://190.92.230.65:8000
+            client: "888"
             destination: LTD888_S4HANA2022
     - name: fiori-tools-appreload
       afterMiddleware: compression
@@ -43,4 +47,8 @@ server:
           - urlPath: /sap/opu/odata/sap/ZVB_3DERP_GMC_FILTERS_CDS
             metadataXmlPath: ./webapp/localService/ZVB_3DERP_GMC_FILTERS_CDS/metadata.xml
             mockdataRootPath: ./webapp/localService/ZVB_3DERP_GMC_FILTERS_CDS/mockdata
+            generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZGW_3DERP_RFC_SRV
+            metadataXmlPath: ./webapp/localService/ZGW_3DERP_RFC_SRV/metadata.xml
+            mockdataRootPath: ./webapp/localService/ZGW_3DERP_RFC_SRV/mockdata
             generateMockData: true

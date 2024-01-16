@@ -1,8 +1,9 @@
 sap.ui.define([ 
     "sap/ui/model/json/JSONModel" ,
     "sap/ui/model/Filter",
-	"sap/ui/model/FilterOperator"
-], function(JSONModel,Filter,FilterOperator) {
+	"sap/ui/model/FilterOperator",
+    "sap/base/util/uid"
+], function(JSONModel,Filter,FilterOperator,uid) {
 	"use strict";
 
 	return {        
@@ -17,31 +18,100 @@ sap.ui.define([
                 col.attachColumnMenuOpen(function(oEvent) {
                     //Get Menu associated with column
                     var oMenu = col.getMenu();                        
-                    var oMenuItem = new sap.ui.unified.MenuItem({
+					
+                    var oMenuItemFilter = new sap.ui.unified.MenuItem({
+                        id: col.sId + "-menu-custom-fltr-" + uid(),
                         icon: "sap-icon://filter",
                         text: "Filter",
                         select: function(oEvent) {
-                            _this.onColFilter(sTableId, oEvent.getSource().oParent.oParent.getAggregation("label").getProperty("text"), me);
-                        }                        
+                            _this.onColFilter(sTableId, oEvent.getSource().oParent.oParent.getAggregation("label").getProperty("text"), me, true);
+                        }
+                    })
+                    
+                    var oMenuItemClearFilter = new sap.ui.unified.MenuItem({
+                        id: col.sId + "-menu-clear-fltr-" + uid(),
+                        icon: "sap-icon://clear-filter",
+                        text: "Clear Filter",
+                        enabled: _this.isFiltered(sTableId, col.getProperty("name"), "COL", me),
+                        select: function(oEvent) {
+                            _this.onColFilter(sTableId, oEvent.getSource().oParent.oParent.getAggregation("label").getProperty("text"), me, false);
+                            _this.onRemoveColFilter(oEvent, me);
+                            _this.onColFilterConfirm(oEvent, me);
+                        }
+                    })
+
+                    var oMenuItemClearAllFilter = new sap.ui.unified.MenuItem({
+                        id: col.sId + "-menu-clear-all-fltr-" + uid(),
+                        icon: "sap-icon://clear-filter",
+                        text: "Clear All Filters",
+                        enabled: _this.isFiltered(sTableId, col.getProperty("name"), "ALL", me),
+                        select: function(oEvent) {
+                            _this.onColFilterClear(oEvent, me);
+                        }
+                    })
+
+                    var oMenuItemClearSort = new sap.ui.unified.MenuItem({
+                        id: col.sId + "-menu-clear-sorting-" + uid(),
+                        icon: "sap-icon://decline",
+                        text: "Clear Sorting",
+                        enabled: _this.isSorted(sTableId, col.getProperty("name"), me),
+                        select: function(oEvent) {
+                            oTable.getBinding().sort(null);
+                            oTable.getBinding().sort([]);
+
+                            oTable.getColumns().forEach(col => {
+                                if (col.getSorted()) {
+                                    col.setSorted(false);
+                                }
+                            })
+                        }
                     })
                     
                     //Create the Menu Item that need to be added
                     setTimeout(() => {
                         var wCustomFilter = false;
-                        oMenu.getItems().forEach(item => {
+                        var iSortIndex = -1;
+
+                        oMenu.getItems().forEach((item, index) => {
                             if (item.sId.indexOf("filter") >= 0) {
                                 oMenu.removeItem(item);
+                            }
+
+                            if (item.sId.indexOf("desc") >= 0) {
+                                iSortIndex = index;
                             }
 
                             if (item.mProperties.text !== undefined && item.mProperties.text === "Filter") {
                                 wCustomFilter = true;
                             }
+
+                            if (item.sId.indexOf("clear-all-fltr") >= 0) {
+                                item.setProperty("enabled", _this.isFiltered(sTableId, col.getAggregation("template").getBindingInfo("text").parts[0].path, "ALL", me));
+                            }
+                            else if (item.sId.indexOf("clear-fltr") >= 0) {
+                                item.setProperty("enabled", _this.isFiltered(sTableId, col.getAggregation("template").getBindingInfo("text").parts[0].path, "COL", me));
+                            }
+                            else if (item.sId.indexOf("clear-sorting") >= 0) {
+                                item.setProperty("enabled", _this.isSorted(sTableId, col.getAggregation("template").getBindingInfo("text").parts[0].path, me));
+                            }
                         })
-                        
+
                         if (!wCustomFilter) {
-                            oMenu.insertItem(oMenuItem, 2);                               
+                            var iCounter = 0;
+
+                            if (oMenuItemClearSort !== -1) {
+                                iCounter++;
+                                oMenu.insertItem(oMenuItemClearSort, iSortIndex + iCounter);
+                            }
+                            
+                            iCounter++;
+                            oMenu.insertItem(oMenuItemFilter, iSortIndex + iCounter);
+                            iCounter++;
+                            oMenu.insertItem(oMenuItemClearFilter, iSortIndex + iCounter);
+                            iCounter++;
+                            oMenu.insertItem(oMenuItemClearAllFilter, iSortIndex + iCounter);
                         }
-                        
+
                         oMenu.setPageSize(oMenu.getItems().length); 
                     }, 10);
                 });
@@ -82,6 +152,7 @@ sap.ui.define([
             var vFilterType = "VLF";
 
             var oTableColumns = [];
+
             var aTableColumns = jQuery.extend(true, [], me._aColumns[sTableId.replace("Tab","")]);
             aTableColumns.forEach((col, idx) => {
                 if (!(col.ColumnName === "SBU" || col.ColumnName === "DOCTYPE" || col.ColumnName === "SHORTTEXT" || col.ColumnName === "INFORECORD" || col.ColumnName === "COMPANY" || col.ColumnName === "PLANMONTH")) {
@@ -1170,6 +1241,41 @@ sap.ui.define([
                     })
                 }
             }
+        },
+
+        isFiltered: function(sTableId, sColumnName, sType, oThis) {
+            var me = oThis;
+            var aColumnItems = undefined;
+            var bFiltered = false;
+
+            if (me._GenericFilterDialog) {
+                if (me._colFilters[sTableId] !== undefined) {
+                    aColumnItems = me._colFilters[sTableId].items;
+
+                    if (sType === "ALL") {
+                        if (aColumnItems.filter(fItem => fItem.isFiltered === true).length > 0) { bFiltered = true; }
+                    }
+                    else {
+                        if (aColumnItems.filter(fItem => fItem.ColumnName === sColumnName && fItem.isFiltered === true).length > 0) { bFiltered = true; }
+                    }
+                }
+            }
+
+            return bFiltered;
+        },
+
+        isSorted: function(sTableId, sColumnName, oThis) {
+            var me = oThis;
+            var bSorted = false;
+            console.log(sColumnName)
+            var oColumnProp = me.byId(sTableId).getColumns().filter(fItem => fItem.getProperty("name") === sColumnName)[0];
+            console.log(me.byId(sTableId).getColumns())
+            if (oColumnProp.getProperty("sorted")) {
+                bSorted = true;
+            }
+            
+            return bSorted;
         }
+
 	};
 });
