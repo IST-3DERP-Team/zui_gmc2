@@ -10,7 +10,132 @@ sap.ui.define([
 ], function(JSONModel, Filter, FilterOperator, SearchField, typeString, Token, FilterBar, FilterGroupItem) {
 	"use strict";
 
-	return {        
+	return {
+
+        setSmartFilterModel(oThis) {
+            //set smartfilterbar model
+            var me = oThis;
+            var oModel = me.getOwnerComponent().getModel("ZVB_3DERP_GMC_FILTERS_CDS");               
+            var oSmartFilter = me.getView().byId("smartFilterBar");
+            oSmartFilter.setModel(oModel);
+
+            //custom control properties 
+            me._oSmartFilterCustomControlProp = {};
+
+            //get cds view service gateway metadata
+            var oModelURI = new sap.ui.model.odata.v2.ODataModel("/sap/opu/odata/sap/ZVB_3DERP_GMC_FILTERS_CDS");
+
+            oModelURI.attachMetadataLoaded(null, function(){
+                var oMetadata = oModelURI.getServiceMetadata();
+
+                var oInterval = setInterval(() => {
+                    if (oSmartFilter !== undefined && oSmartFilter._aFields !== null) {
+                        clearInterval(oInterval);
+
+                        //loop thru smart filter criteria
+                        oSmartFilter._aFields.forEach(item => {
+                            //OPTIONAL: exclude SBU, SBU is using combo box custom control instead of multi input
+                            if (item.name === "SBU") { return; }
+
+                            var oMultiInput = me.byId("sff" + item.name);
+
+                            //skip filter criteria not defined in view xml file
+                            if (oMultiInput === undefined) { return; }
+
+                            var oFieldAnnotation = oMetadata.dataServices.schema[0].annotations.filter(fItem => fItem.target === item.fullName);
+
+                            if (oFieldAnnotation.length > 0) {
+                                //continue if filter criteria has metadata
+                                var sFieldEntitySet = oFieldAnnotation[0].annotation[0].record.propertyValue.filter(fItem => fItem.property === "CollectionPath")[0].string;
+                                var entityType = oMetadata.dataServices.schema[0].entityType.filter(fItem => fItem.name === sFieldEntitySet + "Type")[0];
+
+                                //load the resource 
+                                //OPTIONAL: excelude if mattyp, mattyp resource should be loaded on change of SBU value, see onSBUChange function
+                                if (item.name !== "MATTYP") {
+                                    oModel.read("/" + sFieldEntitySet, {
+                                        success: function (oData) {
+                                            me.getView().setModel(new JSONModel(oData.results), "sfm" + item.name);
+                                        },
+                                        error: function (err) { }
+                                    })
+                                }
+
+                                //define custom control properties
+                                me._oSmartFilterCustomControlProp[item.name] = {};
+                                me._oSmartFilterCustomControlProp[item.name]["property"] = [];
+                                me._oSmartFilterCustomControlProp[item.name]["label"] = item.label;
+                                me._oSmartFilterCustomControlProp[item.name]["key"] = entityType.key.propertyRef[0].name;
+                                me._oSmartFilterCustomControlProp[item.name]["maxLength"] = item.maxLength;
+                                me._oSmartFilterCustomControlProp[item.name]["type"] = item.filterType;
+                                me._oSmartFilterCustomControlProp[item.name]["desc"] = "Description";
+                                me._oSmartFilterCustomControlProp[item.name]["textFormatMode"] = "Key";
+
+                                //attach method/events to multi input
+                                oMultiInput.attachValueHelpRequest(me._smartFilterCustomControl.onSmartFilterCustomControlValueHelp.bind(me));
+                                oMultiInput.attachChange(me._smartFilterCustomControl.onSmartFilterCustomControlValueHelpChange.bind(me));
+                                oMultiInput.attachSuggest(me._smartFilterCustomControl.onMultiInputSuggest.bind(me));
+
+                                //collect the columns to show in suggestion and value help
+                                var oCells = [];
+                                var wDesc = false;
+
+                                entityType.property.forEach((prop, index) => {
+                                    //OPTIONAL: exclude SBU for mattyp
+                                    if (item.name === "MATTYP" && prop.name === "SBU") {
+                                        return;
+                                    }
+
+                                    //add field to suggestion column
+                                    oMultiInput.addSuggestionColumn(new sap.m.Column({
+                                        header: new sap.m.Label({ text: prop.extensions.filter(fItem => fItem.name === "label")[0].value })
+                                    }))
+
+                                    //assign data to cells
+                                    oCells.push(new sap.m.Text({
+                                        text: { path: "sfm" + item.name + ">" + prop.name }
+                                    }))
+
+                                    //add field to custom control property
+                                    me._oSmartFilterCustomControlProp[item.name]["property"].push({
+                                        name: prop.name,
+                                        label: prop.extensions.filter(fItem => fItem.name === "label")[0].value
+                                    })
+
+                                    //if there is a description field in your resource, text format will display description + (key), otherwise will only show key
+                                    if (prop.name.toUpperCase() === "DESCRIPTION" && !wDesc) {
+                                        wDesc = true;
+                                        me._oSmartFilterCustomControlProp[item.name]["desc"] = prop.name;
+                                        me._oSmartFilterCustomControlProp[item.name]["textFormatMode"] = "ValueKey"; 
+                                    }
+                                })
+
+                                //bind suggestion rows
+                                oMultiInput.bindSuggestionRows({
+                                    path: "sfm" + item.name + ">/",
+                                    template: new sap.m.ColumnListItem({
+                                        cells: oCells
+                                    }),
+                                    length: 10000,
+                                    templateShareable: false
+                                });
+
+                                //add multi input validator for checking if entered value exists on the resource
+                                oMultiInput.addValidator(me._smartFilterCustomControl.onMultiInputValidate.bind(me));
+
+                                //add focus event in multi input to set the active custom control
+                                var oMultiInputEventDelegate = { 
+                                    onclick: function(oEvent) {
+                                        me._smartFilterCustomControl.onMultiInputFocus(me, oEvent);
+                                    }
+                                };
+
+                                oMultiInput.addEventDelegate(oMultiInputEventDelegate);
+                            }
+                        });
+                    }
+                }, 100);
+            }, null);
+        },
 
         onSmartFilterCustomControlValueHelp: function(oEvent) {
             var oSource = oEvent.getSource();
