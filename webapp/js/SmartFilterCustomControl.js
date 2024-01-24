@@ -21,6 +21,8 @@ sap.ui.define([
 
             //custom control properties 
             me._oSmartFilterCustomControlProp = {};
+            me._oSmartFilterCustomControls = [];
+            me._isSmartFilterModelSet = false;
 
             //get cds view service gateway metadata
             var oModelURI = new sap.ui.model.odata.v2.ODataModel("/sap/opu/odata/sap/ZVB_3DERP_GMC_FILTERS_CDS");
@@ -35,7 +37,10 @@ sap.ui.define([
                         //loop thru smart filter criteria
                         oSmartFilter._aFields.forEach(item => {
                             //OPTIONAL: exclude SBU, SBU is using combo box custom control instead of multi input
-                            if (item.name === "SBU") { return; }
+                            if (item.name === "SBU") { 
+                                me._oSmartFilterCustomControls.push({key: item.name});
+                                return; 
+                            }
 
                             var oMultiInput = me.byId("sff" + item.name);
 
@@ -69,6 +74,8 @@ sap.ui.define([
                                 me._oSmartFilterCustomControlProp[item.name]["type"] = item.filterType;
                                 me._oSmartFilterCustomControlProp[item.name]["desc"] = "Description";
                                 me._oSmartFilterCustomControlProp[item.name]["textFormatMode"] = "Key";
+
+                                me._oSmartFilterCustomControls.push({key: item.name});
 
                                 //attach method/events to multi input
                                 oMultiInput.attachValueHelpRequest(me._smartFilterCustomControl.onSmartFilterCustomControlValueHelp.bind(me));
@@ -132,6 +139,8 @@ sap.ui.define([
                                 oMultiInput.addEventDelegate(oMultiInputEventDelegate);
                             }
                         });
+
+                        me._isSmartFilterModelSet = true;
                     }
                 }, 100);
             }, null);
@@ -310,7 +319,7 @@ sap.ui.define([
                         oToken.setText(oObject[aFieldProp[1].name] + " (" + oObject[aFieldProp[0].name] + ")");
                     }
 
-                    aToken.push(oToken)
+                    aToken.push(oToken);
                 }
 
                 oMultiInput.setTokens(aToken);
@@ -352,6 +361,117 @@ sap.ui.define([
                 oThis._oSmartFilterCustomControl = oThis.byId("sff" + oEvent.srcControl.getProperty("name"));
             }
         },
+
+        beforeVariantFetch(oThis) {
+            var me = oThis;
+            var oSmartFilter = me.byId("smartFilterBar");
+
+            if (me._oSmartFilterCustomControls !== undefined) {
+                var oCustom = {};
+
+                me._oSmartFilterCustomControls.forEach(item => {
+                    var aKeyText = [];
+
+                    if (item.key === "SBU") {
+                        aKeyText.push({
+                            Key: me.getView().getModel("ui").getData().sbu,
+                            Text: me.getView().getModel("ui").getData().sbu
+                        })
+                    }
+                    else {
+                        var oCtrl = me.getView().byId("smartFilterBar").determineControlByName(item.key);
+
+                        if (oCtrl) {
+                            oCtrl.getTokens().map(function(oToken) {
+                                aKeyText.push({
+                                    Key: oToken.getKey(),
+                                    Text: oToken.getText()
+                                })
+                            })
+                        }
+                    }
+
+                    if (aKeyText.length > 0) {
+                        oCustom[item.key] = aKeyText;
+                    }
+                })
+
+                oSmartFilter.setFilterData({ _CUSTOM : oCustom });
+            }
+        },
+
+        afterVariantLoad(oThis) {
+            var me = oThis;
+            var oSmartFilter = me.byId("smartFilterBar");
+            var oSmartFilterData = oSmartFilter.getFilterData();
+            var oSmartFilterCustomData = oSmartFilterData["_CUSTOM"];
+
+            //clear custom control values
+            oSmartFilter.getControlConfiguration().forEach(item => {
+                if (me.byId("sff" + item.getProperty("key")) !== undefined) {
+                    me.byId("sff" + item.getProperty("key")).destroyTokens();
+                }
+            })
+
+            if (oSmartFilterCustomData !== undefined) {
+                Object.keys(oSmartFilterCustomData).forEach(prop => {
+                    if (prop === "SBU") {
+                        //load sbu model value
+                        var vPrevSBU = me.getView().getModel("ui").getData().sbu;
+                        var vSBU = "";
+    
+                        if (oSmartFilterCustomData[prop].length > 0) {
+                            vSBU = oSmartFilterCustomData[prop][0].Key;
+                        }
+
+                        me.getView().getModel("ui").setProperty("/sbu", vSBU);
+    
+                        if (vPrevSBU !== vSBU) {
+                            me.onSBUChange();
+                        }
+                    }
+                    else {
+                        //load multi input custom control values
+                        var oCustomControl = me.byId("sff" + prop);
+                        var sTextFormatMode = me._oSmartFilterCustomControlProp[prop].textFormatMode;
+                        var aToken = [];
+    
+                        if (oSmartFilterCustomData[prop].length > 0) {
+                            oSmartFilterCustomData[prop].forEach(item => {
+                                var oToken = new Token();
+    
+                                if (sTextFormatMode === "Key") {
+                                    oToken.setKey(item.Key);
+                                    oToken.setText(item.Text);
+                                }
+                                else if (sTextFormatMode === "ValueKey") {
+                                    oToken.setKey(item.Key);
+                                    oToken.setText(item.Text + " (" + item.Key + ")");
+                                }
+    
+                                aToken.push(oToken);
+                            })
+                        }
+    
+                        oCustomControl.setTokens(aToken);
+                    }
+                })
+            }
+        },
+
+        clearSmartFilters(oThis) {
+            var me = oThis;
+
+            me._oSmartFilterCustomControls.forEach(item => {
+                if (item.key === "SBU") {
+                    me.getView().getModel("ui").setProperty("/sbu", "");
+                }
+                else {
+                    var oCustomControl = me.byId("sff" + item.key);
+                    oCustomControl.destroyTokens();
+                }
+            })
+        }
 
 	};
 });

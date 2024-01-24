@@ -30,7 +30,7 @@ sap.ui.define([
 
         return Controller.extend("zuigmc2.controller.Main", {
 
-            onInit: function () {
+            onInit: async function () {
                 this.getAppAction();
                 this.validationErrors = [];
                 // this.showLoadingDialog('Loading...');
@@ -62,6 +62,7 @@ sap.ui.define([
                     currsbu: '',
                     dataMode: 'INIT',
                     updTable: '',
+                    smartfiltergf: 0,
                     splittergf: 0.94,
                     fullscreen: {
                         header: false,
@@ -87,6 +88,7 @@ sap.ui.define([
                 this._oViewSettingsDialog = {};
                 this._DiscardChangesDialog = null;
                 this._GMCDescZHAuth = false;
+                this._bResourcesRendered = false;
 
                 this._aEntitySet = {
                     gmc: "GMCHdr2Set", attributes: "GMCAttribSet", materials: "GMCMaterialSet", cusmat: "GMCCustMaterialSet"
@@ -285,53 +287,53 @@ sap.ui.define([
 
                 oRouter.getRoute("RouteMain").attachPatternMatched(this._onPatternMatched, this);
 
-                oModel.read('/MatTypeSHSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "mattyp");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/MatTypeSHSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "mattyp");
+                //     },
+                //     error: function (err) { }
+                // })
 
-                oModel.read('/MatGrpRscSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "matgrp");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/MatGrpRscSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "matgrp");
+                //     },
+                //     error: function (err) { }
+                // })
 
-                oModel.read('/UOMRscSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "uom");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/UOMRscSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "uom");
+                //     },
+                //     error: function (err) { }
+                // })
 
-                oModel.read('/WtUOMRscSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "wtuom");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/WtUOMRscSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "wtuom");
+                //     },
+                //     error: function (err) { }
+                // })
 
-                oModel.read('/ProcessRscSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "process");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/ProcessRscSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "process");
+                //     },
+                //     error: function (err) { }
+                // })
 
-                oModel.read('/PurcValKeyRscSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "purvalkey");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/PurcValKeyRscSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "purvalkey");
+                //     },
+                //     error: function (err) { }
+                // })
 
                 oModel.read('/MatTypeAttribSet', {
                     async: false,
@@ -341,23 +343,25 @@ sap.ui.define([
                     error: function (err) { }
                 })
 
-                oModel.read('/MatTypeClassSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "mattypcls");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/MatTypeClassSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "mattypcls");
+                //     },
+                //     error: function (err) { }
+                // })
 
-                oModel.read('/CusGrpRscSet', {
-                    async: false,
-                    success: function (oData) {
-                        _this.getView().setModel(new JSONModel(oData.results), "cusgrp");
-                    },
-                    error: function (err) { }
-                })
+                // oModel.read('/CusGrpRscSet', {
+                //     async: false,
+                //     success: function (oData) {
+                //         _this.getView().setModel(new JSONModel(oData.results), "cusgrp");
+                //     },
+                //     error: function (err) { }
+                // })
 
                 this.getGMCDescZHAuth();
+                this.getResources();
+                // this.byId("splitterMain").setProperty("height", "99%");
             },
 
             _onPatternMatched : function (oEvent) {
@@ -371,6 +375,97 @@ sap.ui.define([
                 }
             },
             
+            // onBeforeRendering: async function(oEvent) {
+            //     await this.getResource(this);
+            // },
+
+            getResource: async (me) => {
+                var promise = new Promise((resolve, reject) => {
+                    var oInterval = setInterval(() => {
+                        if (me._bResourcesRendered) {
+                            clearInterval(oInterval);
+                            resolve(true);
+                        }
+                    }, 100);
+                })
+
+                // var oModel = me.getOwnerComponent().getModel();
+
+                // var oParam = {
+                //     "SBU":"",
+                //     "N_MatTypeRsc": [],
+                //     "N_MatGrpRsc": [],
+                //     "N_UOMRsc": [],
+                //     "N_WtUOMRsc": [],
+                //     "N_ProcessRsc": [],
+                //     "N_PurcValKeyRsc": [],
+                //     "N_MatTypeAttribRsc": [],
+                //     "N_MatTypeClassRsc": [],
+                //     "N_CusGrpRsc": []
+                // }
+
+                // var promise = new Promise((resolve, reject) => {
+                //     oModel.create("/ResourceSet", oParam, {
+                //         method: "POST",
+                //         success: function (oData) {
+                //             console.log(oData)
+                //             me.getView().setModel(new JSONModel(oData.N_MatTypeRsc.results), "mattyp");
+                //             me.getView().setModel(new JSONModel(oData.N_MatGrpRsc.results), "matgrp");
+                //             me.getView().setModel(new JSONModel(oData.N_UOMRsc.results), "uom");
+                //             me.getView().setModel(new JSONModel(oData.N_WtUOMRsc.results), "wtuom");
+                //             me.getView().setModel(new JSONModel(oData.N_ProcessRsc.results), "process");
+                //             me.getView().setModel(new JSONModel(oData.N_PurcValKeyRsc.results), "purvalkey");
+                //             me.getView().setModel(new JSONModel(oData.N_MatTypeAttribRsc.results), "mattypattrib");
+                //             me.getView().setModel(new JSONModel(oData.N_MatTypeClassRsc.results), "mattypcls");
+                //             me.getView().setModel(new JSONModel(oData.N_CusGrpRsc.results), "cusgrp");
+                //             resolve(true);
+                //         },
+                //         error: function (err) { 
+                //             resolve(false);
+                //         }
+                //     })
+                // })
+
+                return await promise;
+            },
+
+            getResources() {
+                var me = this;
+                var oModel = me.getOwnerComponent().getModel();
+
+                var oParam = {
+                    "SBU":"",
+                    "N_MatTypeRsc": [],
+                    "N_MatGrpRsc": [],
+                    "N_UOMRsc": [],
+                    "N_WtUOMRsc": [],
+                    "N_ProcessRsc": [],
+                    "N_PurcValKeyRsc": [],
+                    "N_MatTypeClassRsc": [],
+                    "N_CusGrpRsc": []
+                }
+
+                oModel.create("/ResourceSet", oParam, {
+                    method: "POST",
+                    success: function (oData) {
+                        // console.log(oData)
+                        me._bResourcesRendered = true;
+                        me.getView().setModel(new JSONModel(oData.N_MatTypeRsc.results), "mattyp");
+                        me.getView().setModel(new JSONModel(oData.N_MatGrpRsc.results), "matgrp");
+                        me.getView().setModel(new JSONModel(oData.N_UOMRsc.results), "uom");
+                        me.getView().setModel(new JSONModel(oData.N_WtUOMRsc.results), "wtuom");
+                        me.getView().setModel(new JSONModel(oData.N_ProcessRsc.results), "process");
+                        me.getView().setModel(new JSONModel(oData.N_PurcValKeyRsc.results), "purvalkey");
+                        me.getView().setModel(new JSONModel(oData.N_MatTypeAttribRsc.results), "mattypattrib");
+                        me.getView().setModel(new JSONModel(oData.N_MatTypeClassRsc.results), "mattypcls");
+                        me.getView().setModel(new JSONModel(oData.N_CusGrpRsc.results), "cusgrp");
+                    },
+                    error: function (err) { 
+
+                    }
+                })
+            },
+
             getAppAction: async function() {
                 if (sap.ushell.Container !== undefined) {
                     const fullHash = new HashChanger().getHash(); 
@@ -409,7 +504,7 @@ sap.ui.define([
             onSBUChange: function(oEvent) {
                 this._sbuChange = true;
                 
-                var me = this;                
+                var me = this;
                 var vSBU = this.getView().byId("cboxSBU").getSelectedKey();
                 var oModel = this.getOwnerComponent().getModel("ZVB_3DERP_GMC_FILTERS_CDS");
 
@@ -457,6 +552,10 @@ sap.ui.define([
                 // this.byId("searchFieldMatl").setEnabled(true);
                 // this.byId("btnTabLayoutMatl").setEnabled(true);
                 // this.getView().getModel("ui").setProperty("/dataMode", "READ");
+
+                if (vSBU === "") {
+                    this.byId("sffMATTYP").destroyTokens();
+                }
             },
 
             onSearch: function () {
@@ -505,12 +604,12 @@ sap.ui.define([
                 this._sbuChange = false;
             },
 
-            getGMC() {
+            async getGMC() {
                 var _this = this;
                 var oModel = this.getOwnerComponent().getModel();
                 var oSmartFilter = this.getView().byId("smartFilterBar").getFilters();
                 var aFilters = [], aFilter = [], aSmartFilter = [];
-                
+                // console.log(oSmartFilter)
                 if (oSmartFilter.length > 0)  {
                     oSmartFilter[0].aFilters.forEach(item => {
                         if (item.aFilters === undefined) {
@@ -548,13 +647,17 @@ sap.ui.define([
                 }
 
                 aSmartFilter.push(new Filter(aFilters, true));
-
+                // console.log(new Date())
+                await this.getResource(this);
+                // console.log(new Date())
+                // console.log(aSmartFilter)
                 oModel.read('/GMCHdr2Set', { 
                     filters: aSmartFilter,
                     // urlParameters: {
                     //     "$filter": "SBU eq '" + vSBU + "'"
                     // },                    
                     success: function (data, response) {
+                        // console.log(new Date())
                         var oJSONModel = new sap.ui.model.json.JSONModel();
                         var oResult = data.results;
                         
@@ -857,48 +960,87 @@ sap.ui.define([
                 var aNewRows = me.getView().getModel("gmc").getData().results.filter(item => item.New === true);
                 var iCounter = 0;
                 var sMessage = "";
+                var oParam = {};
+                var oParamItems = [];
 
                 var promise = new Promise((resolve, reject) => {
                     aNewRows.forEach(item => {
-                        // console.log(item.MATTYP, item.DESCEN);
-                        oModel.read(oEntitySet, {
-                            urlParameters: {
-                                "$filter": "MATTYP eq '" + item.MATTYP + "' and DESCEN eq '" + item.DESC + "'"
-                            },
-                            success: function (oData, oResponse) {
-                                iCounter++;
-                                // console.log(oData)
+                        oParamItems.push({
+                            GMC: "",
+                            MATTYP: item.MATTYP,
+                            DESCEN: item.DESC
+                        })                        
+                    })
 
-                                if (oData.results.length > 0) {
-                                    sMessage += "Existing GMC " + oData.results[0].GMC + " has the same description " + oData.results[0].DESCEN + "\r\n";
-                                }
+                    oParam["N_ChkDupDescItem"] = oParamItems;
 
-                                if (aNewRows.length === iCounter) {
-                                    if (sMessage.length > 0) {
-                                        MessageBox.information(sMessage);
-                                        resolve(false);
-                                    }
-                                    else {
-                                        resolve(true);
-                                    }
-                                }
-                            },
-                            error: function (err) { 
-                                iCounter++;
+                    oModel.create("/ChkDupDescSet", oParam, {
+                        method: "POST",
+                        success: function (oResult) {
+                            console.log(oResult)
+                            oResult.N_ChkDupDescItem.results.forEach(res => {
+                                if (res.GMC !== "") {
+                                    sMessage += "Existing GMC " + res.GMC + " has the same description " + res.DESCEN + "\r\n";
+                                }                                
+                            })
 
-                                if (aNewRows.length === iCounter) {
-                                    if (sMessage.length > 0) {
-                                        MessageBox.information(sMessage);
-                                        resolve(false);
-                                    }
-                                    else {
-                                        resolve(true);
-                                    }
-                                }
+                            if (sMessage.length > 0) {
+                                MessageBox.information(sMessage);
+                                resolve(false);
                             }
-                        })
+                            else {
+                                resolve(true);
+                            }                            
+                        },
+                        error: function (err) { 
+                            MessageBox.information(err.message);
+                            resolve(false);
+                        }
                     })
                 })
+
+                // var promise = new Promise((resolve, reject) => {
+                //     aNewRows.forEach(item => {
+                //         // console.log(item.MATTYP, item.DESCEN);                        
+                //         var sFilter = encodeURIComponent(`MATTYP eq '` + item.MATTYP + `' and DESCEN eq '` + item.DESC.replace("'","''") + `'`);
+                //         oModel.read(oEntitySet, {
+                //             urlParameters: {
+                //                 "$filter": sFilter
+                //             },
+                //             success: function (oData, oResponse) {
+                //                 iCounter++;
+                //                 // console.log(oData)
+
+                //                 if (oData.results.length > 0) {
+                //                     sMessage += "Existing GMC " + oData.results[0].GMC + " has the same description " + oData.results[0].DESCEN + "\r\n";
+                //                 }
+
+                //                 if (aNewRows.length === iCounter) {
+                //                     if (sMessage.length > 0) {
+                //                         MessageBox.information(sMessage);
+                //                         resolve(false);
+                //                     }
+                //                     else {
+                //                         resolve(true);
+                //                     }
+                //                 }
+                //             },
+                //             error: function (err) { 
+                //                 iCounter++;
+
+                //                 if (aNewRows.length === iCounter) {
+                //                     if (sMessage.length > 0) {
+                //                         MessageBox.information(sMessage);
+                //                         resolve(false);
+                //                     }
+                //                     else {
+                //                         resolve(true);
+                //                     }
+                //                 }
+                //             }
+                //         })
+                //     })
+                // })
 
                 return await promise;
             },
@@ -1539,6 +1681,57 @@ sap.ui.define([
             // },
 
             onTableResize: function(oEvent) {
+                var oSplitter = this.byId("splitterMain");
+                var oFirstPane = oSplitter.getRootPaneContainer().getPanes().at(0);
+                var oSecondPane = oSplitter.getRootPaneContainer().getPanes().at(1);
+                var vFullScreen = oEvent.getSource().data("Fullscreen") === "1" ? true : false;
+                var vPart = oEvent.getSource().data("Part");
+                console.log(oSplitter)
+                this._sActiveTable = oEvent.getSource().data("TableId");
+                this.getView().getModel("ui").setProperty("/fullscreen/" + vPart, vFullScreen);
+
+                if (vFullScreen) {
+                    this.byId("smartFilterBar").setVisible(false);
+
+                    var oLayoutDataMax = new sap.ui.layout.SplitterLayoutData({
+                        size: "100%",
+                        resizable: false
+                    });
+
+                    var oLayoutDataMin = new sap.ui.layout.SplitterLayoutData({
+                        size: "0%",
+                        resizable: false
+                    });
+
+                    if (vPart === "header") {
+                        oFirstPane.setLayoutData(oLayoutDataMax);
+                        oSecondPane.setLayoutData(oLayoutDataMin);
+                    }
+                    else {
+                        oSecondPane.setLayoutData(oLayoutDataMax);
+                        oFirstPane.setLayoutData(oLayoutDataMin);
+                    }
+                }
+                else {
+                    // this.byId("splitterMain").setProperty("height", "99%");
+                    this.byId("smartFilterBar").setVisible(true);
+
+                    var oLayoutDataHdr = new sap.ui.layout.SplitterLayoutData({
+                        size: "46%",
+                        resizable: true
+                    });
+
+                    oFirstPane.setLayoutData(oLayoutDataHdr);
+
+                    var oLayoutDataDtl = new sap.ui.layout.SplitterLayoutData({
+                        size: "54%",
+                        resizable: true
+                    });
+
+                    oSecondPane.setLayoutData(oLayoutDataDtl);
+                }
+                return;
+
                 var vFullScreen = oEvent.getSource().data("Fullscreen") === "1" ? true : false;
                 var vPart = oEvent.getSource().data("Part");
                 var vHeaderSize = oEvent.getSource().data("HeaderSize");
@@ -1548,14 +1741,17 @@ sap.ui.define([
                 this.getView().getModel("ui").setProperty("/fullscreen/" + vPart, vFullScreen);
                 this.getView().getModel("ui").setProperty("/splitter/header", vHeaderSize);
                 this.getView().getModel("ui").setProperty("/splitter/detail", vDetailSize);
-
+                console.log(this.byId("splitterMain"))
                 if (vFullScreen) {
                     this.byId("smartFilterBar").setVisible(false);
                     this.getView().getModel("ui").setProperty("/splittergf", 1);
                 }
                 else {
+                    // this.byId("splitterMain").setProperty("height", "99%");
                     this.byId("smartFilterBar").setVisible(true);
                     this.getView().getModel("ui").setProperty("/splittergf", 0.94);
+                    this.getView().getModel("ui").setProperty("/smartfiltergf", 0);
+                    // this.byId("splitterMain").setProperty("height", "100%");
                 }
             },
 
@@ -1743,6 +1939,7 @@ sap.ui.define([
                 this.byId("searchFieldAttr").setVisible(false);
                 this.byId("btnTabLayoutAttr").setVisible(false);
                 this.byId("btnDataWrapAttr").setVisible(false);
+                this.byId("smartFilterBar").setVisible(false);
 
                 this.getView().getModel("ui").setProperty("/activeGmc", "New");
 
@@ -1874,6 +2071,7 @@ sap.ui.define([
                                             length: 10000,
                                             templateShareable: false
                                         },
+                                        suggest: this.onInputSuggest.bind(this),
                                         change: this.onValueHelpLiveInputChange.bind(this)
                                     })
 
@@ -2096,6 +2294,7 @@ sap.ui.define([
                                             valueHelpRequest: TableValueHelp.handleTableValueHelp.bind(_this),
                                             showSuggestion: true,
                                             maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].maxSuggestionWidth !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
+                                            suggest: _this.onInputSuggest.bind(_this),
                                             change: _this.onValueHelpLiveInputChange.bind(_this)
                                         })
                                     }
@@ -2116,6 +2315,7 @@ sap.ui.define([
                                                 length: 10000,
                                                 templateShareable: false
                                             },
+                                            suggest: _this.onInputSuggest.bind(_this),
                                             change: _this.onValueHelpLiveInputChange.bind(_this)
                                         })
                                     }
@@ -2183,8 +2383,6 @@ sap.ui.define([
                             }
                         })
                 })
-
-
             },
 
             onAddRow: function(oEvent) {
@@ -2272,9 +2470,53 @@ sap.ui.define([
             },
 
             setScreenSize(part, isFullscreen, headerSize, detailSize) {
+                var oSplitter = this.byId("splitterMain");
+                var oFirstPane = oSplitter.getRootPaneContainer().getPanes().at(0);
+                var oSecondPane = oSplitter.getRootPaneContainer().getPanes().at(1);
+
                 this.getView().getModel("ui").setProperty("/fullscreen/" + part, isFullscreen);
-                this.getView().getModel("ui").setProperty("/splitter/header", headerSize);
-                this.getView().getModel("ui").setProperty("/splitter/detail", detailSize);
+                // this.getView().getModel("ui").setProperty("/splitter/header", headerSize);
+                // this.getView().getModel("ui").setProperty("/splitter/detail", detailSize);
+                if (isFullscreen) {
+                    this.byId("smartFilterBar").setVisible(false);
+
+                    var oLayoutDataMax = new sap.ui.layout.SplitterLayoutData({
+                        size: "100%",
+                        resizable: false
+                    });
+
+                    var oLayoutDataMin = new sap.ui.layout.SplitterLayoutData({
+                        size: "0%",
+                        resizable: false
+                    });
+
+                    if (part === "header") {
+                        oFirstPane.setLayoutData(oLayoutDataMax);
+                        oSecondPane.setLayoutData(oLayoutDataMin);
+                    }
+                    else {
+                        oSecondPane.setLayoutData(oLayoutDataMax);
+                        oFirstPane.setLayoutData(oLayoutDataMin);
+                    }
+                }
+                else {
+                    // this.byId("splitterMain").setProperty("height", "99%");
+                    this.byId("smartFilterBar").setVisible(true);
+
+                    var oLayoutDataHdr = new sap.ui.layout.SplitterLayoutData({
+                        size: "46%",
+                        resizable: true
+                    });
+
+                    oFirstPane.setLayoutData(oLayoutDataHdr);
+
+                    var oLayoutDataDtl = new sap.ui.layout.SplitterLayoutData({
+                        size: "54%",
+                        resizable: true
+                    });
+
+                    oSecondPane.setLayoutData(oLayoutDataDtl);
+                }
             },
 
             onCreateCusMat() {
@@ -2413,6 +2655,7 @@ sap.ui.define([
                                             length: 10000,
                                             templateShareable: false
                                         },
+                                        suggest: this.onInputSuggest.bind(this),
                                         change: this.onValueHelpLiveInputChange.bind(this)
                                     })
 
@@ -2903,44 +3146,58 @@ sap.ui.define([
                 if (sap.ushell.Container !== undefined) { sap.ushell.Container.setDirtyFlag(false); }
                 // console.log(oTable.getRows()[0])
 
+                this.getView().getModel("attributes").getData().results.forEach((item, index) => {
+                    var oData = this.getView().getModel("mattypattrib").getData().filter(fItem => fItem.Mattyp === sMattyp && fItem.Mattypcls === item.MATTYPCLS);
+
+                    if (oData.length > 0) {
+                        oData.sort((a,b) => (a.Attribcd > b.Attribcd ? 1 : -1));
+                        _data[item.MATTYPCLS] = oData;
+                    }
+
+                    if (this.getView().getModel("attributes").getData().results.length === (index + 1)) {
+                        oJSONModel.setData(_data);
+                        this.getView().setModel(oJSONModel, "attribute");
+                    }
+                })
+
                 // this.closeLoadingDialog();
 
-                setTimeout(() => {
-                    // oTable.getRows()[0].getCells().forEach((item, idx) => {
-                    //     console.log(item);
+                // setTimeout(() => {
+                //     // oTable.getRows()[0].getCells().forEach((item, idx) => {
+                //     //     console.log(item);
                         
-                    //     if (item.getBindingInfo("value") !== undefined) {
-                    //         if (item.getBindingInfo("value").parts[0].path === "ATTRIBCD") iIndex = idx;
-                    //     }
-                    // }) 
+                //     //     if (item.getBindingInfo("value") !== undefined) {
+                //     //         if (item.getBindingInfo("value").parts[0].path === "ATTRIBCD") iIndex = idx;
+                //     //     }
+                //     // }) 
 
-                    this.getView().getModel("attributes").getData().results.forEach((item, index) => {
-                        var oData = this.getView().getModel("mattypattrib").getData().filter(fItem => fItem.Mattyp === sMattyp && fItem.Mattypcls === item.MATTYPCLS);
-                        // console.log(this.getView().getModel("mattypattrib").getData())
-                        // console.log(sMattyp, item.MATTYPCLS)
-                        // console.log(oData)
-                        if (oData.length > 0) {
-                            oData.sort((a,b) => (a.Attribcd > b.Attribcd ? 1 : -1));
-                            _data[item.MATTYPCLS] = oData;
+                //     this.getView().getModel("attributes").getData().results.forEach((item, index) => {
+                //         var oData = this.getView().getModel("mattypattrib").getData().filter(fItem => fItem.Mattyp === sMattyp && fItem.Mattypcls === item.MATTYPCLS);
+                //         // console.log(this.getView().getModel("mattypattrib").getData())
+                //         // console.log(sMattyp, item.MATTYPCLS)
+                //         // console.log(oData)
+                //         if (oData.length > 0) {
+                //             oData.sort((a,b) => (a.Attribcd > b.Attribcd ? 1 : -1));
+                //             _data[item.MATTYPCLS] = oData;
     
-                            oTable.getRows()[index].getCells()[iIndex].bindAggregation("suggestionItems", {
-                                path: "attribute>/" + item.MATTYPCLS,
-                                length: 10000,
-                                template: new sap.ui.core.ListItem({
-                                    text: "{attribute>Attribcd}",
-                                    key: "{attribute>Attribcd}",
-                                    additionalText: "{attribute>Shorttext}"
-                                })
-                            });
-                        }
+                //             oTable.getRows()[index].getCells()[iIndex].bindAggregation("suggestionItems", {
+                //                 path: "attribute>/" + item.MATTYPCLS,
+                //                 length: 10000,
+                //                 template: new sap.ui.core.ListItem({
+                //                     text: "{attribute>Attribcd}",
+                //                     key: "{attribute>Attribcd}",
+                //                     additionalText: "{attribute>Shorttext}"
+                //                 })
+                //             });
+                //         }
 
-                        if (this.getView().getModel("attributes").getData().results.length === (index + 1)) {
-                            oJSONModel.setData(_data);
-                            this.getView().setModel(oJSONModel, "attribute");
-                            // this.closeLoadingDialog();
-                        }
-                    })
-                }, 100);
+                //         if (this.getView().getModel("attributes").getData().results.length === (index + 1)) {
+                //             oJSONModel.setData(_data);
+                //             this.getView().setModel(oJSONModel, "attribute");
+                //             // this.closeLoadingDialog();
+                //         }
+                //     })
+                // }, 100);
             },
 
             setRowEditMode(arg) {
@@ -2952,6 +3209,12 @@ sap.ui.define([
                     onkeydown: function(oEvent){
                         me.onInputKeyDown(oEvent);
                     },
+
+                    onclick: function(oEvent) {
+                        if (arg === "attributes") {
+                            me.onInputFocus(oEvent);
+                        }
+                    }
                 };
 
                 oTable.getColumns().forEach((col, idx) => {
@@ -3072,6 +3335,7 @@ sap.ui.define([
                                             valueHelpRequest: TableValueHelp.handleTableValueHelp.bind(this),
                                             showSuggestion: true,
                                             maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].maxSuggestionWidth !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
+                                            suggest: this.onInputSuggest.bind(this),
                                             change: this.onValueHelpLiveInputChange.bind(this),
                                             enabled: {
                                                 path: arg + ">WMAT",
@@ -3102,6 +3366,7 @@ sap.ui.define([
                                                 length: 10000,
                                                 templateShareable: false
                                             },
+                                            suggest: this.onInputSuggest.bind(this),
                                             change: this.onValueHelpLiveInputChange.bind(this),
                                             enabled: {
                                                 path: arg + ">WMAT",
@@ -3837,7 +4102,11 @@ sap.ui.define([
                             }
 
                             _this._aColumns[arg].forEach(col => {
-                                if (col.updatable) param[col.name] = item[col.name]
+                                if (col.updatable) param[col.name] = item[col.name];
+
+                                if (arg === "attributes" && (col.name === "DESCEN" || col.name === "DESCZH")) {
+                                    param[col.name] = item[col.name];
+                                }
     
                                 if (iKeyCount === 1) { 
                                     if (col.key) entitySet += "'" + item[col.name] + "'" 
@@ -5020,120 +5289,95 @@ sap.ui.define([
 
                 var aSelectedKeyPath = [];
                 var oSelectedItem = {};
+                // console.log(oSource)
 
-                // oSource.getSuggestionItems().forEach(item => {
-                //     if (oSource.getSelectedKey() === "" && oSource.getValue() !== "") {
-                //         if (oSource.getProperty("textFormatMode") === "ValueKey" && ((item.getProperty("text") + " (" + item.getProperty("key") + ")") === oSource.getValue())) {
-                //             oSource.setSelectedKey(item.getProperty("key"));
-                //             isInvalid = false;
-                //             oSource.setValueState(isInvalid ? "Error" : "None");
-                //             aSelectedKeyPath = item.getBindingContext(item.getBindingInfo("key").parts[0].model).sPath.split("/");
-                //             oSelectedItem = item.getBindingContext(item.getBindingInfo("key").parts[0].model).getModel().oData[aSelectedKeyPath.replace("/","")];
-                //         }
-                //         else if ((oSource.getProperty("textFormatMode") === "Value" || oSource.getProperty("textFormatMode") === "Key") && (item.getProperty("key") === oSource.getValue())) {
-                //             oSource.setSelectedKey(item.getProperty("key"));
-                //             isInvalid = false;
-                //             oSource.setValueState(isInvalid ? "Error" : "None");
-                //             aSelectedKeyPath = item.getBindingContext(item.getBindingInfo("key").parts[0].model).sPath.split("/");
-                //             oSelectedItem = item.getBindingContext(item.getBindingInfo("key").parts[0].model).getModel().oData[aSelectedKeyPath.replace("/","")];
-                //         }
-                //     }
-                //     else if (item.getProperty("key") === oSource.getSelectedKey()) {
-                //         isInvalid = false;
-                //         oSource.setValueState(isInvalid ? "Error" : "None");
-                //         aSelectedKeyPath = item.getBindingContext(item.getBindingInfo("key").parts[0].model).sPath.split("/");
-
-                //         if (aSelectedKeyPath[aSelectedKeyPath.length - 2] === "") {
-                //             oSelectedItem = item.getBindingContext(item.getBindingInfo("key").parts[0].model).getModel().oData[aSelectedKeyPath[aSelectedKeyPath.length - 1]];
-                //         }
-                //         else {
-                //             oSelectedItem = item.getBindingContext(item.getBindingInfo("key").parts[0].model).getModel().oData[aSelectedKeyPath[aSelectedKeyPath.length - 2]][aSelectedKeyPath[aSelectedKeyPath.length - 1]];
-                //         }
-                //     }
-                // })
-
-                if (isInvalid) this.validationErrors.push(oEvent.getSource().getId());
+                if (isInvalid) {
+                    this.validateInputValue(oSource);
+                    // this.validationErrors.push(oEvent.getSource().getId());
+                }
                 else {
-                    var vValue = oSource.getSelectedKey();
-                    var vSuggestKey = oSource.getBindingInfo("value").parts[2].value;
-                    var sSuggestRowModel = oSource.getBindingInfo("value").parts[1].value;
-                    var aSuggestData = [];
+                    this.setValuesAfterInputChange(oSource);
+                    // var vValue = oSource.getSelectedKey();
+                    // var vSuggestKey = oSource.getBindingInfo("value").parts[2].value;
+                    // var sSuggestRowModel = oSource.getBindingInfo("value").parts[1].value;
+                    // var aSuggestData = [];
 
-                    if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') { 
-                        sSuggestRowModel = "attribute"; 
-                        aSuggestData = oSource.getSuggestionRows()[0].getBindingContext(sSuggestRowModel).getModel().getData()[this.getView().getModel(sModel).getProperty(sRowPath + '/MATTYPCLS')];
-                    } 
-                    else {
-                        aSuggestData = oSource.getSuggestionRows()[0].getBindingContext(sSuggestRowModel).getModel().getData();
-                    }
+                    // if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') { 
+                    //     sSuggestRowModel = "attribute"; 
+                    //     aSuggestData = oSource.getSuggestionRows()[0].getBindingContext(sSuggestRowModel).getModel().getData()[this.getView().getModel(sModel).getProperty(sRowPath + '/MATTYPCLS')];
+                    // } 
+                    // else {
+                    //     aSuggestData = oSource.getSuggestionRows()[0].getBindingContext(sSuggestRowModel).getModel().getData();
+                    // }
 
-                    oSelectedItem = aSuggestData.filter(fItem => fItem[vSuggestKey] === vValue)[0];
+                    // oSelectedItem = aSuggestData.filter(fItem => fItem[vSuggestKey] === vValue)[0];
 
-                    if (oSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
-                        this.getView().getModel(sModel).setProperty(sRowPath + '/PROCESSCD', (oSelectedItem ? oSelectedItem.Processcd : ""));
-                        // this.setAttributesOnGMCCreate(vValue, this.getView().getModel(sModel).getProperty(sRowPath + "/TMPGMC"));
-                    }
-                    else if (oSource.getBindingInfo("value").parts[0].path === 'EKWSL') {
-                        if (vValue !== "") {
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTO', oSelectedItem.Uebto);
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/UNTTO', oSelectedItem.Untto);
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTK', oSelectedItem.Uebtk);
-                        }
-                        else {
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTO', "");
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/UNTTO', "");
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTK', false);
-                        }
-                    }
-                    else if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') {
-                        if (vValue !== "") {
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/DESCEN', oSelectedItem.Shorttext);
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/DESCZH', oSelectedItem.Shorttext2);
+                    // if (oSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
+                    //     this.getView().getModel(sModel).setProperty(sRowPath + '/PROCESSCD', (oSelectedItem ? oSelectedItem.Processcd : ""));
+                    //     // this.setAttributesOnGMCCreate(vValue, this.getView().getModel(sModel).getProperty(sRowPath + "/TMPGMC"));
+                    // }
+                    // else if (oSource.getBindingInfo("value").parts[0].path === 'EKWSL') {
+                    //     if (vValue !== "") {
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTO', oSelectedItem.Uebto);
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/UNTTO', oSelectedItem.Untto);
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTK', oSelectedItem.Uebtk);
+                    //     }
+                    //     else {
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTO', "");
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/UNTTO', "");
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTK', false);
+                    //     }
+                    // }
+                    // else if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') {
+                    //     if (vValue !== "") {
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/DESCEN', oSelectedItem.Shorttext);
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/DESCZH', oSelectedItem.Shorttext2);
 
-                            var sTmpGMC = this.getView().getModel(sModel).getProperty(sRowPath + '/TMPGMC');
-                            this._oTmpAttrib[sTmpGMC] = this.getView().getModel("attributes").getData().results;
-                        }
-                        else {
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/DESCEN', "");
-                            this.getView().getModel(sModel).setProperty(sRowPath + '/DESCZH', "");
-                        }
-                    }
-                    else if (oSource.getBindingInfo("value").parts[0].path === 'BASEUOM') { 
-                        var vEntryUOM = this.getView().getModel(sModel).getProperty(sRowPath + '/ORDERUOM');
+                    //         if (this.getView().getModel("ui").getData().dataMode === "NEW") {
+                    //             var sTmpGMC = this.getView().getModel(sModel).getProperty(sRowPath + '/TMPGMC');
+                    //             this._oTmpAttrib[sTmpGMC] = this.getView().getModel("attributes").getData().results;
+                    //         }
+                    //     }
+                    //     else {
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/DESCEN', "");
+                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/DESCZH', "");
+                    //     }
+                    // }
+                    // else if (oSource.getBindingInfo("value").parts[0].path === 'BASEUOM') { 
+                    //     var vEntryUOM = this.getView().getModel(sModel).getProperty(sRowPath + '/ORDERUOM');
 
-                        if (vEntryUOM !== "" && vValue !== vEntryUOM) {
-                            this.convertUOM(vValue, vEntryUOM, sModel, sRowPath);
-                        }
-                    }
-                    else if (oSource.getBindingInfo("value").parts[0].path === 'ORDERUOM') { 
-                        var vBaseUOM = this.getView().getModel(sModel).getProperty(sRowPath + '/BASEUOM');
+                    //     if (vEntryUOM !== "" && vValue !== vEntryUOM) {
+                    //         this.convertUOM(vValue, vEntryUOM, sModel, sRowPath);
+                    //     }
+                    // }
+                    // else if (oSource.getBindingInfo("value").parts[0].path === 'ORDERUOM') { 
+                    //     var vBaseUOM = this.getView().getModel(sModel).getProperty(sRowPath + '/BASEUOM');
 
-                        if (vValue !== "" && vValue !== vBaseUOM) {
-                            this.convertUOM(vBaseUOM, vValue, sModel, sRowPath);
-                        }
-                    }
-
-                    // if (this.getView().getModel("ui").getData().dataMode === "NEW") {
-                    //     if (oSource.getBindingInfo("value").parts[0].path === 'BASEUOM') {
-                    //         this.getView().getModel(sModel).setProperty(sRowPath + '/ORDERUOM', vValue);
+                    //     if (vValue !== "" && vValue !== vBaseUOM) {
+                    //         this.convertUOM(vBaseUOM, vValue, sModel, sRowPath);
                     //     }
                     // }
 
-                    this.getView().getModel(sModel).setProperty(sRowPath + '/' + oSource.getBindingInfo("value").parts[0].path, vValue);
+                    // // if (this.getView().getModel("ui").getData().dataMode === "NEW") {
+                    // //     if (oSource.getBindingInfo("value").parts[0].path === 'BASEUOM') {
+                    // //         this.getView().getModel(sModel).setProperty(sRowPath + '/ORDERUOM', vValue);
+                    // //     }
+                    // // }
+
+                    // this.getView().getModel(sModel).setProperty(sRowPath + '/' + oSource.getBindingInfo("value").parts[0].path, vValue);
                     
-                    if (oSource.getSelectedKey() === "") { oSource.setSelectedKey(vValue); }
+                    // if (oSource.getSelectedKey() === "") { oSource.setSelectedKey(vValue); }
 
+                    // if (oSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
+                    //     this.setAttributesOnGMCCreate(vValue, this.getView().getModel(sModel).getProperty(sRowPath + "/TMPGMC"));
+                    //     this.getView().getModel("ui").setProperty("/activeTmpMattyp", vValue);
+                    // }
 
-                    if (oSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
-                        this.setAttributesOnGMCCreate(vValue, this.getView().getModel(sModel).getProperty(sRowPath + "/TMPGMC"));
-                        this.getView().getModel("ui").setProperty("/activeTmpMattyp", vValue);
-                    }
-
-                    this.validationErrors.forEach((item, index) => {
-                        if (item === oEvent.getSource().getId()) {
-                            this.validationErrors.splice(index, 1)
-                        }
-                    })
+                    // this.validationErrors.forEach((item, index) => {
+                    //     if (item === oEvent.getSource().getId()) {
+                    //         this.validationErrors.splice(index, 1)
+                    //     }
+                    // })
                 }
 
                 if (this.getView().getModel("ui").getData().dataMode === "EDIT") {
@@ -5145,6 +5389,162 @@ sap.ui.define([
                 }
                 
                 if (sap.ushell.Container !== undefined) { sap.ushell.Container.setDirtyFlag(true); }
+            },
+
+            validateInputValue(source) {
+                var oInputSource = source;
+                var sValue = oInputSource.getProperty("value").toLowerCase();
+                var sFieldName = oInputSource.getBindingInfo("value").parts[0].path;
+                var sModel = oInputSource.getBindingInfo("value").parts[0].model;
+                var sDataSourceModel = oInputSource.getBindingInfo("value").parts[1].value;
+                var sKey = oInputSource.getBindingInfo("value").parts[2].value;
+                var sText = oInputSource.getBindingInfo("value").parts[3].value;
+                var sTextFormatMode = oInputSource.getProperty("textFormatMode");
+                var sRowPath = oInputSource.oParent.getBindingContext(sModel).sPath;
+                var aDataSource = jQuery.extend(true, [], this.getView().getModel(sDataSourceModel).getData());
+
+                aDataSource.forEach(item => {
+                    if (sTextFormatMode === "ValueKey") {
+                        item.DESCCODE = item[sText] + " (" + item[sKey] + ")";
+                    }
+                    else if (sTextFormatMode === "KeyValue") {
+                        item.CODEDESC = item[sKey] + " (" + item[sText] + ")";
+                    }
+                })
+
+                var aCols = Object.keys(aDataSource[0]).filter(fItem => fItem !== "__metadata");
+                var vColCount = aCols.length;
+
+                var matchedData = aDataSource.filter(function (d) {
+                    for (let i = 0; i < vColCount; i++) {
+                        // check for a match
+                        if (d[aCols[i]] != null) {
+                            if (d[aCols[i]].toString().toLowerCase().indexOf(sValue) !== -1 || !sValue) {
+                                // found match, return true to add to result set
+                                return true;
+                            }
+                        }
+                    }
+                });
+
+                if (matchedData.length !== 0) {
+                    // console.log(matchedData[0][sKey])                    
+                    
+                    if (sTextFormatMode === "ValueKey") {
+                        oInputSource.setValue(matchedData[0][sText] + " (" + matchedData[0][sKey] + ")")
+                    }
+                    else if (sTextFormatMode === "KeyValue") {
+                        oInputSource.setValue(matchedData[0][sKey] + " (" + matchedData[0][sText] + ")")
+                    }
+                    else if (sTextFormatMode === "Key") {
+                        oInputSource.setValue(matchedData[0][sKey])
+                    }
+                    else if (sTextFormatMode === "Value") {
+                        oInputSource.setValue(matchedData[0][sText])
+                    }
+
+                    oInputSource.setSelectedKey(matchedData[0][sKey]);
+                    oInputSource.setValueState("None");
+
+                    this.setValuesAfterInputChange(oInputSource);
+
+                    // this.getView().getModel(sModel).setProperty(sRowPath + '/' + sFieldName, matchedData[0][sKey]);
+                    
+                    // this._validationErrors.forEach((item, index) => {
+                    //     if (item === oEvent.getSource().getId()) {
+                    //         this._validationErrors.splice(index, 1)
+                    //     }
+                    // })
+                }
+                else {
+                    oInputSource.setValueState("Error");
+                    this._validationErrors.push(oEvent.getSource().getId()); 
+                }
+            },
+
+            setValuesAfterInputChange(source) {                
+                var oSource = source;
+                var vValue = oSource.getSelectedKey();
+                var vSuggestKey = oSource.getBindingInfo("value").parts[2].value;
+                var sSuggestRowModel = oSource.getBindingInfo("value").parts[1].value;
+                var sModel = oSource.getBindingInfo("value").parts[0].model;
+                var sRowPath = oSource.oParent.getBindingContext(sModel).sPath;
+                var aSuggestData = [];
+                var oSelectedItem = {};
+                console.log(oSource)
+
+                if (oSource.getSelectedKey() !== "") {
+                    if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') { 
+                        sSuggestRowModel = "attribute"; 
+                        aSuggestData = oSource.getSuggestionRows()[0].getBindingContext(sSuggestRowModel).getModel().getData()[this.getView().getModel(sModel).getProperty(sRowPath + '/MATTYPCLS')];
+                    } 
+                    else {
+                        aSuggestData = oSource.getSuggestionRows()[0].getBindingContext(sSuggestRowModel).getModel().getData();
+                    }
+                }
+
+                oSelectedItem = aSuggestData.filter(fItem => fItem[vSuggestKey] === vValue)[0];
+
+                if (oSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
+                    this.getView().getModel(sModel).setProperty(sRowPath + '/PROCESSCD', (oSelectedItem ? oSelectedItem.Processcd : ""));
+                    // this.setAttributesOnGMCCreate(vValue, this.getView().getModel(sModel).getProperty(sRowPath + "/TMPGMC"));
+                }
+                else if (oSource.getBindingInfo("value").parts[0].path === 'EKWSL') {
+                    if (vValue !== "") {
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTO', oSelectedItem.Uebto);
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/UNTTO', oSelectedItem.Untto);
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTK', oSelectedItem.Uebtk);
+                    }
+                    else {
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTO', "");
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/UNTTO', "");
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/UEBTK', false);
+                    }
+                }
+                else if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') {
+                    if (vValue !== "") {
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/DESCEN', oSelectedItem.Shorttext);
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/DESCZH', oSelectedItem.Shorttext2);
+
+                        if (this.getView().getModel("ui").getData().dataMode === "NEW") {
+                            var sTmpGMC = this.getView().getModel(sModel).getProperty(sRowPath + '/TMPGMC');
+                            this._oTmpAttrib[sTmpGMC] = this.getView().getModel("attributes").getData().results;
+                        }
+                    }
+                    else {
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/DESCEN', "");
+                        this.getView().getModel(sModel).setProperty(sRowPath + '/DESCZH', "");
+                    }
+                }
+                else if (oSource.getBindingInfo("value").parts[0].path === 'BASEUOM') { 
+                    var vEntryUOM = this.getView().getModel(sModel).getProperty(sRowPath + '/ORDERUOM');
+
+                    if (vEntryUOM !== "" && vValue !== vEntryUOM) {
+                        this.convertUOM(vValue, vEntryUOM, sModel, sRowPath);
+                    }
+                }
+                else if (oSource.getBindingInfo("value").parts[0].path === 'ORDERUOM') { 
+                    var vBaseUOM = this.getView().getModel(sModel).getProperty(sRowPath + '/BASEUOM');
+
+                    if (vValue !== "" && vValue !== vBaseUOM) {
+                        this.convertUOM(vBaseUOM, vValue, sModel, sRowPath);
+                    }
+                }
+
+                this.getView().getModel(sModel).setProperty(sRowPath + '/' + oSource.getBindingInfo("value").parts[0].path, vValue);
+                
+                if (oSource.getSelectedKey() === "") { oSource.setSelectedKey(vValue); }
+
+                if (oSource.getBindingInfo("value").parts[0].path === 'MATTYP') {
+                    this.setAttributesOnGMCCreate(vValue, this.getView().getModel(sModel).getProperty(sRowPath + "/TMPGMC"));
+                    this.getView().getModel("ui").setProperty("/activeTmpMattyp", vValue);
+                }
+
+                this.validationErrors.forEach((item, index) => {
+                    if (item === oEvent.getSource().getId()) {
+                        this.validationErrors.splice(index, 1)
+                    }
+                })
             },
 
             convertUOM(baseUOM, entryUOM, tabModel, rowPath) {
@@ -5761,7 +6161,13 @@ sap.ui.define([
             bindAttribute(input) {
                 var me = this;
                 var oRow = this.getView().getModel("attributes").getProperty(input.oParent.getBindingContext("attributes").sPath);
-                var oData = this.getView().getModel("mattypattrib").getData().filter(fItem => fItem.Mattyp === oRow.MATTYP && fItem.Mattypcls === oRow.MATTYPCLS);
+                var vMattyp = oRow.MATTYP;
+
+                if (this.getView().getModel("ui").getProperty("/dataMode") === "EDIT") {
+                    vMattyp = this.getView().getModel("ui").getProperty("/activeMattyp");
+                }
+
+                var oData = this.getView().getModel("mattypattrib").getData().filter(fItem => fItem.Mattyp === vMattyp && fItem.Mattypcls === oRow.MATTYPCLS);
 
                 if (oData.length > 0) {
                     // console.log("bind suggestion table")
@@ -5769,6 +6175,7 @@ sap.ui.define([
 
                     var oCells = [];
                     var oInput = input;
+
                     var oSuggestColumnCount = oInput.getSuggestionColumns().length;
 
                     if (me._oModelColumns["tvh_attrib"] !== undefined) {
@@ -5819,8 +6226,13 @@ sap.ui.define([
                             length: 10000,
                             templateShareable: false
                         }); 
+                        oInput.setShowSuggestion(false);
 
                         oInput.setSuggestionRowValidator(me.suggestionRowValidator);
+
+                        setTimeout(() => {
+                            oInput.setShowSuggestion(true);
+                        }, 1);
                     }
                 }
             },
@@ -6257,7 +6669,7 @@ sap.ui.define([
                         else {
                             var oRow = this.getView().getModel("attributes").getProperty(oEvent.srcControl.oParent.getBindingContext("attributes").sPath);
             
-                            if (oEvent.srcControl.getBindingInfo("suggestionRows") == undefined) {
+                            if (oEvent.srcControl.getBindingInfo("suggestionRows") === undefined) {
                                 this.bindAttribute(oEvent.srcControl);
                             }
                             else {
@@ -6265,6 +6677,18 @@ sap.ui.define([
                                     this.bindAttribute(oEvent.srcControl);
                                 }
                             }
+                        }
+                    }
+                }
+                else {
+                    var oRow = this.getView().getModel("attributes").getProperty(oEvent.srcControl.oParent.getBindingContext("attributes").sPath);
+
+                    if (oEvent.srcControl.getBindingInfo("suggestionRows") === undefined) {
+                        this.bindAttribute(oEvent.srcControl);
+                    }
+                    else {
+                        if (oEvent.srcControl.getBindingInfo("suggestionRows").path.replace("/", "") !== oRow.MATTYPCLS) {
+                            this.bindAttribute(oEvent.srcControl);
                         }
                     }
                 }
@@ -6345,6 +6769,7 @@ sap.ui.define([
                     this.byId("btnTabLayoutGMC").setVisible(true);
                     this.byId("btnDataWrapGMC").setVisible(true);
                     this.byId("cboxSBU").setEnabled(true);
+                    this.byId("smartFilterBar").setVisible(true);
                     // this.onTableResize("Hdr","Min");
                     this.setScreenSize("header", false, "50%", "50%");
                     this.setRowReadMode("gmc");
@@ -6864,6 +7289,30 @@ sap.ui.define([
                 }
             },
 
+            onInputSuggest: function(oEvent) {
+                //override the default filtering "StartsWidth" to "Contains"
+                var oInputSource = oEvent.getSource();
+                var sSuggestValue = oEvent.getParameter("suggestValue").toLowerCase();
+                var aFilters = [];
+                var oFilter = null;
+                
+                if (oInputSource.getSuggestionRows().length === 0){
+                    oInputSource.getBinding("suggestionRows").filter(null);
+                }
+                
+                if (oInputSource.getSuggestionRows().length > 0) {
+                    oInputSource.getSuggestionRows()[0].getCells().forEach(cell => {
+                        aFilters.push(new Filter(cell.getBinding("text").sPath, FilterOperator.Contains, sSuggestValue))
+                    })
+    
+                    oFilter = new Filter(aFilters, false);
+    
+                    oInputSource.getBinding("suggestionRows").filter(oFilter);
+                    oInputSource.setShowSuggestion(true);
+                    oInputSource.setFilterSuggests(false);
+                }
+            },
+
             //******************************************* */
             // Column Filtering
             //******************************************* */
@@ -6903,6 +7352,22 @@ sap.ui.define([
             onRemoveColFilter: function(oEvent) {
                 TableFilter.onRemoveColFilter(oEvent, this);
             },
+
+            //******************************************* */
+            // Smart Filter
+            //******************************************* */
+
+            beforeVariantFetch: function(oEvent) {
+                SmartFilterCustomControl.beforeVariantFetch(this);
+            },
+
+            afterVariantLoad: function(oEvent) {
+                SmartFilterCustomControl.afterVariantLoad(this);
+            },
+
+            clearSmartFilters: function(oEvent) {
+                SmartFilterCustomControl.clearSmartFilters(this);
+            }
 
         });
     });
