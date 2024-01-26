@@ -1267,9 +1267,9 @@ sap.ui.define([
         isSorted: function(sTableId, sColumnName, oThis) {
             var me = oThis;
             var bSorted = false;
-            console.log(sColumnName)
+            // console.log(sColumnName)
             var oColumnProp = me.byId(sTableId).getColumns().filter(fItem => fItem.getProperty("name") === sColumnName)[0];
-            console.log(me.byId(sTableId).getColumns())
+            // console.log(me.byId(sTableId).getColumns())
             if (oColumnProp.getProperty("sorted")) {
                 bSorted = true;
             }

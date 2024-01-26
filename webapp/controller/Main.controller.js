@@ -1537,58 +1537,67 @@ sap.ui.define([
                 //date/number sorting
                 table.attachSort(function(oEvent) {
                     var sPath = oEvent.getParameter("column").getSortProperty();
-                    var bDescending = false;
-                    
-                    table.getColumns().forEach(col => {
-                        if (col.getSorted()) {
-                            col.setSorted(false);
+                    var bMultiSort = oEvent.getParameter("columnAdded");
+                    var bDescending, sSortOrder, oSorter, oColumn, columnType;
+                    var aSorts = [];
+
+                    if (!bMultiSort) {
+                        table.getColumns().forEach(col => {
+                            if (col.getSorted()) {
+                                col.setSorted(false);
+                            }
+                        })
+                    }
+
+                    table.getSortedColumns().forEach(col => {
+                        if (col.getProperty("name") === sPath) {
+                            sSortOrder = oEvent.getParameter("sortOrder");
+                            oEvent.getParameter("column").setSorted(true); //sort icon indicator
+                            oEvent.getParameter("column").setSortOrder(sSortOrder); //set sort order                          
                         }
+                        else {
+                            sSortOrder = col.getProperty("sortOrder");
+                        }
+
+                        bDescending = (sSortOrder === "Descending" ? true : false);
+                        oSorter = new sap.ui.model.Sorter(col.getProperty("name"), bDescending); //sorter(columnData, If Ascending(false) or Descending(True))
+                        oColumn = aColumns.filter(fItem => fItem.ColumnName === col.getProperty("name"));
+                        columnType = oColumn[0].DataType;
+
+                        if (columnType === "DATETIME") {
+                            oSorter.fnCompare = function(a, b) {
+                                // parse to Date object
+                                var aDate = new Date(a);
+                                var bDate = new Date(b);
+    
+                                if (bDate === null) { return -1; }
+                                if (aDate === null) { return 1; }
+                                if (aDate < bDate) { return -1; }
+                                if (aDate > bDate) { return 1; }
+    
+                                return 0;
+                            };
+                        }
+                        else if (columnType === "NUMBER") {
+                            oSorter.fnCompare = function(a, b) {
+                                // parse to Date object
+                                var aNumber = +a;
+                                var bNumber = +b;
+    
+                                if (bNumber === null) { return -1; }
+                                if (aNumber === null) { return 1; }
+                                if (aNumber < bNumber) { return -1; }
+                                if (aNumber > bNumber) { return 1; }
+    
+                                return 0;
+                            };
+                        }
+
+                        aSorts.push(oSorter);
                     })
-                    
-                    oEvent.getParameter("column").setSorted(true); //sort icon initiator
 
-                    if (oEvent.getParameter("sortOrder") === "Descending") {
-                        bDescending = true;
-                        oEvent.getParameter("column").setSortOrder("Descending") //sort icon Descending
-                    }
-                    else {
-                        oEvent.getParameter("column").setSortOrder("Ascending") //sort icon Ascending
-                    }
+                    table.getBinding('rows').sort(aSorts);
 
-                    var oSorter = new sap.ui.model.Sorter(sPath, bDescending ); //sorter(columnData, If Ascending(false) or Descending(True))
-                    var oColumn = aColumns.filter(fItem => fItem.ColumnName === oEvent.getParameter("column").getProperty("sortProperty"));
-                    var columnType = oColumn[0].DataType;
-
-                    if (columnType === "DATETIME") {
-                        oSorter.fnCompare = function(a, b) {
-                            // parse to Date object
-                            var aDate = new Date(a);
-                            var bDate = new Date(b);
-
-                            if (bDate === null) { return -1; }
-                            if (aDate === null) { return 1; }
-                            if (aDate < bDate) { return -1; }
-                            if (aDate > bDate) { return 1; }
-
-                            return 0;
-                        };
-                    }
-                    else if (columnType === "NUMBER") {
-                        oSorter.fnCompare = function(a, b) {
-                            // parse to Date object
-                            var aNumber = +a;
-                            var bNumber = +b;
-
-                            if (bNumber === null) { return -1; }
-                            if (aNumber === null) { return 1; }
-                            if (aNumber < bNumber) { return -1; }
-                            if (aNumber > bNumber) { return 1; }
-
-                            return 0;
-                        };
-                    }
-                    
-                    table.getBinding('rows').sort(oSorter);
                     // prevent internal sorting by table
                     oEvent.preventDefault();
                 });
@@ -1686,7 +1695,7 @@ sap.ui.define([
                 var oSecondPane = oSplitter.getRootPaneContainer().getPanes().at(1);
                 var vFullScreen = oEvent.getSource().data("Fullscreen") === "1" ? true : false;
                 var vPart = oEvent.getSource().data("Part");
-                console.log(oSplitter)
+
                 this._sActiveTable = oEvent.getSource().data("TableId");
                 this.getView().getModel("ui").setProperty("/fullscreen/" + vPart, vFullScreen);
 
@@ -4746,7 +4755,7 @@ sap.ui.define([
                 var sSortOrder = oEvent.getParameters().sortOrder;
                 var bMultiSort = oEvent.getParameters().columnAdded;
                 var oSortData = this._aSortableColumns[oEvent.getSource().getBindingInfo("rows").model];
-
+                // console.log(oEvent.getParameters())
                 if (!bMultiSort) {
                     oSortData.forEach(item => {
                         if (item.name === sColumnName) {

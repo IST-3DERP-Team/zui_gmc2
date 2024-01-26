@@ -18,7 +18,8 @@
         </dependents>
         <content>
             <VBox fitContainer="true">
-                <smartfilterbar:SmartFilterBar id="smartFilterBar" entitySet="ZVB_3DERP_GMC_FILTERS" search="onSearch" persistencyKey="3DERP_GMCPKey" showClearOnFB="true" beforeVariantFetch="beforeVariantFetch" afterVariantLoad="afterVariantLoad" clear="clearSmartFilters">
+                <smartfilterbar:SmartFilterBar id="smartFilterBar" entitySet="ZVB_3DERP_GMC_FILTERS" search="onSearch" persistencyKey="3DERP_GMCPKey" showClearOnFB="true" 
+                    beforeVariantFetch="beforeVariantFetch" afterVariantLoad="afterVariantLoad" clear="clearSmartFilters">
                     <smartfilterbar:controlConfiguration>
                         <smartfilterbar:ControlConfiguration key="SBU" label="{ddtext>/SBU}" groupId="_BASIC" mandatory="mandatory" width="50px">
                             <smartfilterbar:customControl>
