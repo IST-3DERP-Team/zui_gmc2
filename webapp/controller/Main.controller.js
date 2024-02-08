@@ -58,6 +58,11 @@ sap.ui.define([
                     activeTmpGmc: '',
                     activeMattyp: '',
                     activeTmpMattyp: '',
+                    activeMatClass: '',
+                    activeMatClassSeq: '',
+                    activeMatAttrib: '',
+                    rowCountMatClass: 0,
+                    rowCountMatAttrib: 0,
                     sbu: '',
                     currsbu: '',
                     dataMode: 'INIT',
@@ -269,6 +274,11 @@ sap.ui.define([
                 oDDTextParam.push({CODE: "INFO_SEL_RECORD_TO_REMOVE"}); 
                 oDDTextParam.push({CODE: "INFO_NO_RECORD_TO_REMOVE"}); 
                 oDDTextParam.push({CODE: "INFO_NO_DATA_EDIT"}); 
+                oDDTextParam.push({CODE: "MATTYPCLSF"}); 
+                oDDTextParam.push({CODE: "MATATTRIB"}); 
+                oDDTextParam.push({CODE: "MATTYPE"}); 
+                oDDTextParam.push({CODE: "ITEMS"}); 
+                oDDTextParam.push({CODE: "INFO_CREATE_DATA_NOT_ALLOW"});
 
                 oModelCaps.create("/CaptionMsgSet", { CaptionMsgItems: oDDTextParam  }, {
                     method: "POST",
@@ -362,6 +372,8 @@ sap.ui.define([
                 this.getGMCDescZHAuth();
                 this.getResources();
                 // this.byId("splitterMain").setProperty("height", "99%");
+
+                this.initMatAttrib();
             },
 
             _onPatternMatched : function (oEvent) {
@@ -602,6 +614,8 @@ sap.ui.define([
                 this.getView().getModel("ui").setProperty("/dataMode", "READ");
                 this._dataMode = "READ";
                 this._sbuChange = false;
+
+                this.onShowAttrib();
             },
 
             async getGMC() {
@@ -1190,6 +1204,22 @@ sap.ui.define([
                                 me._aFilterableColumns["cusmat"] = aColumns["filterableColumns"];
                                 me.addColumns(me.byId("cusmatTab"), aColumns["columns"], "cusmat");
                             }
+                            else if (modCode === 'MATCLASSMOD') {
+                                var aColumns = me.setTableColumns(oColumns["matClass"], oData.results);                               
+                                me._aColumns["matClass"] = aColumns["columns"];
+                                me._aSortableColumns["matClass"] = aColumns["sortableColumns"];
+                                me._aFilterableColumns["matClass"] = aColumns["filterableColumns"]; 
+                                me.addColumns(sap.ui.getCore().byId("matClassTab"), aColumns["columns"], "matClass");
+                                me.setRowReadMode("matClass");
+                            }
+                            else if (modCode === 'MATATTRIBMOD') {
+                                var aColumns = me.setTableColumns(oColumns["matAttrib"], oData.results);                               
+                                me._aColumns["matAttrib"] = aColumns["columns"];
+                                me._aSortableColumns["matAttrib"] = aColumns["sortableColumns"];
+                                me._aFilterableColumns["matAttrib"] = aColumns["filterableColumns"]; 
+                                me.addColumns(sap.ui.getCore().byId("matAttribTab"), aColumns["columns"], "matAttrib");
+                                me.setRowReadMode("matAttrib");
+                            }
                         }
                     },
                     error: function (err) {
@@ -1199,7 +1229,7 @@ sap.ui.define([
             },
 
             setTableColumns: function(arg1, arg2, arg3) {
-                var oColumn = arg1;
+                var oColumn = (arg1 ? arg1 : []);
                 var oMetadata = arg2;
                 
                 var aSortableColumns = [];
@@ -1428,7 +1458,7 @@ sap.ui.define([
                             tooltip: "{" + model + ">" + col.name + "}"
                         })
                         
-                        if (col.ValueHelp && col.ValueHelp["items"].text && col.ValueHelp["items"].value !== col.ValueHelp["items"].text &&
+                        if (!(model == "matClass" || model == "matAttrib") && col.ValueHelp && col.ValueHelp["items"].text && col.ValueHelp["items"].value !== col.ValueHelp["items"].text &&
                             col.TextFormatMode && col.TextFormatMode !== "Key") {
                             oText.bindText({  
                                 parts: [  
@@ -1602,7 +1632,9 @@ sap.ui.define([
                     oEvent.preventDefault();
                 });
 
-                TableFilter.updateColumnMenu(model + "Tab", this);
+                if (!(model == "matClass" || model == "matAttrib")) {
+                    TableFilter.updateColumnMenu(model + "Tab", this);
+                }
             },
 
             onAddColumns(table, columns, model) {
@@ -4783,6 +4815,12 @@ sap.ui.define([
                 else if (oTable.getId().indexOf("cusmatTab") >= 0) {
                     sModel = "cusmat";
                 }
+                else if (oTable.getId().indexOf("matClassTab") >= 0) {
+                    sModel = "matClass";
+                }
+                else if (oTable.getId().indexOf("matAttribTab") >= 0) {
+                    sModel = "matAttrib";
+                }
 
                 this.setActiveRowHighlight(sModel);               
             },
@@ -5581,7 +5619,14 @@ sap.ui.define([
 
             setRowReadMode(arg) {
                 var me = this;
-                var oTable = this.byId(arg + "Tab");
+                var oTable;
+                
+                if (arg == "matClass" || arg == "matAttrib") {
+                    oTable = sap.ui.getCore().byId(arg + "Tab");
+                }
+                else {
+                    oTable = this.byId(arg + "Tab");
+                }
 
                 oTable.getColumns().forEach((col, idx) => {                    
                     this._aColumns[arg].filter(item => item.label === col.getLabel().getText())
@@ -7005,6 +7050,12 @@ sap.ui.define([
                 else if (oTable.getId().indexOf("cusmatTab") >= 0) {
                     sModel = "cusmat";
                 }
+                else if (oTable.getId().indexOf("matClassTab") >= 0) {
+                    sModel = "matClass";
+                }
+                else if (oTable.getId().indexOf("matAttribTab") >= 0) {
+                    sModel = "matAttrib";
+                }
 
                 setTimeout(() => {
                     var oData = oTable.getModel(sModel).getData().results;
@@ -7044,17 +7095,28 @@ sap.ui.define([
                 else if (oTable.getId().indexOf("cusmatTab") >= 0) {
                     sModel = "cusmat";
                 }
+                else if (oTable.getId().indexOf("matClassTab") >= 0) {
+                    sModel = "matClass";
+                }
+                else if (oTable.getId().indexOf("matAttribTab") >= 0) {
+                    sModel = "matAttrib";
+                }
 
                 this.setActiveRowHighlight(sModel);
             },
 
             setActiveRowHighlight(arg) {
-                var oTable = this.byId(arg + "Tab");
+                var oTable;
+                if (arg == "matClass" || arg == "matAttrib") {
+                    oTable = sap.ui.getCore().byId(arg + "Tab");
+                } else {
+                    oTable = this.byId(arg + "Tab");
+                }
                 
                 setTimeout(() => {
                     if (oTable.getModel(arg) !== undefined) {
                         var iActiveRowIndex = oTable.getModel(arg).getData().results.findIndex(item => item.ACTIVE === "X");
-
+                        
                         oTable.getRows().forEach(row => {
                             if (row.getBindingContext(arg) && +row.getBindingContext(arg).sPath.replace("/results/", "") === iActiveRowIndex) {
                                 row.addStyleClass("activeRow");
@@ -7082,6 +7144,12 @@ sap.ui.define([
                     }
                     else if (oTable.getId().indexOf("cusmatTab") >= 0) {
                         sModel = "cusmat";
+                    }
+                    else if (oTable.getId().indexOf("matClassTab") >= 0) {
+                        sModel = "matClass";
+                    }
+                    else if (oTable.getId().indexOf("matAttribTab") >= 0) {
+                        sModel = "matAttrib";
                     }
     
                     oTable.getModel(sModel).getData().results.forEach(row => row.ACTIVE = "");
@@ -7376,7 +7444,359 @@ sap.ui.define([
 
             clearSmartFilters: function(oEvent) {
                 SmartFilterCustomControl.clearSmartFilters(this);
-            }
+            },
+
+            initMatAttrib() {
+                this._MatAttribDialog = sap.ui.xmlfragment("zuigmc2.view.MatAttribDialog", this);
+                this._MatAttribDialog.setModel(
+                    new JSONModel({
+                        items: [],
+                        rowCount: 0
+                    })
+                )
+                this.getView().addDependent(this._MatAttribDialog);
+
+                this.getDynamicColumns({}, "MATCLASSMOD", "ZERP_MATTYPCLS");
+                this.getDynamicColumns({}, "MATATTRIBMOD", "ZERP_MATTYPATRB");
+            },
+
+            onShowAttrib() {
+                this.getMatClass();
+                this._MatAttribDialog.open();
+            },
+
+            onCloseAttrib() {
+                this._MatAttribDialog.close();
+            },
+
+            getMatClass() {
+                var me = this;
+                me.showLoadingDialog();
+
+                var oModel = this.getOwnerComponent().getModel();
+                this.getView().getModel("ui").setProperty("/activeTmpMattyp", "ZFAB"); // temporary
+                var sMatType = this.getView().getModel("ui").getData().activeTmpMattyp;
+
+                oModel.read('/MatClassSet', { 
+                    urlParameters: {
+                        "$filter": "MATTYP eq '" + sMatType + "'"
+                    },
+                    success: function (data, response) {
+                        console.log("MatClassSet", data)
+
+                        data.results.forEach((item, idx) => {
+                            if (item.CREATEDDT !== null) item.CREATEDDT = dateFormat.format(item.CREATEDDT);
+                            if (item.UPDATEDDT !== null) item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
+
+                            if (idx == 0) {
+                                item.ACTIVE = "X";
+                            }
+                            else {
+                                item.ACTIVE = "";
+                            }
+                        })
+                        
+                        var oJSONModel = new sap.ui.model.json.JSONModel();
+                        oJSONModel.setData(data);
+                        me.getView().setModel(oJSONModel, "matClass");
+
+                        if (data.results.length > 0) {
+                            me.getView().getModel("ui").setProperty("/activeMatClass", data.results[0].MATTYPCLS);
+                            me.getView().getModel("ui").setProperty("/activeMatClassSeq", data.results[0].SEQ);
+                            me.getView().getModel("ui").setProperty("/rowCountMatClass", data.results.length);
+    
+                            setTimeout(() => {
+                                me.setActiveRowHighlight("matClass");
+                            }, 1000);
+                        }
+
+                        me.closeLoadingDialog();
+                    },
+                    error: function (err) { 
+                        me.closeLoadingDialog();
+                    }
+                })
+            },
+
+            getMatAttrib() {
+                var me = this;
+
+                var oModel = this.getOwnerComponent().getModel();
+                var sMatType = this.getView().getModel("ui").getData().activeTmpMattyp;
+                var sMatClass = this.getView().getModel("ui").getData().activeMatClass;
+
+                oModel.read('/MatAttribSet', { 
+                    urlParameters: {
+                        "$filter": "MATTYP eq '" + sMatType + "' and MATTYPCLS eq '" + sMatClass + "'"
+                    },
+                    success: function (data, response) {
+                        console.log("MatAttribSet", data)
+
+                        data.results.forEach((item, idx) => {
+                            if (item.CREATEDDT !== null) item.CREATEDDT = dateFormat.format(item.CREATEDDT);
+                            if (item.UPDATEDDT !== null) item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
+
+                            if (idx == 0) {
+                                item.ACTIVE = "X";
+                            }
+                            else {
+                                item.ACTIVE = "";
+                            }
+                        })
+                        
+                        var oJSONModel = new sap.ui.model.json.JSONModel();
+                        oJSONModel.setData(data);
+                        me.getView().setModel(oJSONModel, "matAttrib");
+
+                        if (data.results.length > 0) {
+                            me.getView().getModel("ui").setProperty("/activeMatAttrib", data.results[0].ATTRIBCD);
+                            me.getView().getModel("ui").setProperty("/rowCountMatAttrib", data.results.length);
+    
+                            setTimeout(() => {
+                                me.setActiveRowHighlight("matAttrib");
+                            }, 1000);
+                        }
+
+                        me.closeLoadingDialog();
+                    },
+                    error: function (err) { 
+                        me.closeLoadingDialog();
+                    }
+                })
+            },
+
+            onRefreshMatClass() {
+                this.getMatClass();
+            },
+
+            onAddMatAttrib() {
+                var sMatType = this.getView().getModel("ui").getData().activeTmpMattyp;
+                var sMatClass = this.getView().getModel("ui").getData().activeMatClass;
+                var sMatClassSeq = this.getView().getModel("ui").getData().activeMatClassSeq;
+                
+                var bAttrib = this.getView().getModel("matClass").getData().results.filter(
+                    x => x.MATTYP == sMatType && x.MATTYPCLS == sMatClass && x.SEQ == sMatClassSeq)[0].ATTRIB;
+
+                if (bAttrib) {
+                    sap.ui.getCore().byId("btnAddMatAttrib").setVisible(false);
+                    sap.ui.getCore().byId("btnEditMatAttrib").setVisible(false);
+                    sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(true);
+                    sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(true);
+                    sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(true);
+                    sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(true);
+                    sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(false);
+                    sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(false);
+                    
+                    this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("matAttrib").getData());
+                    this.setRowCreateMode("matAttrib");
+                } else {
+                    MessageBox.warning(this.getView().getModel("ddtext").getData()["INFO_CREATE_DATA_NOT_ALLOW"]);
+                }
+            },
+
+            onAddRow(pModel) {
+                this.setRowCreateMode(pModel);
+            },
+
+            onRemoveRow(pModel) {
+                var oTable;
+                if (pModel == "matClass" || pModel == "matAttrib") {
+                    oTable = sap.ui.getCore().byId(pModel + "Tab");
+                } else {
+                    oTable = this.byId(pModel + "Tab");
+                }
+                
+                var aNewRows = this.getView().getModel(pModel).getData().results.filter(item => item.NEW === true);
+                aNewRows.splice(oTable.getSelectedIndices(), 1);
+                this.getView().getModel(pModel).setProperty("/results", aNewRows);
+            },
+
+            setRowCreateMode(pModel) {
+                var me = this;
+
+                var oInputEventDelegate = {
+                    onkeydown: function(oEvent){
+                        me.onInputKeyDown(oEvent);
+                    },
+                };
+    
+                var oTable;
+                if (pModel == "matClass" || pModel == "matAttrib") {
+                    oTable = sap.ui.getCore().byId(pModel + "Tab");
+                } else {
+                    oTable = this.byId(pModel + "Tab");
+                }
+
+                oTable.clearSelection();
+    
+                var oNewRow = {};
+                oTable.getColumns().forEach((col, idx) => {
+                    var sColName = "";
+    
+                    if (col.mAggregations.template.mBindingInfos.text !== undefined) {
+                        sColName = col.mAggregations.template.mBindingInfos.text.parts[0].path;
+                    }
+                    else if (col.mAggregations.template.mBindingInfos.selected !== undefined) {
+                        sColName = col.mAggregations.template.mBindingInfos.selected.parts[0].path;
+                    }
+                    else if (col.mAggregations.template.mBindingInfos.value !== undefined) {
+                        sColName = col.mAggregations.template.mBindingInfos.value.parts[0].path;
+                    }
+                    
+                    me._aColumns[pModel].filter(item => item.ColumnName === sColName)
+                        .forEach(ci => {
+                            if (ci.creatable) {
+                                if (ci.ValueHelp["show"]) {
+                                    var bValueFormatter = false;
+                                    var sSuggestItemText = ci.ValueHelp["SuggestionItems"].text;
+                                    var sSuggestItemAddtlText = ci.ValueHelp["SuggestionItems"].additionalText !== undefined ? ci.ValueHelp["SuggestionItems"].additionalText : '';                                    
+                                    var sTextFormatMode = "Key";
+    
+                                    if (ci.TextFormatMode && ci.TextFormatMode !== "" && ci.TextFormatMode !== "Key" && ci.ValueHelp["items"].value !== ci.ValueHelp["items"].text) {
+                                        sTextFormatMode = ci.TextFormatMode;
+                                        bValueFormatter = true;
+    
+                                        if (ci.ValueHelp["SuggestionItems"].additionalText && ci.ValueHelp["SuggestionItems"].text !== ci.ValueHelp["SuggestionItems"].additionalText) {
+                                            if (sTextFormatMode === "ValueKey" || sTextFormatMode === "Value") {
+                                                sSuggestItemText = ci.ValueHelp["SuggestionItems"].additionalText;
+                                                sSuggestItemAddtlText = ci.ValueHelp["SuggestionItems"].text;
+                                            }
+                                        }
+                                    }
+                                    
+                                    var oInput = new sap.m.Input({
+                                        type: "Text",
+                                        showValueHelp: true,
+                                        valueHelpRequest: TableValueHelp.handleTableValueHelp.bind(this),
+                                        showSuggestion: true,
+                                        maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].additionalText !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
+                                        suggestionItems: {
+                                            path: ci.ValueHelp["SuggestionItems"].path,
+                                            length: 10000,
+                                            template: new sap.ui.core.ListItem({
+                                                key: ci.ValueHelp["SuggestionItems"].text,
+                                                text: sSuggestItemText,
+                                                additionalText: sSuggestItemAddtlText,
+                                            }),
+                                            templateShareable: false
+                                        },
+                                        change: this.onValueHelpInputChange.bind(this)
+                                    })
+    
+                                    if (bValueFormatter) {
+                                        oInput.setProperty("textFormatMode", sTextFormatMode)
+    
+                                        oInput.bindValue({  
+                                            parts: [{ path: pModel + ">" + sColName }, { value: ci.ValueHelp["items"].path }, { value: ci.ValueHelp["items"].value }, { value: ci.ValueHelp["items"].text }, { value: sTextFormatMode }],
+                                            formatter: this.formatValueHelp.bind(this)
+                                        });
+                                    }
+                                    else {
+                                        oInput.bindValue({  
+                                            parts: [  
+                                                { path: pModel + ">" + sColName }
+                                            ]
+                                        });
+                                    }
+    
+                                    oInput.addEventDelegate(oInputEventDelegate);
+                                    col.setTemplate(oInput);
+                                }
+                                else if (ci.DataType === "BOOLEAN") {
+                                    col.setTemplate(new sap.m.CheckBox({selected: "{" + pModel + ">" + sColName + "}",  
+                                        select: this.onCheckBoxChange.bind(this),
+                                        editable: true
+                                    }));
+                                }
+                                else if (ci.DataType === "NUMBER") {
+                                    col.setTemplate(new sap.m.Input({
+                                        type: sap.m.InputType.Number,
+                                        textAlign: sap.ui.core.TextAlign.Right,
+                                        // value: "{" + pModel + ">" + sColName + "}",
+                                        value: "{path:'" + pModel + ">" + sColName + "', formatOptions:{ minFractionDigits:" + ci.scale + ", maxFractionDigits:" + ci.scale + " }, constraints:{ precision:" + ci.precision + ", scale:" + ci.scale + " }}",
+                                        liveChange: this.onNumberLiveChange.bind(this), 
+                                        enabled: true
+                                    }).addEventDelegate(oInputEventDelegate));
+                                }
+                                else if (ci.DataType === "DATE") {
+                                    col.setTemplate(new sap.m.DatePicker({
+                                        value: "{" + pModel + ">" + sColName + "}",
+                                        displayFormat: "MM/dd/yyyy",
+                                        valueFormat: "MM/dd/yyyy",
+                                        change: this.onDateChange.bind(this),
+                                        navigate: this.onClickDate.bind(this)
+                                    }))
+                                }
+                                else {
+                                    col.setTemplate(new sap.m.Input({
+                                        value: "{" + pModel + ">" + sColName + "}",
+                                        liveChange: this.onInputLiveChange.bind(this)
+                                    }).addEventDelegate(oInputEventDelegate));
+                                }
+                            }
+    
+                            if (ci.Mandatory) {
+                                col.getLabel().addStyleClass("sapMLabelRequired");
+                                col.getLabel().addStyleClass("requiredField");
+                            }
+    
+                            if (ci.DataType === "STRING") oNewRow[ci.name] = "";
+                            //else if (ci.DataType === "NUMBER") oNewRow[ci.name] = "0";
+                            else if (ci.DataType === "BOOLEAN") oNewRow[ci.name] = false;
+                        })                
+                })
+    
+                oNewRow["NEW"] = true;
+    
+                var aNewRows = me.getView().getModel(pModel).getData().results.filter(item => item.NEW === true);
+    
+                if (pModel == "matAttrib") {
+                    var iMaxAttrib = 0;
+                    var iMaxAttrib1 = 0;
+                    var iMaxAttrib2 = 0;
+                    
+                    if (me._oDataBeforeChange.results.length > 0) {
+                        iMaxAttrib1 = Math.max(...me._oDataBeforeChange.results.map(item => item.ATTRIBCD));
+                    }
+                    
+                    if (aNewRows.length > 0) {
+                        iMaxAttrib2 = Math.max(...aNewRows.map(item => item.ATTRIBCD));
+                    }
+                    
+                    iMaxAttrib = (iMaxAttrib1 > iMaxAttrib2 ? iMaxAttrib1 : iMaxAttrib2) + 1;
+                    oNewRow["ATTRIBCD"] = iMaxAttrib.toString().padStart(7, "0");
+                }
+
+                aNewRows.push(oNewRow);
+                me.getView().getModel(pModel).setProperty("/results", aNewRows);
+                
+                oTable.getBinding("rows").filter(null, "Application");
+            },
+
+            onCellClickMatClass(oEvent) {
+                var sMatClass = oEvent.getParameters().rowBindingContext.getObject().MATTYPCLS;
+                var sMatClassSeq = oEvent.getParameters().rowBindingContext.getObject().SEQ;
+
+                this.getView().getModel("ui").setProperty("/activeMatClass", sMatClass);
+                this.getView().getModel("ui").setProperty("/activeMatClassSeq", sMatClassSeq);
+
+                this.onCellClick(oEvent);
+            },
+
+            onTabSelect(oEvent) {
+                this._selectedTabKey = oEvent.getParameters().selectedKey;
+                if (this._selectedTabKey == "matAttrib") {
+                    this.getMatAttrib();
+                }
+            },
+
+            onCheckBoxChange: function(oEvent) {
+                const oSource = oEvent.getSource();
+
+                var sRowPath = oSource.getBindingInfo("selected").binding.oContext.sPath;
+                var sModel = oSource.getBindingInfo("selected").parts[0].model;
+                this.getView().getModel(sModel).setProperty(sRowPath + '/EDITED', true);
+            },
 
         });
     });

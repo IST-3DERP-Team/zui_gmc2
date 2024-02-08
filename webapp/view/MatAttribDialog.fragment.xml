@@ -1,0 +1,119 @@
+<core:FragmentDefinition
+		xmlns="sap.m"
+        xmlns:f="sap.ui.layout.form"
+		xmlns:core="sap.ui.core"
+        xmlns:uiT="sap.ui.table"
+        xmlns:uiL="sap.ui.layout"
+        fragmentName="fragment1">
+    <Dialog contentWidth="1300px"
+        contentHeight="350px"
+        title=""
+        resizable="true"
+        draggable="true">
+        <endButton>
+			<Button text="Close" press="onCloseAttrib"/>
+		</endButton>
+
+        <IconTabBar id="itbMatAttrib" 
+            headerMode="Inline"
+            expanded="{device>/isNoPhone}" 
+            expandable="false" 
+            stretchContentHeight="true" 
+            applyContentPadding="false"
+            select="onTabSelect">
+            <items>
+                <IconTabFilter id="itfMatClassDetail" text="Material Classification" key="matClass">
+                    <uiT:Table id="matClassTab"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                        rows="{matClass>/results}"
+                        visibleRowCountMode="Auto"
+                        showColumnVisibilityMenu="true"
+                        enableColumnFreeze="true"
+                        enableCellFilter="true"
+                        selectionMode="Single"
+                        selectionBehavior="RowSelector"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        cellClick="onCellClickMatClass"
+                        sort="onSorted"
+                        filter="onFilter"
+                        columnFreeze="onColumnUpdated"
+                        columnMove="onColumnUpdated"
+                        columnResize="onColumnUpdated"
+                        columnSelect="onColumnUpdated"
+                        columnVisibility="onColumnUpdated">
+                        <uiT:extension>
+                            <OverflowToolbar>
+                                <Text text="{ddtext>/MATTYPE}: {ui>/activeTmpMattyp} ( {ui>/rowCountMatClass} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
+                                <ToolbarSpacer/>
+                                <Button id="btnRefreshMatClass" 
+                                    icon="sap-icon://refresh"
+                                    press="onRefreshMatClass"
+                                    visible="true"/> 
+                            </OverflowToolbar>
+                        </uiT:extension>
+                    </uiT:Table>
+                </IconTabFilter>
+                <IconTabFilter id="itfMatAttrib" text="{ddtext>/MATATTRIB}" key="matAttrib">
+                    <uiT:Table id="matAttribTab"
+                        class="sapUiTinyMarginBottom sapUiTinyMarginBegin sapUiTinyMarginEnd"
+                        rows="{matAttrib>/results}"
+                        visibleRowCountMode="Auto"
+                        showColumnVisibilityMenu="true"
+                        enableColumnFreeze="true"
+                        enableCellFilter="true"
+                        selectionMode="Single"
+                        selectionBehavior="RowSelector"
+                        firstVisibleRowChanged="onFirstVisibleRowChanged"
+                        cellClick="onCellClickMatAttrib"
+                        sort="onSorted"
+                        filter="onFilter"
+                        columnFreeze="onColumnUpdated"
+                        columnMove="onColumnUpdated"
+                        columnResize="onColumnUpdated"
+                        columnSelect="onColumnUpdated"
+                        columnVisibility="onColumnUpdated">
+                        <uiT:extension>
+                            <OverflowToolbar>
+                                <Text text="{ddtext>/MATTYPE}: {ui>/activeTmpMattyp}, {ddtext>/MATTYPCLS}: {ui>/activeMatClass} ( {ui>/rowCountMatAttrib} {ddtext>/ITEMS} )" class="selHdrKeyFontStyle" />
+                                <ToolbarSpacer/>
+                                <Button id="btnAddMatAttrib" 
+                                    icon="sap-icon://add"
+                                    press="onAddMatAttrib"
+                                    visible="true"/>
+                                <Button id="btnEditMatAttrib" 
+                                    icon="sap-icon://edit"
+                                    press="onEditMatAttrib"
+                                    tooltip="Edit"
+                                    visible="true"/>
+                                <Button id="btnAddRowMatAttrib" 
+                                    icon="sap-icon://add"
+                                    press="onAddRow('matAttrib')"
+                                    visible="false" />
+                                <Button id="btnRemoveRowMatAttrib" 
+                                    icon="sap-icon://less"
+                                    press="onRemoveRow('matAttrib')"
+                                    visible="false" />
+                                <Button id="btnSaveMatAttrib" 
+                                    icon="sap-icon://save"
+                                    press="onSave('matAttrib')"
+                                    visible="false" />
+                                <Button id="btnCancelMatAttrib" 
+                                    icon="sap-icon://sys-cancel"
+                                    press="onCancelMatAttrib" 
+                                    visible="false" />                                        
+                                <Button id="btnDeleteMatAttrib" 
+                                    icon="sap-icon://delete"
+                                    press="onDeleteMatAttrib"
+                                    visible="true"/>
+                                <Button id="btnRefreshMatAttrib" 
+                                    icon="sap-icon://refresh"
+                                    press="onRefreshMatAttrib"
+                                    visible="true"/> 
+                            </OverflowToolbar>
+                        </uiT:extension>
+                    </uiT:Table>
+                </IconTabFilter>
+            </items>
+        </IconTabBar>  
+    </Dialog>
+</core:FragmentDefinition>

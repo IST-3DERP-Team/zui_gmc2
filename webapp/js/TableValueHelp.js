@@ -434,10 +434,20 @@ sap.ui.define([
                 // sap.ui.getCore().byId("tvhSearchField").attachSearch(this._tableValueHelp.handleTableValueHelpFilter);           
                 // sap.ui.getCore().byId("btnTVHCancel").attachPress(me._tableValueHelp.handleTableValueHelpCancel.bind(me));
                 this._tableValueHelpDialog.getContent()[0].getItems()[0].getExtension()[0].getContent()[3].attachSearch(this._tableValueHelp.handleTableValueHelpFilter);
-                this._tableValueHelpDialog.getButtons()[0].attachPress(this._tableValueHelp.handleTableValueHelpCancel.bind(this));
+                
+                this._tableValueHelpDialog.getButtons()[0].attachPress(this._tableValueHelp.handleTableValueHelpAdd.bind(this));
+                this._tableValueHelpDialog.getButtons()[1].attachPress(this._tableValueHelp.handleTableValueHelpCancel.bind(this));
+                
             }
             else {
                 this._tableValueHelpDialog.setModel(oVHModel);
+            }
+
+            if (this._inputField.toUpperCase() === "ATTRIBCD") {
+                this._tableValueHelpDialog.getButtons()[0].setVisible(true);
+            }
+            else {
+                this._tableValueHelpDialog.getButtons()[0].setVisible(false);
             }
 
             this._tableValueHelpDialog.open();
@@ -715,7 +725,7 @@ sap.ui.define([
             // sap.ui.getCore().byId("btnTVHCancel").attachPress(me._tableValueHelp.handleTableValueHelpCancel.bind(me));
             me._tableValueHelpDialog.getContent()[0].getItems()[0].getExtension()[0].getContent()[3].attachSearch(me._tableValueHelp.handleTableValueHelpFilter);
             me._tableValueHelpDialog.getButtons()[0].attachPress(me._tableValueHelp.handleTableValueHelpCancel.bind(me));
-
+            
             //bind columns to the table
             oTable.getModel().setProperty("/columns", oColumns.columns);
             oTable.bindColumns("/columns", function (index, context) {
@@ -789,6 +799,12 @@ sap.ui.define([
             // console.log(this._inputSource)
             this._tableValueHelpDialog.close(); 
         }, 
+
+        handleTableValueHelpAdd: function() {
+            if (this._inputField.toUpperCase() === "ATTRIBCD") {
+                this.onShowAttrib();
+            }
+        },
 
         handleTableValueHelpCancel: function() {
             this._tableValueHelpDialog.close();

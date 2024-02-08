@@ -10,9 +10,13 @@
         title="Select {/title}"
         resizable="true"
         draggable="true">
-        <endButton>
+		<!-- <endButton>
 			<Button text="Cancel" />
-		</endButton>
+		</endButton> -->
+        <buttons>
+			<Button id="btnNew" text="New" />
+			<Button id="btnCancel" text="Cancel" />
+		</buttons>
 		<VBox fitContainer="true">
 			<table:Table 
 				enableColumnReordering="false" 
