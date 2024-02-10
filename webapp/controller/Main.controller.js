@@ -279,6 +279,11 @@ sap.ui.define([
                 oDDTextParam.push({CODE: "MATTYPE"}); 
                 oDDTextParam.push({CODE: "ITEMS"}); 
                 oDDTextParam.push({CODE: "INFO_CREATE_DATA_NOT_ALLOW"});
+                oDDTextParam.push({CODE: "CONF_DISCARD_CHANGE"});
+                oDDTextParam.push({CODE: "INFO_ALREADY_EXIST"});
+                oDDTextParam.push({CODE: "WARN_NO_DATA_MODIFIED"});
+                oDDTextParam.push({CODE: "INFO_NO_RECORD_SELECT"});
+                oDDTextParam.push({CODE: "INFO_PROCEED_DELETE"});
 
                 oModelCaps.create("/CaptionMsgSet", { CaptionMsgItems: oDDTextParam  }, {
                     method: "POST",
@@ -3243,7 +3248,15 @@ sap.ui.define([
 
             setRowEditMode(arg) {
                 this.getView().getModel(arg).getData().results.forEach(item => item.Edited = false);
-                var oTable = this.byId(arg + "Tab");
+                
+                var oTable;
+                if (arg == "matClass" || arg == "matAttrib") {
+                    oTable = sap.ui.getCore().byId(arg + "Tab");
+                }
+                else {
+                    oTable = this.byId(arg + "Tab");
+                }
+
                 var me = this;
 
                 var oInputEventDelegate = {
@@ -7456,8 +7469,13 @@ sap.ui.define([
                 )
                 this.getView().addDependent(this._MatAttribDialog);
 
-                this.getDynamicColumns({}, "MATCLASSMOD", "ZERP_MATTYPCLS");
-                this.getDynamicColumns({}, "MATATTRIBMOD", "ZERP_MATTYPATRB");
+                setTimeout(() => {
+                    this.getDynamicColumns({}, "MATCLASSMOD", "ZERP_MATTYPCLS");
+                }, 100);
+
+                setTimeout(() => {
+                    this.getDynamicColumns({}, "MATATTRIBMOD", "ZERP_MATTYPATRB");
+                }, 100);
             },
 
             onShowAttrib() {
@@ -7547,15 +7565,17 @@ sap.ui.define([
                         var oJSONModel = new sap.ui.model.json.JSONModel();
                         oJSONModel.setData(data);
                         me.getView().setModel(oJSONModel, "matAttrib");
+                        me.getView().getModel("ui").setProperty("/rowCountMatAttrib", data.results.length);
 
                         if (data.results.length > 0) {
                             me.getView().getModel("ui").setProperty("/activeMatAttrib", data.results[0].ATTRIBCD);
-                            me.getView().getModel("ui").setProperty("/rowCountMatAttrib", data.results.length);
     
                             setTimeout(() => {
                                 me.setActiveRowHighlight("matAttrib");
                             }, 1000);
                         }
+
+                        me.setRowReadMode("matAttrib");
 
                         me.closeLoadingDialog();
                     },
@@ -7609,6 +7629,295 @@ sap.ui.define([
                 var aNewRows = this.getView().getModel(pModel).getData().results.filter(item => item.NEW === true);
                 aNewRows.splice(oTable.getSelectedIndices(), 1);
                 this.getView().getModel(pModel).setProperty("/results", aNewRows);
+            },
+
+            onEditMatAttrib() {
+                var aData = this.getView().getModel("matAttrib").getData().results.filter(item => item.DELETED === false);
+
+                sap.ui.getCore().byId("btnAddMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnEditMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(true);
+                sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(true);
+                sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(false);
+
+                this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("matAttrib").getData());
+                this.getView().getModel("matAttrib").setProperty("/results", aData);
+                this.setRowEditMode("matAttrib");
+            },
+
+            onSaveMatAttrib() {
+                var me = this;
+                var aNewRows = me.getView().getModel("matAttrib").getData().results.filter(item => item.NEW === true);
+                var aEditedRows = me.getView().getModel("matAttrib").getData().results.filter(item => item.Edited === true);
+
+                var aNewEditRows = aNewRows.length > 0 ? aNewRows : aEditedRows;
+
+                if (me._oDataBeforeChange.results.length > 0) {
+                        
+                    var descValidate1 = aNewEditRows.filter(
+                        x => me._oDataBeforeChange.results.filter(
+                            y => (y.SHORTTEXT.toUpperCase() == x.SHORTTEXT.toUpperCase())).length > 0);
+                
+                    var descValidate2 = aNewEditRows.filter(
+                        x => me._oDataBeforeChange.results.filter(
+                            y => (y.SHORTTEXT2.toUpperCase() == x.SHORTTEXT2.toUpperCase())).length > 0);
+
+                    var descValidate3 = aNewEditRows.filter(
+                        x => aNewEditRows.filter(
+                            y => (!(y.MATTYP == x.MATTYP && y.MATTYPCLS == x.MATTYPCLS && y.ATTRIBCD == x.ATTRIBCD) && 
+                                  y.SHORTTEXT.toUpperCase() == x.SHORTTEXT.toUpperCase())).length > 0);
+
+                    var descValidate4 = aNewEditRows.filter(
+                    x => aNewEditRows.filter(
+                        y => (!(y.MATTYP == x.MATTYP && y.MATTYPCLS == x.MATTYPCLS && y.ATTRIBCD == x.ATTRIBCD) && 
+                                y.SHORTTEXT2.toUpperCase() == x.SHORTTEXT2.toUpperCase())).length > 0);
+
+                    var desc = "";
+                    if (descValidate1.length > 0) desc = descValidate1[0].SHORTTEXT;
+                    else if (descValidate2.length > 0) desc = descValidate2[0].SHORTTEXT2;
+                    else if (descValidate3.length > 0) desc = descValidate3[0].SHORTTEXT;
+                    else if (descValidate4.length > 0) desc = descValidate4[0].SHORTTEXT2;
+
+                    if (desc.length > 0) {
+                        MessageBox.error("\"" + desc + "\" " + 
+                        me.getView().getModel("ddtext").getData()["INFO_ALREADY_EXIST"]);
+
+                        me.closeLoadingDialog();
+                        return;
+                    }
+                }
+
+                var isValid = true;
+                var sInvalidMsg = "";
+                var aRequiredFields = me._aColumns["matAttrib"].filter(x => x.Mandatory).map(x => x.ColumnName);
+                
+                for (var i = 0; i < aRequiredFields.length; i++) {
+                    var sRequiredField = aRequiredFields[i];
+                    if (aNewEditRows.filter(x => !x[sRequiredField]).length > 0) {
+                        isValid = false;
+                        sInvalidMsg = "\"" + me._aColumns["matAttrib"].filter(x => x.ColumnName == sRequiredField)[0].ColumnLabel + "\" is required."
+                        break;
+                    }
+                }
+
+                if (!isValid) {
+                    var bCompact = true;
+                    MessageBox.error(sInvalidMsg);
+
+                    me.closeLoadingDialog();
+                    return;
+                }
+
+                if (aNewRows.length > 0) {
+                    var oModel = this.getOwnerComponent().getModel();
+                    var iNew = 0;
+
+                    aNewRows.forEach((item, idx) => {
+
+                        var param = {
+                            "MATTYP": me.getView().getModel("ui").getData().activeTmpMattyp,
+                            "MATTYPCLS": me.getView().getModel("ui").getData().activeMatClass,
+                            "ATTRIBCD": item["ATTRIBCD"],
+                            "SHORTTEXT": item["SHORTTEXT"],
+                            "SHORTTEXT2": item["SHORTTEXT2"],
+                        };
+
+                        console.log("onsave", param);
+                        setTimeout(() => {
+                            oModel.create("/MatAttribSet", param, {
+                                method: "POST",
+                                success: function(data, oResponse) {
+                                    console.log("success", oResponse)
+                                    iNew++;
+
+                                    if (iNew === aNewRows.length) {
+                                        me.onRefreshMatAttrib();
+                                        sap.ui.getCore().byId("btnAddMatAttrib").setVisible(true);
+                                        sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
+                                        sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
+                                        sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
+                                    }
+
+                                    me._aInvalidValueState = [];
+                                    me.closeLoadingDialog();
+                                },
+                                error: function(err) {
+                                    console.log("error", err)
+                                    var oError = JSON.parse(err.responseText);
+                                    var sError = oError.error.message.value;
+
+                                    sError = sError.replace("Property", "Column");
+                                    sError = sError.replace("at offset '20'", "");
+
+                                    MessageBox.error(sError,
+                                    {
+                                        styleClass: bCompact ? "sapUiSizeCompact" : ""
+                                    });
+
+                                    me.closeLoadingDialog();
+                                }
+                            });
+                        }, 500)
+                    })
+                }
+                else if (aEditedRows.length > 0) {
+                    var oModel = this.getOwnerComponent().getModel();
+                    var iEdited = 0;
+                    
+                    aEditedRows.forEach((item,idx) => {
+                        
+                        var entitySet = "/MatAttribSet(MATTYP='" + item.MATTYP + "',MATTYPCLS='" + item.MATTYPCLS + 
+                            "',ATTRIBCD='" + item.ATTRIBCD + "')";
+                        
+                        var param = {
+                            "SHORTTEXT": item.SHORTTEXT,
+                            "SHORTTEXT2": item.SHORTTEXT2
+                        };
+ 
+                        console.log('onsave', entitySet, param)
+                        
+                        setTimeout(() => {
+                            oModel.update(entitySet, param, {
+                                method: "PUT",
+                                success: function(data, oResponse) {
+                                    iEdited++;
+
+                                    if (iEdited === aEditedRows.length) {
+                                        me.onRefreshMatAttrib();
+                                        sap.ui.getCore().byId("btnAddMatAttrib").setVisible(true);
+                                        sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
+                                        sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(false);
+                                        sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
+                                        sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
+                                    }
+
+                                    me._aInvalidValueState = [];
+                                    me.closeLoadingDialog();
+                                },
+                                error: function(err) {
+                                    console.log("error", err)
+                                    var oError = JSON.parse(err.responseText);
+                                    var sError = oError.error.message.value;
+
+                                    sError = sError.replace("Property", "Column");
+                                    sError = sError.replace("at offset '20'", "");
+                                    
+                                    MessageBox.error(sError,
+                                    {
+                                        styleClass: bCompact ? "sapUiSizeCompact" : ""
+                                    });
+
+                                    me.closeLoadingDialog();
+                                }
+                            });
+                        }, 500)
+                    });
+                }
+                else {
+                    var bCompact = true;
+
+                    MessageBox.information(me.getView().getModel("ddtext").getData()["WARN_NO_DATA_MODIFIED"],
+                        {
+                            styleClass: bCompact ? "sapUiSizeCompact" : ""
+                        }
+                    );
+
+                    me.closeLoadingDialog();
+                }
+            },
+
+            onCancelMatAttrib() {
+                var me = this;
+                var aNewRows = this.getView().getModel("matAttrib").getData().results.filter(item => item.NEW === true);
+                var aEditedRows = this.getView().getModel("matAttrib").getData().results.filter(item => item.Edited === true);
+
+                if (aNewRows.length > 0 || aEditedRows.length > 0) {
+                    MessageBox.confirm(this.getView().getModel("ddtext").getData()["CONF_DISCARD_CHANGE"], {
+                        actions: ["Yes", "No"],
+                        onClose: function (sAction) {
+                            if (sAction == "Yes") {
+                                me.cancelMatAttrib();
+                            }
+                        }
+                    });
+                } else {
+                    me.cancelMatAttrib();
+                }
+            },
+
+            cancelMatAttrib() {
+                sap.ui.getCore().byId("btnAddMatAttrib").setVisible(true);
+                sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
+                sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(false);
+                sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
+                sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
+
+                this.setRowReadMode("matAttrib");
+                this.getView().getModel("matAttrib").setProperty("/", this._oDataBeforeChange);
+                this._aInvalidValueState = [];
+            },
+
+            onDeleteMatAttrib() {
+                var me = this;
+                var oModel = me.getOwnerComponent().getModel();
+                var oTable = sap.ui.getCore().byId("matAttribTab");
+
+                var aSelRows = oTable.getSelectedIndices();
+                
+                if (aSelRows.length === 0) {
+                    MessageBox.information(me.getView().getModel("ddtext").getData()["INFO_NO_RECORD_SELECT"]);
+                }
+                else {
+                    MessageBox.confirm(me.getView().getModel("ddtext").getData()["INFO_PROCEED_DELETE"], {
+                        actions: ["Yes", "No"],
+                        onClose: function (sAction) {
+                            if (sAction === "Yes") {
+                                aSelRows.forEach(rec => {
+                                    var oContext = oTable.getContextByIndex(rec);
+                                    var oModelContext = oContext.getModel();
+                                    var sPath = oContext.getPath();
+
+                                    var entitySet = "/MatAttribSet(MATTYP='" + oContext.getObject().MATTYP + "',MATTYPCLS='" + 
+                                        oContext.getObject().MATTYPCLS + "',ATTRIBCD='" + oContext.getObject().ATTRIBCD + "')";
+
+                                    var oParam = {
+                                        "DELETED": true
+                                    };
+
+                                    //console.log("delete", sParam, oParam)
+                                    setTimeout(() => {
+                                        oModel.update(entitySet, oParam, {
+                                            method: "PUT",
+                                            success: function(data, oResponse) {
+                                                oModelContext.setProperty(sPath + '/DELETED', true);
+                                            },
+                                            error: function() {
+                                                me.closeLoadingDialog();
+                                            }
+                                        });
+                                    }, 500)
+                                });                            
+                            }
+                        }
+                    });
+                }
+            },
+
+            onRefreshMatAttrib() {
+                this.getMatAttrib();
             },
 
             setRowCreateMode(pModel) {
@@ -7785,6 +8094,7 @@ sap.ui.define([
 
             onTabSelect(oEvent) {
                 this._selectedTabKey = oEvent.getParameters().selectedKey;
+                
                 if (this._selectedTabKey == "matAttrib") {
                     this.getMatAttrib();
                 }

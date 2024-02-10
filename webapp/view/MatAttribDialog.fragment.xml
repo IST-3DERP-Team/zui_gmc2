@@ -95,7 +95,7 @@
                                     visible="false" />
                                 <Button id="btnSaveMatAttrib" 
                                     icon="sap-icon://save"
-                                    press="onSave('matAttrib')"
+                                    press="onSaveMatAttrib"
                                     visible="false" />
                                 <Button id="btnCancelMatAttrib" 
                                     icon="sap-icon://sys-cancel"
