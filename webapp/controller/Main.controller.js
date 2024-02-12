@@ -7170,7 +7170,9 @@ sap.ui.define([
                     
                     oTable.getRows().forEach(row => {
                         if (row.getBindingContext(sModel) && row.getBindingContext(sModel).sPath.replace("/results/", "") === sRowPath.replace("/results/", "")) {
-                            row.addStyleClass("activeRow");
+                            setTimeout(() => {
+                                row.addStyleClass("activeRow");
+                            }, 10)
                         }
                         else row.removeStyleClass("activeRow");
                     })
@@ -7524,6 +7526,8 @@ sap.ui.define([
                             me.getView().getModel("ui").setProperty("/rowCountMatClass", data.results.length);
     
                             setTimeout(() => {
+                                TableFilter.applyColFilters("matClassTab", me);
+                                //me.setColumnSorters("matClassTab");
                                 me.setActiveRowHighlight("matClass");
                             }, 1000);
                         }

@@ -8,10 +8,24 @@ sap.ui.define([
 
 	return {        
 
+        getTable(sTableId, oThis) {
+            var oTable;
+
+            if (sTableId == "matClassTab" || sTableId == "matAttribTab") {
+                oTable = sap.ui.getCore().byId(sTableId);
+            }
+            else {
+                oTable = oThis.byId(sTableId);
+            }
+
+            return oTable;
+        },
+
         updateColumnMenu: function(sTableId, oThis) {
             var _this = this;
             var me = oThis;
-            var oTable = me.byId(sTableId);
+            // var oTable = me.byId(sTableId);
+            var oTable = _this.getTable(sTableId, me);
 
             oTable.getColumns().forEach(col => {
                 // Loop onto each column and attach Column Menu Open event
@@ -138,7 +152,14 @@ sap.ui.define([
                 me.getView().addDependent(me._GenericFilterDialog);
             }
 
-            var oTable = me.byId(sTableId);
+            // var oTable = me.byId(sTableId);
+            var oTable;
+            if (sTableId == "matClassTab" || sTableId == "matAttribTab") {
+                oTable = sap.ui.getCore().byId(sTableId);
+            }
+            else {
+                oTable = me.byId(sTableId);
+            }
             var oDialog = me._GenericFilterDialog;
             var aColumnItems = oDialog.getModel().getProperty("/items");
             var oFilterValues = oDialog.getModel().getProperty("/values");
