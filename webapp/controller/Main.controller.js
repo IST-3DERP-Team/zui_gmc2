@@ -7483,7 +7483,7 @@ sap.ui.define([
             },
 
             onShowAttrib() {
-                this.getMatClass();
+                this.getMatClass(true);
                 this._MatAttribDialog.open();
             },
 
@@ -7532,7 +7532,7 @@ sap.ui.define([
                 }
             },
 
-            getMatClass() {
+            getMatClass(pInitLoad) {
                 var me = this;
                 me.showLoadingDialog();
 
@@ -7545,17 +7545,38 @@ sap.ui.define([
                         "$filter": "MATTYP eq '" + sMatType + "'"
                     },
                     success: function (data, response) {
-                        console.log("MatClassSet", data)
+                        console.log("MatClassSet", data);
+
+                        var sRowPathAttrib = me._inputSource.oParent.getBindingContext("attributes").sPath;
+                        var oDataAttrib = me.getView().getModel("attributes").getProperty(sRowPathAttrib);
+                        var bSelected = false;
+                        var sMatClass = "";
+                        var sMatClassSeq = "";
 
                         data.results.forEach((item, idx) => {
                             if (item.CREATEDDT !== null) item.CREATEDDT = dateFormat.format(item.CREATEDDT);
                             if (item.UPDATEDDT !== null) item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
 
-                            if (idx == 0) {
-                                item.ACTIVE = "X";
+                            if (pInitLoad == true) {
+                                if (item.MATTYPCLS == oDataAttrib.MATTYPCLS && bSelected == false) {
+                                    item.ACTIVE = "X";
+                                    bSelected = true;
+                                    sMatClass = item.MATTYPCLS;
+                                    sMatClassSeq = item.SEQ;
+                                }
+                                else {
+                                    item.ACTIVE = "";
+                                }
                             }
                             else {
-                                item.ACTIVE = "";
+                                if (idx == 0) {
+                                    item.ACTIVE = "X";
+                                    sMatClass = item.MATTYPCLS;
+                                    sMatClassSeq = item.SEQ;
+                                }
+                                else {
+                                    item.ACTIVE = "";
+                                }
                             }
                         })
                         
@@ -7564,14 +7585,22 @@ sap.ui.define([
                         me.getView().setModel(oJSONModel, "matClass");
 
                         if (data.results.length > 0) {
-                            me.getView().getModel("ui").setProperty("/activeMatClass", data.results[0].MATTYPCLS);
-                            me.getView().getModel("ui").setProperty("/activeMatClassSeq", data.results[0].SEQ);
+                            me.getView().getModel("ui").setProperty("/activeMatClass", sMatClass);
+                            me.getView().getModel("ui").setProperty("/activeMatClassSeq", sMatClassSeq);
                             me.getView().getModel("ui").setProperty("/rowCountMatClass", data.results.length);
     
                             setTimeout(() => {
                                 TableFilter.applyColFilters("matClassTab", me);
                                 //me.setColumnSorters("matClassTab");
                                 me.setActiveRowHighlight("matClass");
+
+                                // Default Material Attribute Tab
+                                if (pInitLoad == true) {
+                                    var oIconTabBar = sap.ui.getCore().byId("itbMatAttrib");
+                                    oIconTabBar.setSelectedKey("matAttrib");
+
+                                    me.getMatAttrib();
+                                }
                             }, 1000);
                         }
 
@@ -7633,7 +7662,7 @@ sap.ui.define([
             },
 
             onRefreshMatClass() {
-                this.getMatClass();
+                this.getMatClass(false);
             },
 
             onAddMatAttrib() {
