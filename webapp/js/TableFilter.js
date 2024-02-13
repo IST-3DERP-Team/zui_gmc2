@@ -153,13 +153,8 @@ sap.ui.define([
             }
 
             // var oTable = me.byId(sTableId);
-            var oTable;
-            if (sTableId == "matClassTab" || sTableId == "matAttribTab") {
-                oTable = sap.ui.getCore().byId(sTableId);
-            }
-            else {
-                oTable = me.byId(sTableId);
-            }
+            var oTable = this.getTable(sTableId, me);
+
             var oDialog = me._GenericFilterDialog;
             var aColumnItems = oDialog.getModel().getProperty("/items");
             var oFilterValues = oDialog.getModel().getProperty("/values");
@@ -470,10 +465,12 @@ sap.ui.define([
                 item.isFiltered = false;
             })
 
-            me.byId(sSourceTabId).getBinding("rows").filter(oFilter, "Application");           
+            var oTable = this.getTable(sSourceTabId, me);
+
+            oTable.getBinding("rows").filter(oFilter, "Application");           
             oDialog.getContent()[0].getMasterPages()[0].getContent()[0].getItems().forEach(item => item.setIcon("sap-icon://text-align-justified"));
 
-            me.byId(sSourceTabId).getColumns().forEach(col => { 
+            oTable.getColumns().forEach(col => { 
                 col.setProperty("filtered", false);
             })
 
@@ -481,10 +478,10 @@ sap.ui.define([
             me.setActiveRowHighlight(sSourceTabId.replace("Tab",""));
 
             //additonal code
-            var vGmc = me.byId(sSourceTabId).getModel("gmc").getData().results.filter((item,index) => index === 0)[0].GMC;
+            var vGmc = oTable.getModel("gmc").getData().results.filter((item,index) => index === 0)[0].GMC;
 
             if (me.getView().getModel("ui").getProperty("/activeGmc") !== vGmc) {
-                me.byId(sSourceTabId).getModel("gmc").getData().results.forEach(item => {
+                oTable.getModel("gmc").getData().results.forEach(item => {
                     if (item.GMC === vGmc) { item.ACTIVE = "X"; }
                     else { item.ACTIVE = ""; }
                 });
@@ -495,7 +492,7 @@ sap.ui.define([
                 me.getMaterials(false);
             }
 
-            me.getView().getModel("counts").setProperty("/gmc", me.byId(sSourceTabId).getModel("gmc").getData().results.length);
+            me.getView().getModel("counts").setProperty("/gmc", oTable.getModel("gmc").getData().results.length);
         },
 
         onColFilterCancel: function(oEvent, oThis) {
@@ -533,7 +530,8 @@ sap.ui.define([
 
             var aFilter = [];
             var oFilter = null;
-            var oSourceTableColumns = me.byId(sSourceTabId).getColumns();
+            var oTable = this.getTable(sSourceTabId, me);
+            var oSourceTableColumns = oTable.getColumns();
             
             aColumnItems.forEach(item => {
                 var oColumn = oSourceTableColumns.filter(fItem => fItem.getAggregation("label").getProperty("text") === item.ColumnLabel)[0];                    
@@ -593,13 +591,13 @@ sap.ui.define([
             }
 
             // console.log(oFilter)
-            me.byId(sSourceTabId).getBinding("rows").filter(oFilter, "Application");
+            oTable.getBinding("rows").filter(oFilter, "Application");
             me._colFilters[sSourceTabId] = jQuery.extend(true, {}, oDialog.getModel().getData());
 
             //additonal code
             if (oFilter !== "") {
                 if (sSourceTabId === "gmcTab") {
-                    if (me.byId(sSourceTabId).getBinding("rows").aIndices.length === 0) {
+                    if (oTable.getBinding("rows").aIndices.length === 0) {
                         me.getView().getModel("ui").setProperty("/activeGmc", '');
                         me.getView().getModel("ui").setProperty("/activeMattyp", '');
                         me.getView().getModel("counts").setProperty("/gmc", 0);
@@ -615,10 +613,10 @@ sap.ui.define([
                         }), "attributes");
                     }
                     else {
-                        var vGmc = me.byId(sSourceTabId).getModel("gmc").getData().results.filter((item,index) => index === me.byId(sSourceTabId).getBinding("rows").aIndices[0])[0].GMC;
+                        var vGmc = oTable.getModel("gmc").getData().results.filter((item,index) => index === oTable.getBinding("rows").aIndices[0])[0].GMC;
 
                         if (me.getView().getModel("ui").getProperty("/activeGmc") !== vGmc) {
-                            me.byId(sSourceTabId).getModel("gmc").getData().results.forEach(item => {
+                            oTable.getModel("gmc").getData().results.forEach(item => {
                                 if (item.GMC === vGmc) { item.ACTIVE = "X"; }
                                 else { item.ACTIVE = ""; }
                             });
@@ -629,12 +627,12 @@ sap.ui.define([
                             me.getMaterials(false);
                         }
 
-                        me.getView().getModel("counts").setProperty("/gmc", me.byId(sSourceTabId).getBinding("rows").aIndices.length);
+                        me.getView().getModel("counts").setProperty("/gmc", oTable.getBinding("rows").aIndices.length);
                     }
                 }
             }
             else {
-                me.getView().getModel("counts").setProperty("/gmc", me.byId(sSourceTabId).getModel("gmc").getData().results.length);
+                me.getView().getModel("counts").setProperty("/gmc", oTable.getModel("gmc").getData().results.length);
             }
         },
 
@@ -1138,7 +1136,8 @@ sap.ui.define([
     
                     var aFilter = [];
                     var oFilter = null;
-                    var oSourceTableColumns = me.byId(sTableId).getColumns();
+                    var oTable = this.getTable(sTableId, me);
+                    var oSourceTableColumns = oTable.getColumns();
 
                     aColumnItems.forEach(item => {
                         var oColumn = oSourceTableColumns.filter(fItem => fItem.getAggregation("label").getProperty("text") === item.ColumnLabel)[0];                    
@@ -1197,12 +1196,12 @@ sap.ui.define([
                         oFilter = "";
                     }
         
-                    me.byId(sTableId).getBinding("rows").filter(oFilter, "Application");
+                    oTable.getBinding("rows").filter(oFilter, "Application");
                     // me._colFilters[sTableId] = jQuery.extend(true, {}, oDialog.getModel().getData());
 
                     //additonal code
                     if (sTableId === "gmcTab") {
-                        if (me.byId(sTableId).getBinding("rows").aIndices.length === 0) {
+                        if (oTable.getBinding("rows").aIndices.length === 0) {
                             me.getView().getModel("ui").setProperty("/activeGmc", '');
                             me.getView().getModel("ui").setProperty("/activeMattyp", '');
                             me.getView().getModel("counts").setProperty("/gmc", 0);
@@ -1218,10 +1217,10 @@ sap.ui.define([
                             }), "attributes");
                         }
                         else {
-                            var vGmc = me.byId(sTableId).getModel("gmc").getData().results.filter((item,index) => index === me.byId(sTableId).getBinding("rows").aIndices[0])[0].GMC;
+                            var vGmc = oTable.getModel("gmc").getData().results.filter((item,index) => index === oTable.getBinding("rows").aIndices[0])[0].GMC;
 
                             if (me.getView().getModel("ui").getProperty("/activeGmc") !== vGmc) {
-                                me.byId(sTableId).getModel("gmc").getData().results.forEach(item => {
+                                oTable.getModel("gmc").getData().results.forEach(item => {
                                     if (item.GMC === vGmc) { item.ACTIVE = "X"; }
                                     else { item.ACTIVE = ""; }
                                 });
@@ -1232,7 +1231,7 @@ sap.ui.define([
                                 me.getMaterials(false);
                             }
 
-                            me.getView().getModel("counts").setProperty("/gmc", me.byId(sTableId).getBinding("rows").aIndices.length);
+                            me.getView().getModel("counts").setProperty("/gmc", oTable.getBinding("rows").aIndices.length);
                         }
                     }
                 }
@@ -1254,10 +1253,11 @@ sap.ui.define([
                         item.isFiltered = false;
                     })
 
-                    me.byId(sTableId).getBinding("rows").filter(oFilter, "Application");           
+                    var oTable = this.getTable(sTableId, me);
+                    oTable.getBinding("rows").filter(oFilter, "Application");           
                     oDialog.getContent()[0].getMasterPages()[0].getContent()[0].getItems().forEach(item => item.setIcon("sap-icon://text-align-justified"));
 
-                    me.byId(sTableId).getColumns().forEach(col => { 
+                    oTable.getColumns().forEach(col => { 
                         col.setProperty("filtered", false);
                     })
                 }
@@ -1289,7 +1289,8 @@ sap.ui.define([
             var me = oThis;
             var bSorted = false;
             // console.log(sColumnName)
-            var oColumnProp = me.byId(sTableId).getColumns().filter(fItem => fItem.getProperty("name") === sColumnName)[0];
+            var oTable = this.getTable(sTableId, me);
+            var oColumnProp = oTable.getColumns().filter(fItem => fItem.getProperty("name") === sColumnName)[0];
             // console.log(me.byId(sTableId).getColumns())
             if (oColumnProp.getProperty("sorted")) {
                 bSorted = true;

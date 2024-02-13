@@ -11,7 +11,7 @@
         resizable="true"
         draggable="true">
         <endButton>
-			<Button text="Close" press="onCloseAttrib"/>
+			<Button text="Close" press="onCloseAttrib('')"/>
 		</endButton>
 
         <IconTabBar id="itbMatAttrib" 
@@ -80,7 +80,7 @@
                                     icon="sap-icon://add"
                                     press="onAddMatAttrib"
                                     visible="true"/>
-                                <Button id="btnEditMatAttrib" 
+                                <!-- <Button id="btnEditMatAttrib" 
                                     icon="sap-icon://edit"
                                     press="onEditMatAttrib"
                                     tooltip="Edit"
@@ -92,7 +92,7 @@
                                 <Button id="btnRemoveRowMatAttrib" 
                                     icon="sap-icon://less"
                                     press="onRemoveRow('matAttrib')"
-                                    visible="false" />
+                                    visible="false" /> -->
                                 <Button id="btnSaveMatAttrib" 
                                     icon="sap-icon://save"
                                     press="onSaveMatAttrib"
@@ -101,10 +101,10 @@
                                     icon="sap-icon://sys-cancel"
                                     press="onCancelMatAttrib" 
                                     visible="false" />                                        
-                                <Button id="btnDeleteMatAttrib" 
+                                <!-- <Button id="btnDeleteMatAttrib" 
                                     icon="sap-icon://delete"
                                     press="onDeleteMatAttrib"
-                                    visible="true"/>
+                                    visible="true"/> -->
                                 <Button id="btnRefreshMatAttrib" 
                                     icon="sap-icon://refresh"
                                     press="onRefreshMatAttrib"

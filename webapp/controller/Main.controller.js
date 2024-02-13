@@ -620,7 +620,7 @@ sap.ui.define([
                 this._dataMode = "READ";
                 this._sbuChange = false;
 
-                this.onShowAttrib();
+                // this.onShowAttrib();
             },
 
             async getGMC() {
@@ -1637,9 +1637,11 @@ sap.ui.define([
                     oEvent.preventDefault();
                 });
 
-                if (!(model == "matClass" || model == "matAttrib")) {
-                    TableFilter.updateColumnMenu(model + "Tab", this);
-                }
+                TableFilter.updateColumnMenu(model + "Tab", this);
+
+                // if (!(model == "matClass" || model == "matAttrib")) {
+                //     TableFilter.updateColumnMenu(model + "Tab", this);
+                // }
             },
 
             onAddColumns(table, columns, model) {
@@ -7485,8 +7487,49 @@ sap.ui.define([
                 this._MatAttribDialog.open();
             },
 
-            onCloseAttrib() {
-                this._MatAttribDialog.close();
+            onCloseAttrib(pAttribCd) {
+
+                if (pAttribCd.length == 0) {
+                    this._MatAttribDialog.close();
+                }
+                else {
+                    var me = this;
+                    var oModel = this.getOwnerComponent().getModel();
+                    me.showLoadingDialog();
+                    oModel.read('/MatTypeAttribSet', {
+                        async: false,
+                        success: function (oData) {
+                            me.getView().setModel(new JSONModel(oData.results), "mattypattrib");
+
+                            var sMatType = me.getView().getModel("ui").getData().activeTmpMattyp;
+                            var _data = {};
+
+                            me.getView().getModel("attributes").getData().results.forEach((item, index) => {
+                                var oData = me.getView().getModel("mattypattrib").getData().filter(fItem => fItem.Mattyp === sMatType && fItem.Mattypcls === item.MATTYPCLS);
+            
+                                if (oData.length > 0) {
+                                    oData.sort((a,b) => (a.Attribcd > b.Attribcd ? 1 : -1));
+                                    _data[item.MATTYPCLS] = oData;
+                                }
+            
+                                if (me.getView().getModel("attributes").getData().results.length === (index + 1)) {
+                                    var oJSONModel = new JSONModel();
+                                    oJSONModel.setData(_data);
+                                    me.getView().setModel(oJSONModel, "attribute");
+                                }
+                            })
+
+                            me._MatAttribDialog.close();
+                            me._tableValueHelpDialog.close();
+
+                            me._inputSource.setSelectedKey(pAttribCd);
+                            me._inputSource.setValueState("None");            
+                            me._inputSource.fireChangeEvent();
+                            me.closeLoadingDialog();
+                        },
+                        error: function (err) { }
+                    })
+                }
             },
 
             getMatClass() {
@@ -7494,7 +7537,7 @@ sap.ui.define([
                 me.showLoadingDialog();
 
                 var oModel = this.getOwnerComponent().getModel();
-                this.getView().getModel("ui").setProperty("/activeTmpMattyp", "ZFAB"); // temporary
+                // this.getView().getModel("ui").setProperty("/activeTmpMattyp", "ZFAB"); // temporary
                 var sMatType = this.getView().getModel("ui").getData().activeTmpMattyp;
 
                 oModel.read('/MatClassSet', { 
@@ -7603,12 +7646,12 @@ sap.ui.define([
 
                 if (bAttrib) {
                     sap.ui.getCore().byId("btnAddMatAttrib").setVisible(false);
-                    sap.ui.getCore().byId("btnEditMatAttrib").setVisible(false);
-                    sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(true);
-                    sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(true);
+                    // sap.ui.getCore().byId("btnEditMatAttrib").setVisible(false);
+                    // sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(true);
+                    // sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(true);
                     sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(true);
                     sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(true);
-                    sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(false);
+                    // sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(false);
                     sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(false);
                     
                     this._oDataBeforeChange = jQuery.extend(true, {}, this.getView().getModel("matAttrib").getData());
@@ -7738,15 +7781,17 @@ sap.ui.define([
                                     iNew++;
 
                                     if (iNew === aNewRows.length) {
-                                        me.onRefreshMatAttrib();
-                                        sap.ui.getCore().byId("btnAddMatAttrib").setVisible(true);
-                                        sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
-                                        sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
-                                        sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
-                                        sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(false);
-                                        sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(false);
-                                        sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
-                                        sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
+                                        me.onCloseAttrib(aNewRows[0]["ATTRIBCD"]);
+
+                                        // me.onRefreshMatAttrib();
+                                        // sap.ui.getCore().byId("btnAddMatAttrib").setVisible(true);
+                                        // sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
+                                        // sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
+                                        // sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
+                                        // sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(false);
+                                        // sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(false);
+                                        // sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
+                                        // sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
                                     }
 
                                     me._aInvalidValueState = [];
@@ -7861,12 +7906,12 @@ sap.ui.define([
 
             cancelMatAttrib() {
                 sap.ui.getCore().byId("btnAddMatAttrib").setVisible(true);
-                sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
-                sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
-                sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
+                // sap.ui.getCore().byId("btnEditMatAttrib").setVisible(true);
+                // sap.ui.getCore().byId("btnAddRowMatAttrib").setVisible(false);
+                // sap.ui.getCore().byId("btnRemoveRowMatAttrib").setVisible(false);
                 sap.ui.getCore().byId("btnSaveMatAttrib").setVisible(false);
                 sap.ui.getCore().byId("btnCancelMatAttrib").setVisible(false);
-                sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
+                // sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
                 sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
 
                 this.setRowReadMode("matAttrib");

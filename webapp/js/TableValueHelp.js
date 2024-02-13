@@ -5,7 +5,7 @@ sap.ui.define([
 ], function(JSONModel,Filter,FilterOperator) {
 	"use strict";
 
-	return {        
+	return {  
 
         handleFormValueHelp: async function (oEvent, oThis) {
             var me = oThis;
@@ -285,6 +285,7 @@ sap.ui.define([
             var sColumns = vColProp[0].ValueHelp.columns;
             var vhColumns = this._oModelColumns[sColumns];
             var vh = this.getView().getModel(sPath).getData();
+            
             var aColumns = [], oDDTextParam = [];
             var oDDText = this.getView().getModel("ddtext").getData();
 
@@ -799,6 +800,21 @@ sap.ui.define([
             // console.log(this._inputSource)
             this._tableValueHelpDialog.close(); 
         }, 
+
+        // handleTableValueHelpRefresh: async function(oThis, oTable, oTableValueHelpDialog) {
+        //     if (oThis._inputField.toUpperCase() === "ATTRIBCD") {
+        //         await oThis._tableValueHelp.filterValueHelpItems(oThis._inputField, oThis._sActiveTable, oThis);
+
+        //         // var oTable = oThis._tableValueHelpDialog.getContent()[0].getAggregation("items")[0];
+        //         var vh = oThis.getView().getModel("attrib").getData();
+    
+        //         //bind rows to the table
+        //         oTable.getModel().setProperty("/rows", vh);
+        //         oTable.bindRows("/rows");
+
+        //         oTableValueHelpDialog.getModel().setProperty("/count", vh.length);
+        //     }
+        // },
 
         handleTableValueHelpAdd: function() {
             if (this._inputField.toUpperCase() === "ATTRIBCD") {
