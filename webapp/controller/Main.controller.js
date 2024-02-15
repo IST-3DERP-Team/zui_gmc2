@@ -7690,22 +7690,22 @@ sap.ui.define([
                 }
             },
 
-            onAddRow(pModel) {
-                this.setRowCreateMode(pModel);
-            },
+            // onAddRow(pModel) {
+            //     this.setRowCreateMode(pModel);
+            // },
 
-            onRemoveRow(pModel) {
-                var oTable;
-                if (pModel == "matClass" || pModel == "matAttrib") {
-                    oTable = sap.ui.getCore().byId(pModel + "Tab");
-                } else {
-                    oTable = this.byId(pModel + "Tab");
-                }
+            // onRemoveRow(pModel) {
+            //     var oTable;
+            //     if (pModel == "matClass" || pModel == "matAttrib") {
+            //         oTable = sap.ui.getCore().byId(pModel + "Tab");
+            //     } else {
+            //         oTable = this.byId(pModel + "Tab");
+            //     }
                 
-                var aNewRows = this.getView().getModel(pModel).getData().results.filter(item => item.NEW === true);
-                aNewRows.splice(oTable.getSelectedIndices(), 1);
-                this.getView().getModel(pModel).setProperty("/results", aNewRows);
-            },
+            //     var aNewRows = this.getView().getModel(pModel).getData().results.filter(item => item.NEW === true);
+            //     aNewRows.splice(oTable.getSelectedIndices(), 1);
+            //     this.getView().getModel(pModel).setProperty("/results", aNewRows);
+            // },
 
             onEditMatAttrib() {
                 var aData = this.getView().getModel("matAttrib").getData().results.filter(item => item.DELETED === false);
