@@ -1691,56 +1691,8 @@ sap.ui.define([
 
             onTableResize: function(oEvent) {
                 var oSplitter = this.byId("splitterMain");
-                var oFirstPane = oSplitter.getRootPaneContainer().getPanes().at(0);
-                var oSecondPane = oSplitter.getRootPaneContainer().getPanes().at(1);
-                var vFullScreen = oEvent.getSource().data("Fullscreen") === "1" ? true : false;
-                var vPart = oEvent.getSource().data("Part");
-
-                this._sActiveTable = oEvent.getSource().data("TableId");
-                this.getView().getModel("ui").setProperty("/fullscreen/" + vPart, vFullScreen);
-
-                if (vFullScreen) {
-                    this.byId("smartFilterBar").setVisible(false);
-
-                    var oLayoutDataMax = new sap.ui.layout.SplitterLayoutData({
-                        size: "100%",
-                        resizable: false
-                    });
-
-                    var oLayoutDataMin = new sap.ui.layout.SplitterLayoutData({
-                        size: "0%",
-                        resizable: false
-                    });
-
-                    if (vPart === "header") {
-                        oFirstPane.setLayoutData(oLayoutDataMax);
-                        oSecondPane.setLayoutData(oLayoutDataMin);
-                    }
-                    else {
-                        oSecondPane.setLayoutData(oLayoutDataMax);
-                        oFirstPane.setLayoutData(oLayoutDataMin);
-                    }
-                }
-                else {
-                    // this.byId("splitterMain").setProperty("height", "99%");
-                    this.byId("smartFilterBar").setVisible(true);
-
-                    var oLayoutDataHdr = new sap.ui.layout.SplitterLayoutData({
-                        size: "46%",
-                        resizable: true
-                    });
-
-                    oFirstPane.setLayoutData(oLayoutDataHdr);
-
-                    var oLayoutDataDtl = new sap.ui.layout.SplitterLayoutData({
-                        size: "54%",
-                        resizable: true
-                    });
-
-                    oSecondPane.setLayoutData(oLayoutDataDtl);
-                }
-                return;
-
+                var oHeaderPane = oSplitter.getRootPaneContainer().getPanes().at(0);
+                var oDetailPane = oSplitter.getRootPaneContainer().getPanes().at(1);
                 var vFullScreen = oEvent.getSource().data("Fullscreen") === "1" ? true : false;
                 var vPart = oEvent.getSource().data("Part");
                 var vHeaderSize = oEvent.getSource().data("HeaderSize");
@@ -1748,20 +1700,22 @@ sap.ui.define([
 
                 this._sActiveTable = oEvent.getSource().data("TableId");
                 this.getView().getModel("ui").setProperty("/fullscreen/" + vPart, vFullScreen);
-                this.getView().getModel("ui").setProperty("/splitter/header", vHeaderSize);
-                this.getView().getModel("ui").setProperty("/splitter/detail", vDetailSize);
-                console.log(this.byId("splitterMain"))
-                if (vFullScreen) {
-                    this.byId("smartFilterBar").setVisible(false);
-                    this.getView().getModel("ui").setProperty("/splittergf", 1);
-                }
-                else {
-                    // this.byId("splitterMain").setProperty("height", "99%");
-                    this.byId("smartFilterBar").setVisible(true);
-                    this.getView().getModel("ui").setProperty("/splittergf", 0.94);
-                    this.getView().getModel("ui").setProperty("/smartfiltergf", 0);
-                    // this.byId("splitterMain").setProperty("height", "100%");
-                }
+                this.byId("smartFilterBar").setVisible(!vFullScreen);
+
+                var oHeaderLayoutData = new sap.ui.layout.SplitterLayoutData({
+                    size: vHeaderSize,
+                    resizable: !vFullScreen
+                });
+
+                var oDetailLayoutData = new sap.ui.layout.SplitterLayoutData({
+                    size: vDetailSize,
+                    resizable: !vFullScreen
+                });
+
+                document.getElementsByClassName("sapUiLoSplitterBar")[0].setAttribute("style", "display: " + (vFullScreen ? "none" : "flex"));
+
+                oHeaderPane.setLayoutData(oHeaderLayoutData);
+                oDetailPane.setLayoutData(oDetailLayoutData);
             },
 
             onNew() {
@@ -1871,7 +1825,7 @@ sap.ui.define([
 
                                         // console.log(aData);
 
-                                        me.getView().getModel("cusmat").setProperty("/", aData);
+                                        me.getView().getModel("cusmat").setProperty("/results/", aData);
 
                                         // if (me._aColFilters.length > 0) { me.setColumnFilters(me._sActiveTable); }
                                         // if (me._aColSorters.length > 0) { me.setColumnSorters(me._sActiveTable); }
@@ -2081,6 +2035,7 @@ sap.ui.define([
                                             templateShareable: false
                                         },
                                         suggest: this.onInputSuggest.bind(this),
+                                        suggestionItemSelected: this.onInputSuggestionItemSelected.bind(this),
                                         change: this.onValueHelpLiveInputChange.bind(this)
                                     })
 
@@ -2183,6 +2138,7 @@ sap.ui.define([
 
                             if (ci.required) {
                                 col.getLabel().addStyleClass("sapMLabelRequired");
+
                             }
 
                             if (ci.type === "STRING") oNewRow[ci.name] = "";
@@ -2304,6 +2260,7 @@ sap.ui.define([
                                             showSuggestion: true,
                                             maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].maxSuggestionWidth !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
                                             suggest: _this.onInputSuggest.bind(_this),
+                                            suggestionItemSelected: _this.onInputSuggestionItemSelected.bind(_this),
                                             change: _this.onValueHelpLiveInputChange.bind(_this)
                                         })
                                     }
@@ -2313,7 +2270,6 @@ sap.ui.define([
                                             showValueHelp: true,
                                             valueHelpRequest: TableValueHelp.handleTableValueHelp.bind(_this),
                                             showSuggestion: true,
-                                            // suggest: _this.onInputSuggest.bind(_this),
                                             maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].maxSuggestionWidth !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
                                             suggestionColumns: oColumns,
                                             suggestionRows: {
@@ -2325,6 +2281,7 @@ sap.ui.define([
                                                 templateShareable: false
                                             },
                                             suggest: _this.onInputSuggest.bind(_this),
+                                            suggestionItemSelected: _this.onInputSuggestionItemSelected.bind(_this),
                                             change: _this.onValueHelpLiveInputChange.bind(_this)
                                         })
                                     }
@@ -2395,33 +2352,57 @@ sap.ui.define([
             },
 
             onAddRow: function(oEvent) {
+                var bProceed = true;
+
+                this._aColumns[this._sActiveTable.replace("Tab", "")].filter(fItem => fItem.required).forEach(item => {
+                    this.getView().getModel(this._sActiveTable.replace("Tab", "")).getData().results.forEach(r => {
+                        if (r[item.name] === "") {
+                            bProceed = false;
+                        }
+                    })
+                })
+
+                if (!bProceed) {
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_INPUT_REQD_FIELDS"]);
+                    return;
+                }
+
                 var aNewRows = this.getView().getModel(this._sActiveTable.replace("Tab", "")).getData().results.filter(item => item.New === true);
                 var oNewRow = {};
 
-                oNewRow["CUSMATCD"] = "";
-                oNewRow["ISSUOM"] = "";
-                oNewRow["VOLUOM"] = "";
-                oNewRow["WTUOM"] = "";
-                oNewRow["EKWSL"] = "";
-                oNewRow["GRSWT"] = "0";
-                oNewRow["NETWT"] = "0";
-                oNewRow["VOLUME"] = "0";
-                oNewRow["UNTTO"] = "0";
-                oNewRow["UEBTO"] = "0";
-                oNewRow["UMREN"] = "1";
-                oNewRow["UMREZ"] = "1";
-                oNewRow["DESC"] = "";
-                oNewRow["TMPGMC"] = aNewRows.length + 1 + "";
+                if (this._sActiveTable === "gmcTab") {
+                    oNewRow["CUSMATCD"] = "";
+                    oNewRow["ISSUOM"] = "";
+                    oNewRow["VOLUOM"] = "";
+                    oNewRow["WTUOM"] = "";
+                    oNewRow["EKWSL"] = "";
+                    oNewRow["GRSWT"] = "0";
+                    oNewRow["NETWT"] = "0";
+                    oNewRow["VOLUME"] = "0";
+                    oNewRow["UNTTO"] = "0";
+                    oNewRow["UEBTO"] = "0";
+                    oNewRow["UMREN"] = "1";
+                    oNewRow["UMREZ"] = "1";
+                    oNewRow["DESC"] = "";
+                    oNewRow["TMPGMC"] = aNewRows.length + 1 + "";
+                }
+                else {
+                    oNewRow["GMC"] = this.getView().getModel("ui").getData().activeGmc;
+                }
+
                 oNewRow["New"] = true;
                 aNewRows.push(oNewRow);
 
-                this.getView().getModel("ui").setProperty("/activeTmpGmc", aNewRows.length + "");
+                if (this._sActiveTable === "gmcTab") {
+                    this.getView().getModel("ui").setProperty("/activeTmpGmc", aNewRows.length + "");
+                    this.getView().getModel("attributes").setProperty("/results", []);
+                }
+
                 this.getView().getModel(this._sActiveTable.replace("Tab", "")).setProperty("/results", aNewRows);
-                this.getView().getModel("attributes").setProperty("/results", []);
                 this._setFocusInput = false;
 
                 setTimeout(() => {
-                    this.byId("gmcTab").getRows()[aNewRows.length - 1].getCells().forEach(cell => {
+                    this.byId(this._sActiveTable).getRows()[aNewRows.length - 1].getCells().forEach(cell => {
                         if (cell.getBindingInfo("value") !== undefined && !this._setFocusInput) {
                             this._setFocusInput = true;
                             cell.focus();
@@ -2461,12 +2442,14 @@ sap.ui.define([
                         this.getView().getModel(this._sActiveTable.replace("Tab", "")).setProperty("/results", oData);
                         oTable.clearSelection();
 
-                        if (oData.length === 0) {
-                            this.getView().getModel("attributes").setProperty("/results", []);
-                        }
-                        else {
-                            var sTmpGMC = oData[0].TMPGMC;
-                            this.getView().getModel("attributes").setProperty("/results", this._oTmpAttrib[sTmpGMC]);
+                        if (this._sActiveTable === "gmcTab") {
+                            if (oData.length === 0) {
+                                this.getView().getModel("attributes").setProperty("/results", []);
+                            }
+                            else {
+                                var sTmpGMC = oData[0].TMPGMC;
+                                this.getView().getModel("attributes").setProperty("/results", this._oTmpAttrib[sTmpGMC]);
+                            }
                         }
                     }
                     else {
@@ -2530,6 +2513,8 @@ sap.ui.define([
 
             onCreateCusMat() {
                 this.byId("btnAddCusMat").setVisible(false);
+                this.byId("btnAddRowCusMat").setVisible(true);
+                this.byId("btnRemoveRowCusMat").setVisible(true);
                 this.byId("btnEditCusMat").setVisible(false);
                 this.byId("btnDeleteCusMat").setVisible(false);
                 this.byId("btnSaveCusMat").setVisible(true);
@@ -2665,6 +2650,7 @@ sap.ui.define([
                                             templateShareable: false
                                         },
                                         suggest: this.onInputSuggest.bind(this),
+                                        suggestionItemSelected: this.onInputSuggestionItemSelected.bind(this),
                                         change: this.onValueHelpLiveInputChange.bind(this)
                                     })
 
@@ -2761,6 +2747,7 @@ sap.ui.define([
                         })
                 })
 
+                oNewRow["GMC"] = this.getView().getModel("ui").getData().activeGmc;
                 oNewRow["New"] = true;
                 aNewRow.push(oNewRow);
                 this.getView().getModel("cusmat").setProperty("/results", aNewRow);
@@ -2768,6 +2755,17 @@ sap.ui.define([
                 this.getView().getModel("ui").setProperty("/updTable", "cusmat");
 
                 oTable.focus();
+                this._setFocusInput = false;
+
+                setTimeout(() => {
+                    this.byId(this._sActiveTable).getRows()[aNewRow.length - 1].getCells().forEach(cell => {
+                        if (cell.getBindingInfo("value") !== undefined && !this._setFocusInput) {
+                            this._setFocusInput = true;
+                            cell.focus();
+                        }
+                    })
+                }, 1);
+
                 if (sap.ushell.Container !== undefined) { sap.ushell.Container.setDirtyFlag(true); }
             },
 
@@ -3345,6 +3343,7 @@ sap.ui.define([
                                             showSuggestion: true,
                                             maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].maxSuggestionWidth !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
                                             suggest: this.onInputSuggest.bind(this),
+                                            suggestionItemSelected: this.onInputSuggestionItemSelected.bind(this),
                                             change: this.onValueHelpLiveInputChange.bind(this),
                                             enabled: {
                                                 path: arg + ">WMAT",
@@ -3364,7 +3363,6 @@ sap.ui.define([
                                             showValueHelp: true,
                                             valueHelpRequest: TableValueHelp.handleTableValueHelp.bind(this),
                                             showSuggestion: true,
-                                            // suggest: this.onInputSuggest.bind(this),
                                             maxSuggestionWidth: ci.ValueHelp["SuggestionItems"].maxSuggestionWidth !== undefined ? ci.ValueHelp["SuggestionItems"].maxSuggestionWidth : "1px",
                                             suggestionColumns: oColumns,
                                             suggestionRows: {
@@ -3376,6 +3374,7 @@ sap.ui.define([
                                                 templateShareable: false
                                             },
                                             suggest: this.onInputSuggest.bind(this),
+                                            suggestionItemSelected: this.onInputSuggestionItemSelected.bind(this),
                                             change: this.onValueHelpLiveInputChange.bind(this),
                                             enabled: {
                                                 path: arg + ">WMAT",
@@ -3753,6 +3752,8 @@ sap.ui.define([
                 }
                 else {
                     this.byId("btnAddCusMat").setVisible(true);
+                    this.byId("btnAddRowCusMat").setVisible(false);
+                    this.byId("btnRemoveRowCusMat").setVisible(false);
                     this.byId("btnEditCusMat").setVisible(true);
                     this.byId("btnDeleteCusMat").setVisible(true);
                     this.byId("btnSaveCusMat").setVisible(false);
@@ -4314,6 +4315,8 @@ sap.ui.define([
                     }
                     else if (arg1 === "cusmat") {
                         this.byId("btnAddCusMat").setVisible(true);
+                        this.byId("btnAddRowCusMat").setVisible(false);
+                        this.byId("btnRemoveRowCusMat").setVisible(false);
                         this.byId("btnEditCusMat").setVisible(true);
                         this.byId("btnDeleteCusMat").setVisible(true);
                         this.byId("btnSaveCusMat").setVisible(false);
@@ -5428,7 +5431,7 @@ sap.ui.define([
                     for (let i = 0; i < vColCount; i++) {
                         // check for a match
                         if (d[aCols[i]] != null) {
-                            if (d[aCols[i]].toString().toLowerCase().indexOf(sValue) !== -1 || !sValue) {
+                            if (d[aCols[i]].toString().toLowerCase() === sValue) {
                                 // found match, return true to add to result set
                                 return true;
                             }
@@ -5480,7 +5483,6 @@ sap.ui.define([
                 var sRowPath = oSource.oParent.getBindingContext(sModel).sPath;
                 var aSuggestData = [];
                 var oSelectedItem = {};
-                console.log(oSource)
 
                 if (oSource.getSelectedKey() !== "") {
                     if (oSource.getBindingInfo("value").parts[0].path === 'ATTRIBCD') { 
@@ -5839,6 +5841,10 @@ sap.ui.define([
                 this.newMattyp = mattyp;
                 var bProceed = true;
                 var iRowCount = 0;
+
+                if (this.getView().getModel("attribute") !== undefined) {
+                    _data = this.getView().getModel("attribute").getData();
+                }
                 
                 if (mattyp === "") {
                     this.getView().getModel("attributes").setProperty("/results", []);
@@ -6181,7 +6187,7 @@ sap.ui.define([
                 if (oData.length > 0) {
                     // console.log("bind suggestion table")
                     oData.sort((a,b) => (a.Attribcd > b.Attribcd ? 1 : -1));
-
+                    
                     var oCells = [];
                     var oInput = input;
 
@@ -6235,9 +6241,12 @@ sap.ui.define([
                             length: 10000,
                             templateShareable: false
                         }); 
-                        oInput.setShowSuggestion(false);
 
+                        oInput.setShowSuggestion(false);
                         oInput.setSuggestionRowValidator(me.suggestionRowValidator);
+
+                        var vh = me.getView().getModel("attribute").getData()[oRow.MATTYPCLS];
+                        me.getView().setModel(new JSONModel(vh), "attrib");
 
                         setTimeout(() => {
                             oInput.setShowSuggestion(true);
@@ -6569,12 +6578,17 @@ sap.ui.define([
                         }
                     }                   
                 }
+                else if (oEvent.key === "Enter" && oEvent.srcControl.sParentAggregationName === "cells" && this._sActiveTable !== "attributesTab") {
+                    if (_dataMode === "NEW") { this.onAddRow(); }
+                }
             },
 
             onInputKeyDown(oEvent) {
                 if (oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") {
                     //prevent increase/decrease of number value
                     oEvent.preventDefault();
+                    console.log(this._inputSuggest)
+                    if (this._inputSuggest) { return }
 
                     var sTableId = oEvent.srcControl.oParent.oParent.sId;
                     var oTable = this.byId(sTableId);
@@ -6830,6 +6844,8 @@ sap.ui.define([
                 }  
                 else if (this._cancelCusMat) {
                     this.byId("btnAddCusMat").setVisible(true);
+                    this.byId("btnAddRowCusMat").setVisible(false);
+                    this.byId("btnRemoveRowCusMat").setVisible(false);
                     this.byId("btnEditCusMat").setVisible(true);
                     this.byId("btnDeleteCusMat").setVisible(true);
                     this.byId("btnSaveCusMat").setVisible(false);
@@ -7305,6 +7321,8 @@ sap.ui.define([
                 var aFilters = [];
                 var oFilter = null;
                 
+                this._inputSuggest = true;                
+
                 if (oInputSource.getSuggestionRows().length === 0){
                     oInputSource.getBinding("suggestionRows").filter(null);
                 }
@@ -7320,6 +7338,10 @@ sap.ui.define([
                     oInputSource.setShowSuggestion(true);
                     oInputSource.setFilterSuggests(false);
                 }
+            },
+
+            onInputSuggestionItemSelected: function(oEvent) {
+                this._inputSuggest = false;
             },
 
             //******************************************* */
