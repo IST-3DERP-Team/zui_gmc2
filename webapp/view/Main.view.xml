@@ -350,7 +350,7 @@
                                                                 <core:CustomData key="Fullscreen" value="1" />
                                                                 <core:CustomData key="Part" value="detail" />
                                                                 <core:CustomData key="HeaderSize" value="0%" />
-                                                                <core:CustomData key="DetailSize" value="100%" />
+                                                                <core:CustomData key="DetailSize" value="102%" />
                                                             </customData>
                                                         </Button>
                                                         <Button id="btnExitFullScreenAttr" 
@@ -450,7 +450,7 @@
                                                                 <core:CustomData key="Fullscreen" value="1" />
                                                                 <core:CustomData key="Part" value="detail" />
                                                                 <core:CustomData key="HeaderSize" value="0%" />
-                                                                <core:CustomData key="DetailSize" value="100%" />
+                                                                <core:CustomData key="DetailSize" value="102%" />
                                                             </customData>
                                                         </Button>
                                                         <Button id="btnExitFullScreenMatl" 
@@ -522,6 +522,14 @@
                                                             press="onCreateCusMat" 
                                                             tooltip="{ddtext>/ADD}"
                                                             visible="true"/>
+                                                        <Button id="btnAddRowCusMat" 
+                                                            icon="sap-icon://add"
+                                                            press="onAddRow"
+                                                            visible="false" />
+                                                        <Button id="btnRemoveRowCusMat" 
+                                                            icon="sap-icon://less"
+                                                            press="onRemoveRow"
+                                                            visible="false" />
                                                         <Button id="btnEditCusMat" 
                                                             icon="sap-icon://edit"
                                                             press="onEditCusMat"
@@ -557,7 +565,7 @@
                                                                 <core:CustomData key="Fullscreen" value="1" />
                                                                 <core:CustomData key="Part" value="detail" />
                                                                 <core:CustomData key="HeaderSize" value="0%" />
-                                                                <core:CustomData key="DetailSize" value="100%" />
+                                                                <core:CustomData key="DetailSize" value="102%" />
                                                             </customData>
                                                         </Button>
                                                         <Button id="btnExitFullScreenCusMat" 
