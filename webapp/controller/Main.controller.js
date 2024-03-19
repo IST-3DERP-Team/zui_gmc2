@@ -2392,7 +2392,7 @@ sap.ui.define([
 
             onAddRow: function(oEvent) {
                 var bProceed = true;
-
+                console.log(this.getView().getModel(this._sActiveTable.replace("Tab", "")).getData().results);
                 this._aColumns[this._sActiveTable.replace("Tab", "")].filter(fItem => fItem.required).forEach(item => {
                     this.getView().getModel(this._sActiveTable.replace("Tab", "")).getData().results.forEach(r => {
                         if (r[item.name] === "") {
@@ -2403,6 +2403,17 @@ sap.ui.define([
 
                 if (!bProceed) {
                     MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_INPUT_REQD_FIELDS"]);
+                    return;
+                }
+
+                if (this._sActiveTable === "gmcTab") {
+                    if (this.getView().getModel("attributes").getData().results.filter(fItem => fItem.ATTRIBCD !== "").length === 0) {
+                        bProceed = false;
+                    }
+                }
+
+                if (!bProceed) {
+                    MessageBox.information(this.getView().getModel("ddtext").getData()["INFO_GMC_DESC_REQD"]);
                     return;
                 }
 
@@ -5934,6 +5945,9 @@ sap.ui.define([
                             oNewRow["MATTYPCLS"] = item.MATTYPCLS;
                             oNewRow["INCLINDESC"] = item.INCLINDESC;
                             oNewRow["TMPGMC"] = tmpgmc;
+                            oNewRow["ATTRIBCD"] = "";
+                            oNewRow["DESCEN"] = "";
+                            oNewRow["DESCZH"] = "";
                             oNewRow["New"] = true;
                             aNewRow.push(oNewRow);
 
@@ -6647,7 +6661,7 @@ sap.ui.define([
                 if (oEvent.key === "ArrowUp" || oEvent.key === "ArrowDown") {
                     //prevent increase/decrease of number value
                     oEvent.preventDefault();
-                    console.log(this._inputSuggest)
+
                     if (this._inputSuggest) { return }
 
                     var sTableId = oEvent.srcControl.oParent.oParent.sId;
@@ -7567,8 +7581,6 @@ sap.ui.define([
                         "$filter": "MATTYP eq '" + sMatType + "'"
                     },
                     success: function (data, response) {
-                        console.log("MatClassSet", data);
-
                         var sRowPathAttrib = me._inputSource.oParent.getBindingContext("attributes").sPath;
                         var oDataAttrib = me.getView().getModel("attributes").getProperty(sRowPathAttrib);
                         var bSelected = false;
@@ -7646,8 +7658,6 @@ sap.ui.define([
                         "$filter": "MATTYP eq '" + sMatType + "' and MATTYPCLS eq '" + sMatClass + "'"
                     },
                     success: function (data, response) {
-                        console.log("MatAttribSet", data)
-
                         data.results.forEach((item, idx) => {
                             if (item.CREATEDDT !== null) item.CREATEDDT = dateFormat.format(item.CREATEDDT);
                             if (item.UPDATEDDT !== null) item.UPDATEDDT = dateFormat.format(item.UPDATEDDT);
