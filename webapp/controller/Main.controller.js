@@ -7531,7 +7531,7 @@ sap.ui.define([
                 else {
                     var me = this;
                     var oModel = this.getOwnerComponent().getModel();
-                    me.showLoadingDialog();
+                    me.showLoadingDialog('Processing...');
                     oModel.read('/MatTypeAttribSet', {
                         async: false,
                         success: function (oData) {
@@ -7563,14 +7563,16 @@ sap.ui.define([
                             me._inputSource.fireChangeEvent();
                             me.closeLoadingDialog();
                         },
-                        error: function (err) { }
+                        error: function (err) { 
+                            me.closeLoadingDialog();
+                        }
                     })
                 }
             },
 
             getMatClass(pInitLoad) {
                 var me = this;
-                me.showLoadingDialog();
+                me.showLoadingDialog("Loading...");
 
                 var oModel = this.getOwnerComponent().getModel();
                 // this.getView().getModel("ui").setProperty("/activeTmpMattyp", "ZFAB"); // temporary
@@ -7758,6 +7760,8 @@ sap.ui.define([
 
             onSaveMatAttrib() {
                 var me = this;
+                me.showLoadingDialog('Processing...');
+
                 var aNewRows = me.getView().getModel("matAttrib").getData().results.filter(item => item.NEW === true);
                 var aEditedRows = me.getView().getModel("matAttrib").getData().results.filter(item => item.Edited === true);
 
@@ -7834,7 +7838,7 @@ sap.ui.define([
                         };
 
                         console.log("onsave", param);
-                        setTimeout(() => {
+                        // setTimeout(() => {
                             oModel.create("/MatAttribSet", param, {
                                 method: "POST",
                                 success: function(data, oResponse) {
@@ -7854,9 +7858,11 @@ sap.ui.define([
                                         // sap.ui.getCore().byId("btnDeleteMatAttrib").setVisible(true);
                                         // sap.ui.getCore().byId("btnRefreshMatAttrib").setVisible(true);
                                     }
+                                    else {
+                                        me.closeLoadingDialog();
+                                    }
 
                                     me._aInvalidValueState = [];
-                                    me.closeLoadingDialog();
                                 },
                                 error: function(err) {
                                     console.log("error", err)
@@ -7874,7 +7880,7 @@ sap.ui.define([
                                     me.closeLoadingDialog();
                                 }
                             });
-                        }, 500)
+                        // }, 500)
                     })
                 }
                 else if (aEditedRows.length > 0) {
@@ -7893,7 +7899,7 @@ sap.ui.define([
  
                         console.log('onsave', entitySet, param)
                         
-                        setTimeout(() => {
+                        // setTimeout(() => {
                             oModel.update(entitySet, param, {
                                 method: "PUT",
                                 success: function(data, oResponse) {
@@ -7930,7 +7936,7 @@ sap.ui.define([
                                     me.closeLoadingDialog();
                                 }
                             });
-                        }, 500)
+                        // }, 500)
                     });
                 }
                 else {
